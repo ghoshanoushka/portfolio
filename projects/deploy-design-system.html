@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deploy Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0..100,0..1;1,9..144,400,0..100,0..1&family=Roboto+Mono:wght@400&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+</head>
+<body data-root="../" data-page="project" data-title="Deploy">
+  <div class="shell">
+    <div class="page-margin" style="flex:1;display:flex;flex-direction:column">
+      <div class="grid-12" style="flex:1">
+        <main class="content">
+          <article class="case-study fade-in d1">
+            <div class="project-hero" style="background:linear-gradient(135deg, #050a1f, #2f6bff)"><iframe src="../media/deploy/hero.html" title="thehive.ai changes to deploy.com, then components from the Deploy design system appear" loading="lazy" tabindex="-1"></iframe></div>
+
+            <div class="project-measure">
+              <h1 class="project-title">Rebuilding Hive's design system for Deploy</h1>
+              <div class="project-meta">
+                <div><p class="project-meta-label">Collaborators</p><p class="project-meta-value">Design team</p><p class="project-meta-value">Frontend engineers</p></div>
+                <div><p class="project-meta-label">Timeline</p><p class="project-meta-value">Shipped October 2026</p></div>
+                <div><p class="project-meta-label">Scope</p><p class="project-meta-value">Design System</p><p class="project-meta-value">Visual Design</p><p class="project-meta-value">Landing Pages</p></div>
+              </div>
+            </div>
+
+            <div class="project-sections">
+
+              <section id="overview" data-toc="Overview" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Overview</p>
+                <div class="project-content-text"><h2>Hive is now Deploy.</h2></div>
+                <div class="project-content-text"><p>In October 2026, Hive rebranded as Deploy, an AI inference platform for developers and enterprises. The brand, platform and website changed at the same time.</p><p>I rebuilt the design system for the new brand and used it to design the new landing pages, working with frontend engineers through handoff.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <p class="panel-label">thehive.ai → deploy.com</p>
+                    <div class="panel-card compare-card">
+                      <div class="compare" style="--pos: 50%">
+                        <img src="../media/deploy/deploy-home.jpg" alt="deploy.com homepage after the rebrand">
+                        <img class="compare-before" src="../media/deploy/hive-home.jpg" alt="thehive.ai homepage before the rebrand">
+                        <div class="compare-handle" aria-hidden="true"></div>
+                        <input type="range" min="0" max="100" value="50" aria-label="Drag to compare the Hive and Deploy homepages">
+                        <button type="button" class="compare-tag compare-tag-before" data-pos="100">Before</button>
+                        <button type="button" class="compare-tag compare-tag-after" data-pos="0">After</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="problem" data-toc="The problem" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">The problem</p>
+                <div class="project-content-text"><h2>Hive's system didn't fit Deploy</h2></div>
+                <div class="project-content-text"><p>It was built for trust and safety dashboards. Deploy needed a system for a developer platform, a new website and a model catalog.</p></div>
+
+                <div id="audit" data-toc="Auditing Hive" class="project-subsection project-content-text">
+                  <p class="project-subsection-label">Auditing Hive</p>
+                  <h2>What we started with</h2>
+                </div>
+                <div class="project-content-text"><p>Hive had primitive and semantic tokens, but only for a light theme. There was no dark mode.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#ECF2FF">
+                    <p class="panel-label">Hive design system</p>
+                    <div class="panel-card hs" role="img" aria-label="Hive's type, color, buttons, form fields and badges on one sheet">
+                      <div class="hs-board">
+                        <div class="hs-card hs-type">
+                          <p class="hs-label">Typeface</p>
+                          <div class="hs-face"><span class="hs-aa">Aa</span><div><p class="hs-name">Roboto</p><p class="hs-meta">Regular, Medium, SemiBold</p></div></div>
+                          <div class="hs-scale">
+                            <p style="font-size:1.5em;line-height:1.333">Head 4<small>24 / 32</small></p>
+                            <p style="font-size:1.125em;line-height:1.556">Head 6<small>18 / 28</small></p>
+                            <p style="font-size:0.875em;line-height:1.43">Body<small>14 / 20</small></p>
+                            <p style="font-size:0.75em;line-height:1.333">Caption<small>12 / 16</small></p>
+                          </div>
+                        </div>
+                        <div class="hs-card hs-color">
+                          <p class="hs-label">Colour</p>
+                          <div class="hs-swatches"><div><span class="hs-chip" style="background:#206CFD"></span><code>blue-500</code><small>#206CFD</small></div><div><span class="hs-chip" style="background:#1853DF"></span><code>blue-400</code><small>#1853DF</small></div><div><span class="hs-chip" style="background:#3BC27C"></span><code>green-500</code><small>#3BC27C</small></div><div><span class="hs-chip" style="background:#D10A1E"></span><code>red-500</code><small>#D10A1E</small></div><div><span class="hs-chip" style="background:#9699F5"></span><code>purple-500</code><small>#9699F5</small></div><div><span class="hs-chip" style="background:#9923EC"></span><code>magenta-700</code><small>#9923EC</small></div><div><span class="hs-chip" style="background:#333D47"></span><code>grey-800</code><small>#333D47</small></div><div><span class="hs-chip" style="background:#EDEDEF"></span><code>grey-175</code><small>#EDEDEF</small></div></div>
+                        </div>
+                        <div class="hs-card hs-buttons">
+                          <p class="hs-label">Buttons</p>
+                          <p class="hs-sub">Styles</p>
+                          <div class="hs-row"><span class="hs-btn">Filled</span><span class="hs-btn hs-outlined">Outlined</span><span class="hs-btn hs-ghost">Ghost</span></div>
+                          <p class="hs-sub">States</p>
+                          <div class="hs-row"><span class="hs-btn">Default</span><span class="hs-btn hs-hover">Hover</span><span class="hs-btn hs-disabled">Disabled</span></div>
+                          <p class="hs-sub">Sizes</p>
+                          <div class="hs-row hs-sizes"><span class="hs-btn" style="height:2em;font-size:0.875em">Xs</span><span class="hs-btn" style="height:2.625em">Md</span><span class="hs-btn" style="height:3em">Xl</span></div>
+                        </div>
+                        <div class="hs-card hs-forms">
+                          <p class="hs-label">Forms</p>
+                          <p class="hs-field-label">Sample text</p>
+                          <span class="hs-input">Enter text here</span>
+                          <span class="hs-input hs-focused">Focused field</span>
+                          <span class="hs-input hs-filled">Filled field</span>
+                          <span class="hs-input hs-error">Enter text here</span>
+                          <p class="hs-error-text">Error</p>
+                        </div>
+                        <div class="hs-card hs-status">
+                          <p class="hs-label">Badges</p>
+                          <div class="hs-badges">
+                            <span class="hs-badge" style="background:#3BC27C;color:#fff">Playground available</span>
+                            <span class="hs-badge" style="background:#1853DF;color:#fff">Featured</span>
+                            <span class="hs-badge" style="background:#3D4852;color:#fff">LLM</span>
+                            <span class="hs-badge" style="background:#3D4852;color:#fff">Multimodal LLM</span>
+                            <span class="hs-badge" style="background:#EDEDEF;color:#424245">Enterprise</span>
+                          </div>
+                          <p class="hs-label" style="margin-top:1em">Chips</p>
+                          <div class="hs-badges">
+                            <span class="hs-badge hs-outline" style="color:#D10A1E">Flagged</span>
+                            <span class="hs-badge hs-outline" style="color:#FAAA4C">Review</span>
+                            <span class="hs-badge hs-outline" style="color:#206CFD">Pattern</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="exploration" data-toc="Exploration" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Exploration</p>
+                <div class="project-content-text"><h2>Exploring color and type</h2></div>
+                <div class="project-content-text"><p>We tested a palette and a type scale before settling on the final system.</p></div>
+                <div class="project-content-media">
+                  <div class="explore-row">
+                    <div class="panel explore-panel">
+                      <div class="cx-label-row">
+                        <p class="panel-label">Palette</p>
+                        <div class="cx-tabs" role="tablist" aria-label="Palette"><button type="button" role="tab" aria-selected="true" aria-controls="cx-explored">Explored</button><button type="button" role="tab" aria-selected="false" aria-controls="cx-final" tabindex="-1">Final</button></div>
+                      </div>
+                      <div class="panel-card cx">
+                        <div class="cx-board" id="cx-explored" role="tabpanel" aria-label="The explored palette of navy, blue, green and volt in a form and progress bars, with contrast checks showing volt and green fail on white">
+                          <div class="cx-swatches"><div class="cx-swatch" style="background:#F5F5F5;color:#111E69"><span>Background</span><code>#F5F5F5</code></div><div class="cx-swatch" style="background:#111E69;color:#fff"><span>Foreground</span><code>#111E69</code></div><div class="cx-swatch" style="background:#0047C2;color:#fff"><span>Primary</span><code>#0047C2</code></div><div class="cx-swatch" style="background:#00B877;color:#fff"><span>Secondary</span><code>#00B877</code></div><div class="cx-swatch" style="background:#D3E151;color:#111E69"><span>Accent</span><code>#D3E151</code></div></div>
+                          <div class="cx-ui">
+                            <div class="cx-card">
+                              <p class="cx-title">Create project <span class="cx-badge">New</span></p>
+                              <span class="cx-input">My Project</span>
+                              <div class="cx-actions"><span class="cx-btn cx-secondary">Preview</span><span class="cx-btn">Deploy</span></div>
+                            </div>
+                            <div class="cx-card">
+                              <p class="cx-title">Goals</p>
+                              <div class="cx-bar"><span>Design System</span><i><b style="width:85%;background:#0047C2"></b></i></div>
+                              <div class="cx-bar"><span>Mobile App</span><i><b style="width:52%;background:#00B877"></b></i></div>
+                              <div class="cx-bar"><span>Marketing Site</span><i><b style="width:28%;background:#D3E151"></b></i></div>
+                            </div>
+                          </div>
+                          <div class="cx-checks">
+                            <p class="cx-check-head"><span>Contrast</span><span>Ratio</span><span>WCAG AA</span></p>
+                            <p class="cx-check"><span><i style="background:#D3E151"></i>Accent on white</span><span>1.4:1</span><b class="cx-fail">Fail</b></p>
+                            <p class="cx-check"><span><i style="background:#00B877"></i>Secondary on white</span><span>2.6:1</span><b class="cx-fail">Fail</b></p>
+                            <p class="cx-check"><span><i style="background:#0047C2"></i>White on primary</span><span>7.8:1</span><b class="cx-pass">Pass</b></p>
+                          </div>
+                        </div>
+                        <div class="cx-board" id="cx-final" data-set="final" role="tabpanel" aria-label="The final palette of near-black, blue and light blue tints in the same form and progress bars, with contrast checks that pass AA" hidden>
+                          <div class="cx-swatches"><div class="cx-swatch" style="background:#FFFFFF;color:#0D111B"><span>Background</span><code>#FFFFFF</code></div><div class="cx-swatch" style="background:#0D111B;color:#fff"><span>Foreground</span><code>#0D111B</code></div><div class="cx-swatch" style="background:#206CFD;color:#fff"><span>Primary</span><code>#206CFD</code></div><div class="cx-swatch" style="background:#F4F7FE;color:#0D111B"><span>Secondary</span><code>#F4F7FE</code></div><div class="cx-swatch" style="background:#E6EEFF;color:#0D111B"><span>Accent</span><code>#E6EEFF</code></div></div>
+                          <div class="cx-ui">
+                            <div class="cx-card">
+                              <p class="cx-title">Create project <span class="cx-badge">New</span></p>
+                              <span class="cx-input">My Project</span>
+                              <div class="cx-actions"><span class="cx-btn cx-secondary">Preview</span><span class="cx-btn">Deploy</span></div>
+                            </div>
+                            <div class="cx-card">
+                              <p class="cx-title">Goals</p>
+                              <div class="cx-bar"><span>Design System</span><i><b style="width:85%"></b></i></div>
+                              <div class="cx-bar"><span>Mobile App</span><i><b style="width:52%"></b></i></div>
+                              <div class="cx-bar"><span>Marketing Site</span><i><b style="width:28%"></b></i></div>
+                            </div>
+                          </div>
+                          <div class="cx-checks">
+                            <p class="cx-check-head"><span>Contrast</span><span>Ratio</span><span>WCAG AA</span></p>
+                            <p class="cx-check"><span><i style="background:#0D111B"></i>Foreground on secondary</span><span>17.6:1</span><b class="cx-pass">Pass</b></p>
+                            <p class="cx-check"><span><i style="background:#64748B"></i>Muted text on white</span><span>4.8:1</span><b class="cx-pass">Pass</b></p>
+                            <p class="cx-check"><span><i style="background:#206CFD"></i>White on primary</span><span>4.5:1</span><b class="cx-pass">Pass</b></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="explore-caption">
+                      <p>Dropping the volt green</p>
+                      <p>The volt green failed contrast on white and worked more as an accent than a secondary, so we kept blue as the primary.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-media">
+                  <div class="explore-row">
+                    <div class="panel explore-panel">
+                      <p class="panel-label">Type scale</p>
+                      <div class="panel-card tx" role="img" aria-label="Two Inter type scales side by side, each shown in the same model card: one from the product, one from the marketing site">
+                        <div class="tx-board">
+                          <div class="tx-col">
+                            <p class="tx-head">Product scale</p>
+                            <div class="tx-specimens tx-p"><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:1.125em;font-weight:500">Aa</span></span><p><code>text-lg</code><small>Medium 18/24</small></p></div><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:0.875em;font-weight:500">Aa</span></span><p><code>text-sm</code><small>Medium 14/20</small></p></div><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:0.75em;font-weight:400">Aa</span></span><p><code>text-xs</code><small>Regular 12/16</small></p></div><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:0.625em;font-weight:400">Aa</span></span><p><code>text-xxs</code><small>Regular 10/12</small></p></div></div>
+                            <div class="tx-use tx-card-p">
+                              <span class="tx-badge-p">Badge</span>
+                              <p class="tx-name-p">Model name</p>
+                              <p class="tx-desc-p">Short model description.</p>
+                              <div class="tx-prices"><div><p class="tx-lab-p">INPUT</p><p class="tx-val">$0.00 / 1M</p></div><div><p class="tx-lab-p">OUTPUT</p><p class="tx-val">$0.00 / 1M</p></div></div>
+                              <p class="tx-link-p">Try now ›</p>
+                            </div>
+                          </div>
+                          <div class="tx-col">
+                            <p class="tx-head">Marketing scale</p>
+                            <div class="tx-specimens tx-m"><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:4.0em;font-weight:500;letter-spacing:-0.04em">Aa</span></span><p><code>H1</code><small>Medium 64/66, −4%</small></p></div><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:2.0em;font-weight:500;letter-spacing:-0.04em">Aa</span></span><p><code>H3</code><small>Medium 32/40, −4%</small></p></div><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:1.125em;font-weight:600;letter-spacing:-0.04em">Aa</span></span><p><code>H5</code><small>Semibold 18/24, −4%</small></p></div><div><span class="tx-aa-box"><span class="tx-aa" style="font-size:0.75em;font-weight:400">Aa</span></span><p><code>Caption</code><small>Regular 12/16</small></p></div></div>
+                            <div class="tx-use tx-card-m">
+                              <div class="tx-card-m-body">
+                                <span class="tx-badge-m">Badge</span>
+                                <p class="tx-name-m">Model name</p>
+                                <p class="tx-desc-m">Short model description.</p>
+                                <div class="tx-prices"><div><p class="tx-lab-m">Input Tokens</p><p class="tx-val-m">$0.00 / 1M</p></div><div><p class="tx-lab-m">Output Tokens</p><p class="tx-val-m">$0.00 / 1M</p></div></div>
+                              </div>
+                              <div class="tx-card-m-foot"><span class="tx-tag-m">Tag</span><span class="tx-link-m">Try Now &gt;</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="explore-caption">
+                      <p>Kept from the first round</p>
+                      <p>Both scales worked from the start, so we kept them. The Portal needs small, dense sizes that map to the Tailwind classes engineers use. Landing pages need bigger headlines, so they use their own H1–H6 scale.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="solution" data-toc="The system" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">The system</p>
+                <div class="project-content-text"><h2>Foundations, components, themes</h2></div>
+                <div class="project-content-text"><p>Primitive tokens hold the raw values. Semantic tokens point to them, so components can switch themes.</p></div>
+
+                <div id="foundations" data-toc="Foundations" class="project-subsection project-content-text">
+                  <p class="project-subsection-label">Foundations</p>
+                  <h2>Primitive and semantic tokens</h2>
+                </div>
+                <div class="foundation-row">
+                  <div class="foundation-text project-content-text"><ol class="numbered" style="counter-reset: n 0"><li><p>Color palette</p><p>Six ramps, with blue as the primary.</p></li></ol></div>
+                  <div class="foundation-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <div class="panel-card fb pl" role="img" aria-label="Deploy's primitive color ramps: blue, grey, green, orange, red and purple, with each step's hex value">
+                      <div class="fb-board">
+                        <div class="pl-row"><p class="fb-label">Blue (Primary)</p><div class="pl-ramp" style="grid-template-columns:repeat(16,1fr)"><div class="pl-cell"><span style="background:#F4F7FE;color:#0F172A">50</span><code>F4F7FE</code></div><div class="pl-cell"><span style="background:#E6EEFF;color:#0F172A">100</span><code>E6EEFF</code></div><div class="pl-cell"><span style="background:#F8FAFD;color:#0F172A">150</span><code>F8FAFD</code></div><div class="pl-cell"><span style="background:#C7D9FF;color:#0F172A">200</span><code>C7D9FF</code></div><div class="pl-cell"><span style="background:#B4CCFF;color:#0F172A">250</span><code>B4CCFF</code></div><div class="pl-cell"><span style="background:#9FBCFF;color:#0F172A">300</span><code>9FBCFF</code></div><div class="pl-cell"><span style="background:#7DA6FF;color:#fff">350</span><code>7DA6FF</code></div><div class="pl-cell"><span style="background:#5C8FFF;color:#fff">400</span><code>5C8FFF</code></div><div class="pl-cell"><span style="background:#5169AC;color:#fff">450</span><code>5169AC</code></div><div class="pl-cell"><span style="background:#206CFD;color:#fff">500</span><code>206CFD</code></div><div class="pl-cell"><span style="background:#2457FF;color:#fff">600</span><code>2457FF</code></div><div class="pl-cell"><span style="background:#174BCC;color:#fff">700</span><code>174BCC</code></div><div class="pl-cell"><span style="background:#123AA3;color:#fff">800</span><code>123AA3</code></div><div class="pl-cell"><span style="background:#0D2A78;color:#fff">900</span><code>0D2A78</code></div><div class="pl-cell"><span style="background:#071D58;color:#fff">950</span><code>071D58</code></div><div class="pl-cell"><span style="background:#121C3A;color:#fff">975</span><code>121C3A</code></div></div></div>
+                        <div class="pl-row"><p class="fb-label">Grey</p><div class="pl-ramp" style="grid-template-columns:repeat(16,1fr)"><div class="pl-cell"><span style="background:#F1F5F9;color:#0F172A">100</span><code>F1F5F9</code></div><div class="pl-cell"><span style="background:#EDEDEF;color:#0F172A">150</span><code>EDEDEF</code></div><div class="pl-cell"><span style="background:#E2E8F0;color:#0F172A">200</span><code>E2E8F0</code></div><div class="pl-cell"><span style="background:#CBD5E1;color:#0F172A">300</span><code>CBD5E1</code></div><div class="pl-cell"><span style="background:#94A3B8;color:#fff">400</span><code>94A3B8</code></div><div class="pl-cell"><span style="background:#64748B;color:#fff">500</span><code>64748B</code></div><div class="pl-cell"><span style="background:#475569;color:#fff">600</span><code>475569</code></div><div class="pl-cell"><span style="background:#2B3644;color:#fff">650</span><code>2B3644</code></div><div class="pl-cell"><span style="background:#1F2937;color:#fff">700</span><code>1F2937</code></div><div class="pl-cell"><span style="background:#1E293B;color:#fff">750</span><code>1E293B</code></div><div class="pl-cell"><span style="background:#121723;color:#fff">800</span><code>121723</code></div><div class="pl-cell"><span style="background:#0D111B;color:#fff">900</span><code>0D111B</code></div><div class="pl-cell"><span style="background:#050811;color:#fff">950</span><code>050811</code></div></div></div>
+                        <div class="pl-row"><p class="fb-label">Green</p><div class="pl-ramp" style="grid-template-columns:repeat(16,1fr)"><div class="pl-cell"><span style="background:#F0FDF4;color:#0F172A">50</span><code>F0FDF4</code></div><div class="pl-cell"><span style="background:#DBF3E6;color:#0F172A">100</span><code>DBF3E6</code></div><div class="pl-cell"><span style="background:#BBF7D0;color:#0F172A">200</span><code>BBF7D0</code></div><div class="pl-cell"><span style="background:#86EFAC;color:#0F172A">300</span><code>86EFAC</code></div><div class="pl-cell"><span style="background:#4ADE80;color:#0F172A">400</span><code>4ADE80</code></div><div class="pl-cell"><span style="background:#22C55E;color:#0F172A">500</span><code>22C55E</code></div><div class="pl-cell"><span style="background:#0BA74F;color:#fff">600</span><code>0BA74F</code></div><div class="pl-cell"><span style="background:#15803D;color:#fff">700</span><code>15803D</code></div><div class="pl-cell"><span style="background:#166534;color:#fff">800</span><code>166534</code></div><div class="pl-cell"><span style="background:#14532D;color:#fff">900</span><code>14532D</code></div><div class="pl-cell"><span style="background:#062E16;color:#fff">950</span><code>062E16</code></div></div></div>
+                        <div class="pl-row"><p class="fb-label">Orange</p><div class="pl-ramp" style="grid-template-columns:repeat(16,1fr)"><div class="pl-cell"><span style="background:#FFFBEB;color:#0F172A">50</span><code>FFFBEB</code></div><div class="pl-cell"><span style="background:#FEF3C7;color:#0F172A">100</span><code>FEF3C7</code></div><div class="pl-cell"><span style="background:#FDE68A;color:#0F172A">200</span><code>FDE68A</code></div><div class="pl-cell"><span style="background:#FCD34D;color:#0F172A">300</span><code>FCD34D</code></div><div class="pl-cell"><span style="background:#FBBF24;color:#0F172A">400</span><code>FBBF24</code></div><div class="pl-cell"><span style="background:#F59E0B;color:#0F172A">500</span><code>F59E0B</code></div><div class="pl-cell"><span style="background:#D97706;color:#fff">600</span><code>D97706</code></div><div class="pl-cell"><span style="background:#B45309;color:#fff">700</span><code>B45309</code></div><div class="pl-cell"><span style="background:#78350F;color:#fff">800</span><code>78350F</code></div><div class="pl-cell"><span style="background:#7C2D12;color:#fff">900</span><code>7C2D12</code></div><div class="pl-cell"><span style="background:#501602;color:#fff">950</span><code>501602</code></div></div></div>
+                        <div class="pl-row"><p class="fb-label">Red</p><div class="pl-ramp" style="grid-template-columns:repeat(16,1fr)"><div class="pl-cell"><span style="background:#FEF2F2;color:#0F172A">50</span><code>FEF2F2</code></div><div class="pl-cell"><span style="background:#FEE2E2;color:#0F172A">100</span><code>FEE2E2</code></div><div class="pl-cell"><span style="background:#FECACA;color:#0F172A">200</span><code>FECACA</code></div><div class="pl-cell"><span style="background:#FCA5A5;color:#0F172A">300</span><code>FCA5A5</code></div><div class="pl-cell"><span style="background:#F87171;color:#fff">400</span><code>F87171</code></div><div class="pl-cell"><span style="background:#EF4444;color:#fff">500</span><code>EF4444</code></div><div class="pl-cell"><span style="background:#D92323;color:#fff">600</span><code>D92323</code></div><div class="pl-cell"><span style="background:#B91C1C;color:#fff">700</span><code>B91C1C</code></div><div class="pl-cell"><span style="background:#991B1B;color:#fff">800</span><code>991B1B</code></div><div class="pl-cell"><span style="background:#7F1D1D;color:#fff">900</span><code>7F1D1D</code></div><div class="pl-cell"><span style="background:#490606;color:#fff">950</span><code>490606</code></div></div></div>
+                        <div class="pl-row"><p class="fb-label">Purple</p><div class="pl-ramp" style="grid-template-columns:repeat(16,1fr)"><div class="pl-cell"><span style="background:#F0DEFC;color:#0F172A">100</span><code>F0DEFC</code></div><div class="pl-cell"><span style="background:#9923EC;color:#fff">700</span><code>9923EC</code></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div class="foundation-row">
+                  <div class="foundation-text project-content-text"><ol class="numbered" style="counter-reset: n 1"><li><p>Semantic colors</p><p>One set of names with a light and a dark value.</p></li></ol></div>
+                  <div class="foundation-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <div class="panel-card sc" data-mode="light">
+                      <div class="sc-board">
+                        <div class="sc-top">
+                          <p class="sc-kicker">Same token names, two values</p>
+                        </div>
+                        <div class="sc-main">
+                          <div class="sc-ui" aria-hidden="true">
+                            <div class="sc-card">
+                              <p class="sc-title">Title</p>
+                              <p class="sc-desc">Description in muted text.</p>
+                              <span class="sc-input">Placeholder</span>
+                              <div class="sc-pills"><span class="sc-pill sc-ok">Success</span><span class="sc-pill sc-warn">Warning</span><span class="sc-pill sc-err">Error</span></div>
+                              <div class="sc-actions"><span class="sc-link">Link</span><span class="sc-btn sc-btn-2">Secondary</span><span class="sc-btn">Primary</span></div>
+                            </div>
+                          </div>
+                          <ul class="sc-tokens"><li><i style="background:var(--sc-bg)"></i><span>Backgrounds / Primary</span><code><b>#FFFFFF</b><b>#050811</b></code></li><li><i style="background:var(--sc-bg2)"></i><span>Backgrounds / Secondary</span><code><b>#FAFCFF</b><b>#151B2D</b></code></li><li><i style="background:var(--sc-border)"></i><span>Borders / Default</span><code><b>#CBD5E1</b><b>#475569</b></code></li><li><i style="background:var(--sc-text)"></i><span>Text / Primary</span><code><b>#0F172A</b><b>#FAFCFF</b></code></li><li><i style="background:var(--sc-muted)"></i><span>Text / Muted</span><code><b>#64748B</b><b>#94A3B8</b></code></li><li><i style="background:var(--sc-link)"></i><span>Text / Brand (Link)</span><code><b>#1D4ED8</b><b>#7DA6FF</b></code></li><li><i style="background:var(--sc-action)"></i><span>Actions / Primary</span><code><b>#206CFD</b><b>#206CFD</b></code></li><li><i style="background:var(--sc-ok-text)"></i><span>Status / Success text</span><code><b>#15803D</b><b>#86EFAC</b></code></li></ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div class="foundation-row">
+                  <div class="foundation-text project-content-text"><ol class="numbered" style="counter-reset: n 2"><li><p>Typography</p><p>Inter, from text-xxs to text-9xl.</p></li></ol></div>
+                  <div class="foundation-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <div class="panel-card fb ty" role="img" aria-label="The Inter type classes from text-9xl at 64px down to text-xxs at 10px, with line heights and weights">
+                      <div class="fb-board">
+                        <div class="ty-head"><p class="fb-label">Inter</p><p class="fb-note">Classes · size / line height · weights</p></div>
+                        <div class="ty-list"><div class="ty-row"><code>text-9xl</code><span class="ty-sample" style="font-size:4.0em;line-height:1.031;font-weight:500">The quick brown fox</span><small>64/66 · Medium</small></div><div class="ty-row"><code>text-8xl</code><span class="ty-sample" style="font-size:3.75em;line-height:1.000;font-weight:500">The quick brown fox</span><small>60/60 · Medium</small></div><div class="ty-row"><code>text-7xl</code><span class="ty-sample" style="font-size:3.25em;line-height:1.154;font-weight:500">The quick brown fox</span><small>52/60 · Medium</small></div><div class="ty-row"><code>text-6xl</code><span class="ty-sample" style="font-size:3.0em;line-height:1.125;font-weight:400">The quick brown fox</span><small>48/54 · Regular</small></div><div class="ty-row"><code>text-5xl</code><span class="ty-sample" style="font-size:2.25em;line-height:1.111;font-weight:500">The quick brown fox</span><small>36/40 · Medium</small></div><div class="ty-row"><code>text-4xl</code><span class="ty-sample" style="font-size:2.0em;line-height:1.250;font-weight:500">The quick brown fox</span><small>32/40 · Medium</small></div><div class="ty-row"><code>text-3xl</code><span class="ty-sample" style="font-size:1.875em;line-height:1.200;font-weight:500">The quick brown fox</span><small>30/36 · Medium</small></div><div class="ty-row"><code>text-2xl</code><span class="ty-sample" style="font-size:1.5em;line-height:1.167;font-weight:500">The quick brown fox</span><small>24/28 · Medium</small></div><div class="ty-row"><code>text-xl</code><span class="ty-sample" style="font-size:1.25em;line-height:1.400;font-weight:500">The quick brown fox</span><small>20/28 · Medium</small></div><div class="ty-row"><code>text-lg</code><span class="ty-sample" style="font-size:1.125em;line-height:1.333;font-weight:500">The quick brown fox</span><small>18/24 · Semibold, Medium, Regular</small></div><div class="ty-row"><code>text-base</code><span class="ty-sample" style="font-size:1.0em;line-height:1.625;font-weight:500">The quick brown fox</span><small>16/26 · Semibold, Medium, Regular</small></div><div class="ty-row"><code>text-sm</code><span class="ty-sample" style="font-size:0.875em;line-height:1.429;font-weight:500">The quick brown fox</span><small>14/20 · Semibold to Light</small></div><div class="ty-row"><code>text-xs</code><span class="ty-sample" style="font-size:0.75em;line-height:1.333;font-weight:500">The quick brown fox</span><small>12/16 · Semibold to Light</small></div><div class="ty-row"><code>text-xxs</code><span class="ty-sample" style="font-size:0.625em;line-height:1.200;font-weight:400">The quick brown fox</span><small>10/12 · Medium to Light</small></div></div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div class="foundation-row">
+                  <div class="foundation-text project-content-text"><ol class="numbered" style="counter-reset: n 3"><li><p>Spacing, radius and scale</p><p>A 4px spacing base and an 8px radius base.</p></li></ol></div>
+                  <div class="foundation-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <div class="panel-card fb sp" role="img" aria-label="Spacing tokens from 0 to 96px on a 4px base, radius tokens from 4px to full, and the size scale from 0 to 64px">
+                      <div class="fb-board">
+                        <div class="sp-col"><p class="fb-label">Spacing</p><p class="fb-note">Base 4px</p><div class="sp-list"><div class="sp-row"><code>spacing-0</code><i style="width:0.0em"></i><small>0</small></div><div class="sp-row"><code>spacing-0.5</code><i style="width:0.125em"></i><small>2</small></div><div class="sp-row"><code>spacing-1</code><i style="width:0.25em"></i><small>4</small></div><div class="sp-row"><code>spacing-1.5</code><i style="width:0.375em"></i><small>6</small></div><div class="sp-row"><code>spacing-2</code><i style="width:0.5em"></i><small>8</small></div><div class="sp-row"><code>spacing-2.5</code><i style="width:0.625em"></i><small>10</small></div><div class="sp-row"><code>spacing-3</code><i style="width:0.75em"></i><small>12</small></div><div class="sp-row"><code>spacing-4</code><i style="width:1.0em"></i><small>16</small></div><div class="sp-row"><code>spacing-5</code><i style="width:1.25em"></i><small>20</small></div><div class="sp-row"><code>spacing-6</code><i style="width:1.5em"></i><small>24</small></div><div class="sp-row"><code>spacing-8</code><i style="width:2.0em"></i><small>32</small></div><div class="sp-row"><code>spacing-10</code><i style="width:2.5em"></i><small>40</small></div><div class="sp-row"><code>spacing-12</code><i style="width:3.0em"></i><small>48</small></div><div class="sp-row"><code>spacing-16</code><i style="width:4.0em"></i><small>64</small></div><div class="sp-row"><code>spacing-20</code><i style="width:5.0em"></i><small>80</small></div><div class="sp-row"><code>spacing-24</code><i style="width:6.0em"></i><small>96</small></div></div></div>
+                        <div class="sp-col"><p class="fb-label">Radius</p><p class="fb-note">Base 8px</p><div class="rd-grid"><div class="rd-item"><i style="border-radius:0.25em"></i><small>4px</small></div><div class="rd-item"><i style="border-radius:0.375em"></i><small>6px</small></div><div class="rd-item"><i style="border-radius:0.5em"></i><small>8px</small></div><div class="rd-item"><i style="border-radius:0.625em"></i><small>10px</small></div><div class="rd-item"><i style="border-radius:0.875em"></i><small>14px</small></div><div class="rd-item"><i style="border-radius:1.0em"></i><small>16px</small></div><div class="rd-item"><i style="border-radius:1.25em"></i><small>20px</small></div><div class="rd-item"><i style="border-radius:1.5em"></i><small>24px</small></div><div class="rd-item"><i style="border-radius:62.4375em"></i><small>Full</small></div></div></div>
+                        <div class="sp-col"><p class="fb-label">Scale</p><p class="fb-note">Shared sizes, px</p><div class="ss-list"><div class="ss-row"><code>#0</code><small>0</small></div><div class="ss-row"><code>#25</code><small>1</small></div><div class="ss-row"><code>#50</code><small>2</small></div><div class="ss-row"><code>#100</code><small>4</small></div><div class="ss-row"><code>#150</code><small>8</small></div><div class="ss-row"><code>#200</code><small>10</small></div><div class="ss-row"><code>#250</code><small>12</small></div><div class="ss-row"><code>#300</code><small>16</small></div><div class="ss-row"><code>#350</code><small>20</small></div><div class="ss-row"><code>#400</code><small>24</small></div><div class="ss-row"><code>#450</code><small>28</small></div><div class="ss-row"><code>#500</code><small>32</small></div><div class="ss-row"><code>#550</code><small>36</small></div><div class="ss-row"><code>#600</code><small>40</small></div><div class="ss-row"><code>#650</code><small>44</small></div><div class="ss-row"><code>#700</code><small>48</small></div><div class="ss-row"><code>#750</code><small>56</small></div><div class="ss-row"><code>#800</code><small>64</small></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div class="foundation-row">
+                  <div class="foundation-text project-content-text"><ol class="numbered" style="counter-reset: n 4"><li><p>Effects</p><p>Elevation, focus rings, inner shadows and a glow.</p></li></ol></div>
+                  <div class="foundation-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <div class="panel-card fb fx" role="img" aria-label="Elevation shadows from focus rings to shadow-grey-2xl and a blue glow, plus light and dark inner shadows">
+                      <div class="fb-board">
+                        <p class="fb-label">Elevation</p>
+                        <div class="fx-grid"><div class="fx-item"><i style="--fx:0 0 3px 1px #9FBCFF"></i><code>focus-ring</code></div><div class="fx-item"><i style="--fx:0 0 3px 1px #FCA5A5"></i><code>focus-ring-error</code></div><div class="fx-item"><i style="--fx:0 1px 2px 0 rgba(81,105,172,.10)"></i><code>shadow-grey-xs</code></div><div class="fx-item"><i style="--fx:0 1px 6px 0 rgba(81,105,172,.10), 0 1px 3px 0 rgba(81,105,172,.10)"></i><code>shadow-grey-sm</code></div><div class="fx-item"><i style="--fx:0 0 8px -2px rgba(81,105,172,.10), 0 1px 8px -1px rgba(81,105,172,.10)"></i><code>shadow-grey-md</code></div><div class="fx-item"><i style="--fx:0 10px 15px -3px rgba(81,105,172,.10), 0 4px 6px -4px rgba(81,105,172,.10)"></i><code>shadow-grey-lg</code></div><div class="fx-item"><i style="--fx:0 20px 25px -5px rgba(81,105,172,.10), 0 8px 10px -6px rgba(81,105,172,.10)"></i><code>shadow-grey-xl</code></div><div class="fx-item"><i style="--fx:0 25px 50px -12px rgba(81,105,172,.25)"></i><code>shadow-grey-2xl</code></div><div class="fx-item"><i style="--fx:0 0 16px 0 rgba(32,108,253,.07)"></i><code>shadow-glow</code></div></div>
+                        <p class="fb-label">Inner shadows</p>
+                        <div class="fx-grid fx-inner"><div class="fx-item"><i style="--fx:inset 0 1px 2px 0 rgba(15,23,42,.08)"></i><code>inner-shadow-subtle-light</code></div><div class="fx-item"><i style="--fx:inset 0 2px 4px 0 rgba(15,23,42,.08)"></i><code>inner-shadow-pressed-light</code></div><div class="fx-item"><i style="--fx:inset 0 3px 6px 0 rgba(15,23,42,.10)"></i><code>inner-shadow-strong-light</code></div><div class="fx-item fx-dark"><i style="--fx:inset 0 1px 2px 0 rgba(0,0,0,.50)"></i><code>inner-shadow-subtle-dark</code></div><div class="fx-item fx-dark"><i style="--fx:inset 0 2px 4px 0 rgba(0,0,0,.65)"></i><code>inner-shadow-pressed-dark</code></div><div class="fx-item fx-dark"><i style="--fx:inset 0 3px 6px 0 rgba(0,0,0,.75)"></i><code>inner-shadow-strong-dark</code></div></div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div id="components" data-toc="Components" class="project-subsection project-content-text">
+                  <p class="project-subsection-label">Components</p>
+                  <h2>33 components, 977 variants</h2>
+                </div>
+                <div class="project-content-text"><p>Built on shadcn/ui and restyled with Deploy's tokens. Every component works in light and dark mode.</p></div>
+                <div class="project-content-text"><p class="pair-label">The basics</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <div class="panel-card fb cb">
+                      <div class="fb-board">
+                        <p class="cb-hint">Try it: hover, click or tab through the components.</p>
+                        <div class="cb-card cb-wide">
+                          <p class="fb-label">Button</p>
+                          <div class="cb-row"><span class="cb-tag">Type</span><button type="button" class="cb-btn cb-primary">Primary</button><button type="button" class="cb-btn cb-outline">Outline</button><button type="button" class="cb-btn cb-secondary">Secondary</button><button type="button" class="cb-btn cb-ghost">Ghost</button><button type="button" class="cb-btn cb-destructive">Destructive</button><button type="button" class="cb-btn cb-link">Link</button></div>
+                          <div class="cb-row"><span class="cb-tag">Size</span><button type="button" class="cb-btn cb-primary cb-xs">Extra small</button><button type="button" class="cb-btn cb-primary cb-sm">Small</button><button type="button" class="cb-btn cb-primary">Default</button><button type="button" class="cb-btn cb-primary cb-lg">Large</button></div>
+                        </div>
+                        <div class="cb-card">
+                          <p class="fb-label">Input</p>
+                          <div class="cb-fields">
+                            <input class="cb-input" type="text" placeholder="Enter your name" aria-label="Name">
+                            <input class="cb-input" type="text" value="Name" aria-invalid="true" aria-label="Name, invalid">
+                            <input class="cb-input" type="text" placeholder="Enter your name" disabled aria-label="Name, disabled">
+                          </div>
+                        </div>
+                        <div class="cb-card">
+                          <p class="fb-label">Select</p>
+                          <div class="cb-dd">
+                            <button type="button" class="cb-btn cb-outline cb-trigger" aria-haspopup="menu" aria-expanded="false">Select<svg class="cb-chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <ul class="cb-menu" role="menu" aria-label="My Account" hidden>
+                              <li class="cb-menu-label" role="presentation">My Account</li>
+                              <li role="menuitem" tabindex="-1" class="cb-item">Profile</li>
+                              <li role="menuitem" tabindex="-1" class="cb-item">Billing</li>
+                              <li role="menuitem" tabindex="-1" class="cb-item">Settings</li>
+                              <li class="cb-sep" role="separator"></li>
+                              <li role="menuitem" tabindex="-1" class="cb-item">Github</li>
+                              <li role="menuitem" tabindex="-1" class="cb-item">Support</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="cb-card">
+                          <p class="fb-label">Badge</p>
+                          <div class="cb-row cb-wrap">
+                            <span class="cb-badge" style="background:#206CFD;color:#fff">Default</span>
+                            <span class="cb-badge" style="background:var(--cb-secondary);color:var(--cb-fg)">Secondary</span>
+                            <span class="cb-badge" style="background:var(--cb-card);color:var(--cb-fg);box-shadow:inset 0 0 0 1px var(--cb-border)">Outline</span>
+                            <span class="cb-badge" style="background:#2B3644;color:#fff">Secondary dark</span>
+                            <span class="cb-badge" style="background:var(--cb-destructive-bg);color:var(--cb-destructive)">Destructive</span>
+                            <span class="cb-badge" style="background:#F0FDF4;color:#15803D">Success</span>
+                            <span class="cb-badge" style="background:var(--cb-warning-bg);color:var(--cb-warning)">Warning</span>
+                          </div>
+                        </div>
+                        <div class="cb-card">
+                          <p class="fb-label">Tabs</p>
+                          <div class="cb-tabs" role="tablist" aria-label="Example tabs"><button type="button" role="tab" aria-selected="true" class="cb-tab">Overview</button><button type="button" role="tab" aria-selected="false" class="cb-tab">Settings</button><button type="button" role="tab" aria-selected="false" class="cb-tab">Usage</button></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-text"><p class="pair-label">Complex components</p><p>Selection, overlays, feedback and navigation.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <p class="panel-label">Selection</p>
+                    <div class="panel-card fb cb">
+                      <div class="fb-board">
+                        <p class="cb-hint">Try it: pick one or more frameworks, or pick a date range.</p>
+                        <div class="cb-card cb-wide cc-combo-card">
+                          <p class="fb-label">Combobox</p>
+                          <div class="cc-combo-row">
+                            <div class="cc-combo-col">
+                              <span class="cb-tag">Basic</span>
+                              <div class="cc-combo cc-anchor">
+                                <div class="cc-field" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Framework"><span class="cc-chips"><span class="cc-val">Select framework...</span></span><i data-icon="chevron-down" class="cc-chev"></i></div>
+                                <ul class="cc-pop cc-list" role="listbox" hidden>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Next.js</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>React</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Vue.js</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Angular</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Svelte</span><i data-icon="check"></i></li>
+                                </ul>
+                              </div>
+                            </div>
+                            <div class="cc-combo-col">
+                              <span class="cb-tag">Multiple</span>
+                              <div class="cc-combo cc-anchor" data-multiple>
+                                <div class="cc-field" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Framework, multiple"><span class="cc-chips"><span class="cc-val">Select framework...</span></span><button type="button" class="cc-clear" aria-label="Clear all" hidden><i data-icon="x"></i></button><i data-icon="chevron-down" class="cc-chev"></i></div>
+                                <ul class="cc-pop cc-list" role="listbox" aria-multiselectable="true" hidden>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Next.js</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>React</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Vue.js</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Angular</span><i data-icon="check"></i></li>
+                                <li role="option" class="cc-opt" tabindex="-1" aria-selected="false"><span>Svelte</span><i data-icon="check"></i></li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="cb-card cb-wide cc-range-card">
+                          <p class="fb-label">Date Range Picker</p>
+                          <div class="cc-date cc-anchor">
+                            <p class="cc-label">Date Range Picker</p>
+                            <button type="button" class="cc-field cc-date-field" aria-haspopup="dialog" aria-expanded="false"><i data-icon="calendar"></i><span class="cc-val"></span></button>
+                            <div class="cc-pop cc-cal cc-range" role="dialog" aria-label="Choose date range" hidden></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <p class="panel-label">Overlays</p>
+                    <div class="panel-card fb cb">
+                      <div class="fb-board">
+                        <p class="cb-hint">Try it: open the dialog, drawer or popover.</p>
+                        <div class="cb-card cb-wide cc-stage">
+                          <p class="fb-label">Dialog, Drawer and Popover</p>
+                          <div class="cb-row">
+                            <button type="button" class="cb-btn cb-outline" data-open="cc-dialog">Open Dialog</button>
+                            <button type="button" class="cb-btn cb-outline" data-open="cc-drawer">Open Drawer</button>
+                            <div class="cc-anchor">
+                              <button type="button" class="cb-btn cb-outline cc-pop-trigger" aria-expanded="false">Open Popover</button>
+                              <div class="cc-pop cc-popover" role="dialog" aria-label="Dimensions" hidden>
+                                <div class="cc-head"><p class="cc-title-sm">Dimensions</p><p class="cc-desc">Set the dimensions for the layer.</p></div>
+                                <div class="cc-dims">
+                                  <label><span class="cc-label">Width</span><input class="cb-input" type="text" value="100%"></label>
+                                  <label><span class="cc-label">Max. width</span><input class="cb-input" type="text" value="320px"></label>
+                                  <label><span class="cc-label">Height</span><input class="cb-input" type="text" value="25px"></label>
+                                  <label><span class="cc-label">Max. height</span><input class="cb-input" type="text" value="none"></label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="cc-scrim" hidden></div>
+                          <div class="cc-dialog" id="cc-dialog" role="dialog" aria-modal="true" aria-labelledby="cc-dialog-title" hidden>
+                            <div class="cc-dialog-body">
+                              <div class="cc-head"><div class="cc-head-row"><p class="cc-title" id="cc-dialog-title">Edit profile</p><button type="button" class="cc-x" data-close aria-label="Close"><i data-icon="x"></i></button></div><p class="cc-desc">Make changes to your profile here. Click save when you're done.</p></div>
+                              <div class="cc-fields">
+                                <label class="cc-input-field"><span class="cc-label">Name</span><input class="cb-input" type="text" placeholder="Enter your name"></label>
+                                <label class="cc-input-field"><span class="cc-label">Username</span><input class="cb-input" type="text" placeholder="Enter your username"></label>
+                              </div>
+                            </div>
+                            <div class="cc-dialog-foot"><button type="button" class="cb-btn cb-outline" data-close>Cancel</button><button type="button" class="cb-btn cb-primary" data-close>Save Changes</button></div>
+                          </div>
+                          <div class="cc-drawer" id="cc-drawer" role="dialog" aria-modal="true" aria-labelledby="cc-drawer-title" hidden>
+                            <div class="cc-handle"><span></span></div>
+                            <div class="cc-head cc-center"><p class="cc-title" id="cc-drawer-title">Edit Profile</p><p class="cc-desc">Make changes to your profile here. Click save when you're done.</p></div>
+                            <div class="cc-fields cc-drawer-body">
+                                <label class="cc-input-field"><span class="cc-label">Name</span><input class="cb-input" type="text" placeholder="Enter your name"></label>
+                                <label class="cc-input-field"><span class="cc-label">Username</span><input class="cb-input" type="text" placeholder="Enter your username"></label>
+                            </div>
+                            <div class="cc-drawer-foot"><button type="button" class="cb-btn cb-primary" data-close>Save Changes</button><button type="button" class="cb-btn cb-outline" data-close>Cancel</button></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <p class="panel-label">Feedback</p>
+                    <div class="panel-card fb cb">
+                      <div class="fb-board">
+                        <p class="cb-hint">Try it: hover a type to show its toast.</p>
+                        <div class="cb-card cb-wide cc-toasts">
+                          <p class="fb-label">Toast</p>
+                          <div class="cc-toast-layout">
+                            <div class="cc-toast-btns"><button type="button" class="cb-btn cb-outline cb-sm" data-toast="success">Success</button><button type="button" class="cb-btn cb-outline cb-sm" data-toast="info">Info</button><button type="button" class="cb-btn cb-outline cb-sm" data-toast="warning">Warning</button><button type="button" class="cb-btn cb-outline cb-sm" data-toast="error">Error</button></div>
+                            <div class="cc-toast-region" aria-live="polite"></div>
+                          </div>
+                        </div>
+                        <div class="cb-card cb-wide">
+                          <p class="fb-label">Alert</p>
+                          <div class="cc-alerts">
+                            <div class="cc-alert cc-success" role="note"><i data-icon="circle-check"></i><div><p class="cc-alert-title">Payment successful</p><p class="cc-alert-desc">A receipt was sent to your email.</p></div></div>
+                            <div class="cc-alert cc-info" role="note"><i data-icon="info"></i><div><p class="cc-alert-title">New feature available</p><p class="cc-alert-desc">Dark mode is now in Settings.</p></div></div>
+                            <div class="cc-alert cc-error" role="note"><i data-icon="circle-alert"></i><div><p class="cc-alert-title">Payment failed</p><p class="cc-alert-desc">Check your payment method.</p></div></div>
+                            <div class="cc-alert cc-warning" role="note"><i data-icon="triangle-alert"></i><div><p class="cc-alert-title">Subscription expiring</p><p class="cc-alert-desc">Renew within 3 days to keep access.</p></div></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <p class="panel-label">Navigation</p>
+                    <div class="panel-card fb cb">
+                      <div class="fb-board">
+                        <p class="cb-hint">Try it: open a menu, or click a page in the breadcrumb.</p>
+                        <div class="cb-card cb-wide cc-nav-card">
+                          <p class="fb-label">Navigation Menu</p>
+                          <nav class="cc-nav" aria-label="Example">
+                            <div class="cc-nav-row">
+                              <button type="button" class="cc-nav-btn" aria-expanded="false" aria-controls="cc-nav-start">Getting started<i data-icon="chevron-down"></i></button>
+                              <button type="button" class="cc-nav-btn" aria-expanded="false" aria-controls="cc-nav-pop">Components<i data-icon="chevron-down"></i></button>
+                              <button type="button" class="cc-nav-btn" aria-expanded="false" aria-controls="cc-nav-docs">Docs<i data-icon="chevron-down"></i></button>
+                            </div>
+                            <div class="cc-nav-pop" id="cc-nav-pop" hidden>
+                              <a href="#components" class="cc-nav-item"><span class="cc-nav-t">Button</span><span class="cc-nav-d">Six types, from primary to link.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Dialog</span><span class="cc-nav-d">A window that asks for input or a decision.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Combobox</span><span class="cc-nav-d">Search a list and pick one or more options.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Toast</span><span class="cc-nav-d">A short message that confirms an action.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Date Picker</span><span class="cc-nav-d">Pick a single date or a date range.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Breadcrumb</span><span class="cc-nav-d">Shows where a page sits in the site.</span></a>
+                            </div>
+                            <div class="cc-nav-pop cc-nav-single" id="cc-nav-start" hidden>
+                              <div class="cc-nav-col"><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Introduction</span><span class="cc-nav-d">An overview of the design system and how it is organized.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Installation</span><span class="cc-nav-d">Add the components and tokens to a new project.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Theming</span><span class="cc-nav-d">Use semantic tokens to support light and dark mode.</span></a></div>
+                            </div>
+                            <div class="cc-nav-pop cc-nav-single" id="cc-nav-docs" hidden>
+                              <div class="cc-nav-col"><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Tokens</span><span class="cc-nav-d">Color, typography, spacing and effects.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Components</span><span class="cc-nav-d">Usage guidelines for every component.</span></a><a href="#components" class="cc-nav-item"><span class="cc-nav-t">Changelog</span><span class="cc-nav-d">What changed in each release.</span></a></div>
+                            </div>
+                          </nav>
+                        </div>
+                        <div class="cb-card cb-wide cc-crumb-card">
+                          <p class="fb-label">Breadcrumb</p>
+                          <ol class="cc-crumbs" aria-label="Breadcrumb"><li><a href="#components">Home</a><i data-icon="chevron-right"></i></li><li><a href="#components">Components</a><i data-icon="chevron-right"></i></li><li><a href="#components" aria-current="page">Breadcrumb</a></li></ol>
+                          <ol class="cc-crumbs" aria-label="Breadcrumb, collapsed"><li><a href="#components">Home</a><i data-icon="chevron-right"></i></li><li><div class="cb-dd"><button type="button" class="cb-trigger cc-ellipsis" aria-haspopup="menu" aria-expanded="false" aria-label="Show hidden pages"><i data-icon="ellipsis"></i></button><ul class="cb-menu" role="menu" aria-label="Hidden pages" hidden><li role="menuitem" tabindex="-1" class="cb-item">Docs</li><li role="menuitem" tabindex="-1" class="cb-item">Guides</li></ul></div><i data-icon="chevron-right"></i></li><li><a href="#components">Components</a><i data-icon="chevron-right"></i></li><li><a href="#components" aria-current="page">Breadcrumb</a></li></ol>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-text"><p class="pair-label">Button</p><p>216 variants across type, size and state, including icon buttons.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#2f6bff22">
+                    <p class="panel-label">Button, every variant</p>
+                    <div class="panel-card fb cb">
+                      <div class="fb-board" data-bv>
+                        <div class="bv-head">
+                          <p class="cb-hint">Try it: pick a component and size.</p>
+                          <div class="cb-head-tabs">
+                            <div class="cb-tabs" role="tablist" aria-label="Component" data-kind-tabs><button type="button" class="cb-tab" role="tab" aria-selected="true" data-kind="buttons">Button</button><button type="button" class="cb-tab" role="tab" aria-selected="false" data-kind="icons">Icon Button</button></div>
+                            <div class="cb-tabs" role="tablist" aria-label="Size" data-size-tabs><button type="button" class="cb-tab" role="tab" aria-selected="true" data-size="xs" aria-label="Extra small">XS</button><button type="button" class="cb-tab" role="tab" aria-selected="false" data-size="sm" aria-label="Small">SM</button><button type="button" class="cb-tab" role="tab" aria-selected="false" data-size="md" aria-label="Default">MD</button><button type="button" class="cb-tab" role="tab" aria-selected="false" data-size="lg" aria-label="Large">LG</button></div>
+                          </div>
+                        </div>
+                        <div class="cb-card"><p class="fb-label bv-title">Button</p><div class="bv-grid bv-buttons"></div><div class="bv-grid bv-icons" hidden></div></div>
+                        <div class="cb-card bv-examples">
+                          <div class="bv-ex"><p class="fb-label">With Icon</p><div class="bv-ex-row"><button type="button" class="cb-btn cb-outline bv-lead"><i data-icon="git-branch-plus"></i>New Branch</button></div></div>
+                          <div class="bv-ex"><p class="fb-label">Spinner</p><div class="bv-ex-row"><button type="button" class="cb-btn cb-outline bv-lead" disabled><i data-icon="loader-circle" class="bv-spin"></i>Generating</button><button type="button" class="cb-btn cb-secondary bv-lead" disabled>Downloading<i data-icon="loader-circle" class="bv-spin"></i></button></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </section>
+
+              <section id="engineering" data-toc="Design x Engineering" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Design x Engineering</p>
+                <div class="project-content-text"><h2>Handoff to engineering</h2></div>
+                <div class="project-content-text"><p>Type styles are named after the Tailwind classes engineers use, so specs map straight to code.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:color-mix(in srgb, var(--foreground) 6%, transparent)">
+                    <p class="panel-label">Token naming and handoff</p>
+                    <div class="panel-card fb vp">
+                      <div class="fb-board vp-board" data-vars>
+                        <div class="vp-overview">
+                          <div class="vp-stats"></div>
+                          <div class="vp-tour"><button type="button" class="vp-play" aria-pressed="true"></button><span class="vp-progress"><i></i></span></div>
+                        </div>
+                        <aside class="vp-side">
+                          <p class="vp-h">Collections</p>
+                          <div class="vp-cols" role="tablist" aria-label="Collections"></div>
+                          <p class="vp-h">Groups</p>
+                          <div class="vp-groups"></div>
+                        </aside>
+                        <section class="vp-main">
+                          <header class="vp-top"><p class="vp-title"></p><input class="vp-search" type="search" placeholder="Search" aria-label="Search variables"></header>
+                          <div class="vp-table" role="table"></div>
+                          <div class="vp-detail" role="dialog" aria-label="Variable details" hidden></div>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="reflection" data-toc="Impact &amp; reflection" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Impact &amp; reflection</p>
+                <div class="project-content-text"><h2>Shipped with the rebrand</h2></div>
+                <div class="project-content-text">
+                  <ul class="bullets">
+                    <li>Deploy launched in October 2026 on the new system.</li>
+                    <li>Light and dark themes from one set of tokens.</li>
+                    <li>Separate type scales for product and marketing.</li>
+                  </ul>
+                </div>
+                <div class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>Check contrast early</p><p>The volt green failed before it reached a single screen.</p></div>
+                    <div><p>Name tokens the way engineers do</p><p>Matching Tailwind names made handoff simpler.</p></div>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+          </article>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="../media/deploy/variables.js"></script>
+  <script src="../site.js"></script>
+  <script src="../chat.js"></script>
+</body>
+</html>

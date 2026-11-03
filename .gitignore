@@ -1,0 +1,4 @@
+.DS_Store
+*.fig
+figma_plugins/
+media/reference/
