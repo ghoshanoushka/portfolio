@@ -40,6 +40,25 @@ function navLinks() {
     .join("");
 }
 
+// Nav icons (sidebar pill and phone bottom bar): Phosphor, regular weight.
+const NAV_ICONS = {
+  Work: "M216,56H176V48a24,24,0,0,0-24-24H104A24,24,0,0,0,80,48v8H40A16,16,0,0,0,24,72V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V72A16,16,0,0,0,216,56ZM96,48a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM216,72v41.61A184,184,0,0,1,128,136a184.07,184.07,0,0,1-88-22.38V72Zm0,128H40V131.64A200.19,200.19,0,0,0,128,152a200.25,200.25,0,0,0,88-20.37V200ZM104,112a8,8,0,0,1,8-8h32a8,8,0,0,1,0,16H112A8,8,0,0,1,104,112Z",
+  Fun: "M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z",
+  About: "M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM80,108a12,12,0,1,1,12,12A12,12,0,0,1,80,108Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,176,108Zm-1.07,48c-10.29,17.79-27.4,28-46.93,28s-36.63-10.2-46.92-28a8,8,0,1,1,13.84-8c7.47,12.91,19.21,20,33.08,20s25.61-7.1,33.07-20a8,8,0,0,1,13.86,8Z",
+  Mail: "M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM203.43,64,128,133.15,52.57,64ZM216,192H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z",
+};
+const navIcon = (label) => `<svg class="ph" viewBox="0 0 256 256" aria-hidden="true"><path d="${NAV_ICONS[label] || NAV_ICONS.Work}"/></svg>`;
+
+// Desktop sidebar: a vertical pill that shows icons and opens to labels on hover or focus.
+function pillLinks() {
+  return SITE.nav
+    .map(({ label, href }) => {
+      const active = href === currentPage ? ' data-active="true" aria-current="page"' : "";
+      return `<a class="nav-link pill-link" href="${ROOT}${href}"${active}>${navIcon(label)}<span>${label}</span></a>`;
+    })
+    .join("");
+}
+
 // Sidebar table of contents built from <section id> and .project-subsection[id] on project pages.
 function tocLinks() {
   return [...document.querySelectorAll("main section[id], main .project-subsection[id]")]
@@ -62,7 +81,7 @@ function renderChrome() {
     `<div class="sidebar"><div class="page-margin" style="height:100%"><div class="grid-12">
       <aside>
         ${top}
-        <nav class="fade-in${isProject ? " toc" : ""}">${isProject ? tocLinks() : navLinks()}</nav>
+        <nav class="fade-in${isProject ? " toc" : " side-pill"}" aria-label="${isProject ? "Sections" : "Site"}">${isProject ? tocLinks() : pillLinks()}</nav>
       </aside>
     </div></div></div>`
   );
@@ -73,12 +92,6 @@ function renderChrome() {
   );
 
   // Phones get a bottom bar instead of the top nav; chat.js puts Valentino in the last slot.
-  const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
-  const ICONS = {
-    Work: "M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z",
-    Fun: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
-    About: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1-4 4-6 7.5-6s6.5 2 7.5 6",
-  };
   const social = (label) => SITE.socials.find((x) => x.label === label);
   const dockLink = (href, label, svg, ext) =>
     `<a class="dock-link" href="${href}" aria-label="${label}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ""}>${svg}</a>`;
@@ -88,10 +101,10 @@ function renderChrome() {
     `<nav class="dock" aria-label="Site">
       ${SITE.nav.map(({ label, href }) => {
         const active = href === currentPage || (isProject && href === "index.html") ? ' aria-current="page"' : "";
-        return dockLink(`${ROOT}${href}`, label, icon(ICONS[label] || ICONS.Work)).replace("<a ", `<a${active} `);
+        return dockLink(`${ROOT}${href}`, label, navIcon(label)).replace("<a ", `<a${active} `);
       }).join("")}
       <span class="dock-sep"></span>
-      ${chat ? dockLink(chat.href, "Book a chat", icon("M4 6h16v12H4zM4 7l8 6 8-6"), true) : ""}
+      ${chat ? dockLink(chat.href, "Book a chat", navIcon("Mail"), true) : ""}
       ${linkedin ? dockLink(linkedin.href, "LinkedIn", '<span class="dock-in" aria-hidden="true">in</span>', true) : ""}
       <span class="dock-sep"></span>
       <span class="dock-cat-slot"></span>

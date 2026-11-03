@@ -27,7 +27,7 @@
     },
     {
       keys: ["design system", "hive", "rebrand", "landing", "component", "token"],
-      html: `When Hive rebranded as Deploy in October 2026, Anoushka rebuilt the design system for the new brand. She then used it to design the new landing pages, working with frontend engineers through handoff. ${link("projects/deploy-design-system.html", "Read the case study")}.`,
+      html: `When Hive rebranded as Deploy in October 2026, Anoushka and the design team rebuilt the design system for the new brand. One system serves both the Portal and the marketing site: the color tokens are shared, and product and marketing each get their own type scale. She worked with frontend engineers through handoff. ${link("projects/deploy-design-system.html", "Read the case study")}.`,
       chips: ["What about Mensio?", "How do I get in touch?"],
     },
     {
@@ -57,7 +57,7 @@
     },
     {
       keys: ["what does", "what do", "who is", "who's", "tell me about anoushka", "designer", "job title", "title"],
-      html: "Anoushka is a UX/UI designer at Deploy in San Francisco, where she works on the design system, landing pages and product. She focuses on thoughtful, scalable products from 0–1 and beyond.",
+      html: "Anoushka is a UX/UI designer at Deploy in San Francisco, where she works on the product and its design system. She focuses on thoughtful, scalable products from 0–1 and beyond.",
       chips: ["Which project should I see first?", "Where has she worked?"],
     },
   ];
@@ -225,6 +225,8 @@
 
   function open() {
     hideHello();
+    document.querySelectorAll(".vc-say").forEach((el) => (el.hidden = true));
+    document.querySelectorAll(".vc-cat.is-hover").forEach((el) => el.classList.remove("is-hover"));
     panel.hidden = false;
     launch.setAttribute("aria-expanded", "true");
     dockCat?.setAttribute("aria-expanded", "true");
@@ -270,7 +272,8 @@
   let line = 0;
   const timers = new WeakMap();
   const show = (el, cat) => {
-    // One cat talks at a time.
+    // Nobody talks while the chat is open, and only one cat talks at a time.
+    if (!panel.hidden) return;
     document.querySelectorAll(".vc-say").forEach((o) => { if (o !== el) o.hidden = true; });
     scene.querySelectorAll(".vc-cat").forEach((o) => o.classList.toggle("is-hover", o === cat));
     clearTimeout(timers.get(el)); el.hidden = false;
@@ -285,7 +288,7 @@
   ollieHit.addEventListener("pointerleave", () => hide(sayOllie, ollie));
   ollieHit.addEventListener("blur", () => hide(sayOllie, ollie, 0));
 
-  const valSay = () => { if (panel.hidden) show(sayVal, val); };
+  const valSay = () => show(sayVal, val);
   [launch, sayVal].forEach((el) => {
     el.addEventListener("pointerenter", valSay);
     el.addEventListener("pointerleave", () => hide(sayVal, val));

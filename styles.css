@@ -1480,3 +1480,18 @@ footer .links a:hover { color: var(--primary); }
   :root:not([data-theme="light"]) .theme-toggle .sun { display: none; }
   :root:not([data-theme="light"]) .theme-toggle .moon { display: block; }
 }
+
+/* ---------- Sidebar nav pill (site.js) ---------- */
+
+.sidebar nav.side-pill { top: 50%; translate: 0 -50%; gap: 2px; padding: 4px; border-radius: 22px; background: color-mix(in srgb, var(--foreground) 7%, transparent); }
+.side-pill .pill-link { display: flex; align-items: center; height: 36px; padding: 0 9px; border-radius: 18px; line-height: 1; white-space: nowrap; color: var(--ink-55); transition: color .2s, background-color .25s; }
+.side-pill .pill-link svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.side-pill .pill-link span { max-width: 0; margin-left: 0; opacity: 0; overflow: hidden; transition: max-width .35s cubic-bezier(0.32, 0.72, 0, 1), margin-left .35s cubic-bezier(0.32, 0.72, 0, 1), opacity .2s; }
+.side-pill:hover .pill-link span, .side-pill:focus-within .pill-link span { max-width: 80px; margin-left: 10px; opacity: 1; }
+.side-pill .pill-link:hover { color: var(--ink-100); }
+.side-pill .pill-link[data-active] { background: var(--foreground); color: var(--background); }
+.side-pill .pill-link[data-active]::before { content: none; }
+.side-pill .pill-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .side-pill .pill-link span { transition: none; } }
+
+.pill-link svg.ph, .dock-link svg.ph { fill: currentColor; stroke: none; }
