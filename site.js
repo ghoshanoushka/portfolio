@@ -210,7 +210,14 @@ function initScrollSpy() {
   if (!links.length) return;
   const targets = links.map((l) => document.getElementById(l.dataset.toc));
 
+  // A clicked entry stays active until the visitor scrolls on their own; short sections otherwise land
+  // with the next one already past the line.
+  let picked = null;
+  links.forEach((l) => l.addEventListener("click", () => { picked = l.dataset.toc; links.forEach((k) => k.toggleAttribute("data-active", k === l)); }));
+  ["wheel", "touchstart", "keydown"].forEach((t) => window.addEventListener(t, () => { picked = null; }, { passive: true }));
+
   const update = () => {
+    if (picked) return;
     const line = window.innerHeight * 0.4;
     // Nothing is active above the first section; sections hidden by TL;DR are skipped.
     let current = null;
