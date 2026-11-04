@@ -19,7 +19,7 @@ const SITE = {
   // `cursor` is the label that follows the mouse: "View project", "Visit site", "Coming soon".
   // `ratio` is the thumbnail aspect ratio (width / height).
   projects: [
-    { title: "Mensio", sub: "Shipped 2026", href: "projects/mensio.html", cursor: "View project", ratio: 16 / 9, colors: ["#2b3a67", "#7aaee9"] },
+    { title: "Mensio", sub: "Shipped 2026", href: "projects/mensio.html", cursor: "View project", ratio: 16 / 9, media: "media/mensio/hero.html", colors: ["#2b3a67", "#7aaee9"] },
     { title: "Deploy Design System", sub: "Shipped 2026", href: "projects/deploy-design-system.html", cursor: "View project", ratio: 16 / 9, media: "media/deploy/hero.html", colors: ["#050a1f", "#2f6bff"] },
     { title: "Project One", sub: "Concept 2025", href: "projects/project-one.html", cursor: "View project", ratio: 16 / 9, colors: ["#e98d34", "#d0a8d8"] },
     { title: "Deploy Chat", sub: "Shipping 2026", cursor: "Coming soon", ratio: 16 / 9, colors: ["#0b1430", "#4a7dff"] },
@@ -204,7 +204,7 @@ function initCursorLabel() {
   document.addEventListener("mouseleave", () => label.classList.remove("visible"));
 }
 
-// Highlights the TOC entry for the last section whose top has passed 40% of the viewport.
+// Highlights the TOC entry for the last section whose top has passed 40% of the viewport, and none before the first.
 function initScrollSpy() {
   const links = [...document.querySelectorAll("a[data-toc]")];
   if (!links.length) return;
@@ -212,11 +212,12 @@ function initScrollSpy() {
 
   const update = () => {
     const line = window.innerHeight * 0.4;
-    let current = targets[0];
-    for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t;
+    // Nothing is active above the first section; sections hidden by TL;DR are skipped.
+    let current = null;
+    for (const t of targets) if (t.getClientRects().length && t.getBoundingClientRect().top <= line) current = t;
     // The last sections may never reach the line, so activate the last one at the page bottom.
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = targets[targets.length - 1];
-    links.forEach((l) => l.toggleAttribute("data-active", l.dataset.toc === current.id));
+    links.forEach((l) => l.toggleAttribute("data-active", l.dataset.toc === current?.id));
   };
   window.addEventListener("scroll", update, { passive: true });
   update();
@@ -234,6 +235,32 @@ function initCompare() {
       el.classList.remove("sweeping");
       set(el, input.value);
     });
+    // With a live prototype on the After side, drag from the handle instead of the whole image.
+    const frame = el.querySelector(".compare-after");
+    if (frame) {
+      new ResizeObserver(() => {
+        const scale = el.clientWidth / 1440;
+        frame.style.height = `${el.clientHeight / scale}px`;
+        frame.style.transform = `scale(${scale})`;
+      }).observe(el);
+      const handle = el.querySelector(".compare-handle");
+      const move = (e) => {
+        const box = el.getBoundingClientRect();
+        const v = Math.round(Math.min(100, Math.max(0, ((e.clientX - box.left) / box.width) * 100)));
+        input.value = v;
+        set(el, v);
+      };
+      handle.addEventListener("pointerdown", (e) => {
+        el.classList.remove("sweeping");
+        el.classList.add("dragging");
+        handle.setPointerCapture(e.pointerId);
+        move(e);
+      });
+      handle.addEventListener("pointermove", (e) => { if (el.classList.contains("dragging")) move(e); });
+      ["pointerup", "pointercancel"].forEach((t) => handle.addEventListener(t, () => el.classList.remove("dragging")));
+      // A visitor working in the prototype has taken over; stop the intro sweep.
+      frame.addEventListener("load", () => frame.contentDocument?.addEventListener("pointerdown", () => el.classList.remove("sweeping")));
+    }
     // Before shows all of Hive, After shows all of Deploy.
     el.querySelectorAll("[data-pos]").forEach((btn) =>
       btn.addEventListener("click", () => {
@@ -631,6 +658,108 @@ function initModeToggle() {
   });
 }
 
+// Guided Setup frames: Next, Back, the stepper and the Metrics radio are clickable, and the tabs follow along.
+function initGsFlow() {
+  const flow = document.querySelector(".gs-flow");
+  if (!flow) return;
+  const tabs = [...flow.closest(".panel").querySelectorAll('.cx-tabs [role="tab"]')];
+  const metrics = flow.querySelector("#gs-metrics");
+  const empty = metrics.getAttribute("src");
+  const spots = flow.querySelector(".gs-hotspots");
+  // [left, top, width, height] in % of the frame
+  const STEPPER = [11.7, 21.1, 30.5, 39.8, 49.2].map((top) => [15, top, 13.5, 4.3]);
+  const NEXT = [80, 92.2, 5, 4.3], BACK = [75, 92.2, 5.2, 4.3];
+  const FETCH = [77.2, 92.2, 7.4, 4.3], FETCH_BACK = [72, 92.2, 4.6, 4.3];
+  const RADIO = [30.5, 22.4, 54, 6.5], EDIT = [83.7, 8.4, 6.1, 3.9];
+  const result = flow.querySelector(".gs-result"), fetching = flow.querySelector(".gs-fetching");
+  // Steps whose modal body runs past the fold get a scrollable copy of the full column over it
+  const scroller = flow.querySelector(".gs-scroll");
+  const COLUMNS = ["metrics", null, "groupings", "filters", "review"];
+  let step = 0, picked = false, done = false, fetched = false;
+  const go = (i) => tabs[i].click();
+  const spot = ([l, t, w, hgt], label, fn, hint) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-label", label);
+    b.style.cssText = `left:${l}%;top:${t}%;width:${w}%;height:${hgt}%`;
+    b.classList.toggle("hint", hint === "always" || (Boolean(hint) && !done));
+    b.addEventListener("click", fn);
+    spots.append(b);
+  };
+  const render = () => {
+    metrics.src = picked ? metrics.dataset.picked : empty;
+    spots.replaceChildren();
+    // After a dummy fetch the chart page covers the frames; Edit Chart goes back to Review
+    result.hidden = !fetched;
+    const col = !fetched && (step > 0 || picked) && COLUMNS[step];
+    scroller.hidden = !col;
+    if (col) {
+      const src = `../media/mensio/gs-col-${col}.jpg`;
+      if (!scroller.firstChild.src.endsWith(src.slice(2))) { scroller.firstChild.src = src; scroller.scrollTop = 0; }
+    }
+    if (fetched) return spot(EDIT, "Edit Chart, back to Review", () => go(tabs.length - 1), "always");
+    STEPPER.forEach((r, i) => i !== step && spot(r, `Go to ${tabs[i].textContent}`, () => go(i)));
+    const last = step === tabs.length - 1;
+    if (step === 0 && !picked) spot(RADIO, "Pick TV Sponsorship [Visual]", () => { picked = true; render(); }, true);
+    if (step === 0 && !picked) spots.lastChild.classList.add("at-radio");
+    else if (last) spot(FETCH, "Save & Fetch", () => {
+      spots.replaceChildren();
+      fetching.hidden = false;
+      setTimeout(() => { fetching.hidden = true; fetched = done = true; render(); }, 900);
+    }, true);
+    else spot(NEXT, "Next step", () => go(step + 1), true);
+    if (step > 0) spot(last ? FETCH_BACK : BACK, "Back", () => go(step - 1));
+  };
+  tabs.forEach((t, i) => t.addEventListener("click", () => { step = i; fetched = false; render(); }));
+  render();
+}
+
+// Frustrated session: steps through the recording's key frames while on screen, zooming to what each beat is
+// about and ringing what went wrong. Rects are in the 1914 x 860 frame's px.
+function initSession() {
+  const box = document.querySelector(".figure-media.session");
+  if (!box) return;
+  const stage = box.querySelector(".session-stage");
+  const frames = [...stage.querySelectorAll("img")];
+  const mark = box.querySelector(".session-mark");
+  const cap = box.querySelector(".session-cap");
+  // [caption, ms, zoom [x, y, width], ring around [x0, y0, x1, y1] or null], measured from the frames
+  const FETCH = [1636, 90, 1752, 132];
+  const BEATS = [
+    ["Every requirement is met, but Fetch won't run.", 2400, [1060, 0, 854], FETCH],
+    ["The only hint: “Invalid selection combinations.” Nothing says how to fix it.", 3200, [1060, 0, 854], [1540, 142, 1890, 232]],
+    ["The user guesses, and opens the groupings again.", 2000, [640, 60, 760], [960, 210, 1098, 232]],
+    ["Swaps Network Owners for Brand Owners.", 2000, [0, 60, 760], [131, 210, 268, 232]],
+    ["Fetch works now.", 1600, [1060, 0, 854], FETCH],
+    ["Loading…", 1300, [384, 0, 1146], null],
+    ["Finally, a table.", 2400, [0, 200, 880], null],
+    ["Then the page reloads. Nothing was saved, so the whole chart is gone.", 3600, [384, 0, 1146], [405, 288, 996, 569]],
+  ];
+  const PAD = 6; // on-screen px around each ringed element
+  let i = 0, timer = 0, visible = false;
+  const show = (k) => {
+    const [text, , [x, y, w], ring] = BEATS[k];
+    const s = box.clientWidth / w;
+    stage.style.transform = `scale(${s}) translate(${-x}px, ${-y}px)`;
+    frames.forEach((f, n) => f.classList.toggle("on", n === k));
+    cap.textContent = text;
+    mark.classList.toggle("on", !!ring);
+    if (ring) {
+      const [x0, y0, x1, y1] = ring;
+      Object.assign(mark.style, { left: `${(x0 - x) * s - PAD}px`, top: `${(y0 - y) * s - PAD}px`, width: `${(x1 - x0) * s + PAD * 2}px`, height: `${(y1 - y0) * s + PAD * 2}px` });
+    }
+  };
+  const tick = () => { show(i); timer = setTimeout(() => { i = (i + 1) % frames.length; if (visible) tick(); }, BEATS[i][1]); };
+  box.showBeat = (k) => { clearTimeout(timer); i = k; show(k); };
+  new ResizeObserver(() => show(i)).observe(box);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    clearTimeout(timer);
+    if (visible) tick();
+  }, { threshold: 0.4 }).observe(box);
+}
+
 // Palette: switch between the explored and final colours.
 function initPaletteTabs() {
   document.querySelectorAll(".cx-tabs").forEach((list) => {
@@ -685,16 +814,20 @@ function initFitToOpen() {
   });
 }
 
-// Foundations boards: an expand button opens the board in a large dialog so its small text is readable.
-// The board itself moves into the dialog (and back on close), so it keeps any state such as dark mode.
-function initExpandBoards() {
+// Expand buttons for assets whose text renders under 10px. Boards move into a large dialog (and back on close),
+// so they keep state such as dark mode or the open tab. Screenshots open as a full-width copy of the image on show.
+// Add selectors here to give more assets the button: boards move into the dialog, shots open as an image copy.
+const EXPAND_BOARDS = [".gs-panel", ".figure-media.mail-board", ".figure-media.session"];
+const EXPAND_SHOTS = [];
+function initExpand() {
   const start = document.getElementById("foundations");
   const end = document.getElementById("components");
-  if (!start || !end) return;
-  const cards = [...document.querySelectorAll(".panel-card")].filter(
+  const foundations = start && end ? [...document.querySelectorAll(".panel-card")].filter(
     (c) => start.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING && end.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_PRECEDING
-  );
-  if (!cards.length) return;
+  ) : [];
+  const boards = [...new Set([...foundations, ...EXPAND_BOARDS.flatMap((sel) => [...document.querySelectorAll(sel)])])];
+  const shots = EXPAND_SHOTS.flatMap((sel) => [...document.querySelectorAll(sel)]);
+  if (!boards.length && !shots.length && !document.querySelector(".mess")) return;
   const EXPAND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>';
   const dialog = document.createElement("dialog");
   dialog.className = "expand-dialog";
@@ -703,39 +836,89 @@ function initExpandBoards() {
   const slot = dialog.querySelector(".expand-slot");
   let placeholder = null;
   let opener = null;
-  // Put the open board back where it came from. Safe to call twice.
+  // Put the open board back where it came from, or drop the image copy. Safe to call twice.
   const restore = () => {
-    const card = slot.querySelector(".panel-card");
+    const card = slot.firstElementChild;
     if (card && placeholder) placeholder.replaceWith(card);
+    else card?.remove();
     placeholder = null;
   };
-
-  cards.forEach((card) => {
-    const label = card.closest(".foundation-row")?.querySelector(".numbered li p")?.textContent.trim() || "board";
+  const labelOf = (el) => (el.closest(".foundation-row")?.querySelector(".numbered li p") || el.querySelector(".mess-tabs [aria-selected=true]") || el.closest(".panel")?.querySelector(".panel-label") || el.closest("figure")?.querySelector("figcaption, p"))?.textContent.trim() || "image";
+  const addButton = (el, open, name = labelOf(el)) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "expand-btn";
-    btn.setAttribute("aria-label", `Expand ${label}`);
+    btn.setAttribute("aria-label", `Expand ${name}`);
     btn.innerHTML = EXPAND;
-    card.append(btn);
-    btn.addEventListener("click", () => {
+    el.classList.add("expandable");
+    el.append(btn);
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
       if (dialog.open) dialog.close();
       restore();
       opener = btn;
-      placeholder = document.createElement("div");
-      placeholder.style.height = `${card.offsetHeight}px`;
-      // Fit the whole board on screen: as wide as possible without being taller than the window.
-      const ratio = card.offsetWidth / card.offsetHeight;
-      dialog.style.width = `${Math.min(1280, innerWidth - 48, (innerHeight - 64) * ratio)}px`;
-      card.replaceWith(placeholder);
-      slot.append(card);
-      dialog.setAttribute("aria-label", label);
+      open();
+      dialog.setAttribute("aria-label", labelOf(el));
       dialog.showModal();
     });
-  });
+  };
+
+  boards.forEach((card) => addButton(card, () => {
+    placeholder = document.createElement("div");
+    placeholder.style.height = `${card.offsetHeight}px`;
+    // Fit the whole board on screen: as wide as possible without being taller than the window.
+    const ratio = card.offsetWidth / card.offsetHeight;
+    dialog.style.width = `${Math.min(1280, innerWidth - 48, (innerHeight - 64) * ratio)}px`;
+    card.replaceWith(placeholder);
+    slot.append(card);
+  }));
+  // Before/after pivots open side by side, uncropped, with the panel's tabs to switch pivots in the dialog too.
+  document.querySelectorAll(".mess").forEach((panel) => addButton(panel, () => {
+    const pageTabs = [...panel.querySelectorAll(".mess-tabs [role=tab]")];
+    const view = document.createElement("div");
+    view.className = "expand-pair";
+    const tabs = panel.querySelector(".mess-tabs").cloneNode(true);
+    const body = document.createElement("div");
+    body.className = "expand-pair-body";
+    view.append(tabs, body);
+    const show = (i) => {
+      // Keep the page in step, so closing lands on the same pivot
+      pageTabs[i].click();
+      tabs.querySelectorAll("[role=tab]").forEach((t, k) => t.setAttribute("aria-selected", String(k === i)));
+      const pair = panel.querySelector(".mess-pair:not([hidden])");
+      body.replaceChildren();
+      pair.querySelectorAll("figure").forEach((fig) => {
+        const src = fig.querySelector("img");
+        const col = document.createElement("figure");
+        col.innerHTML = `<p>${fig.querySelector("p").textContent}</p>`;
+        const img = new Image();
+        img.src = src.currentSrc || src.src;
+        img.alt = src.alt;
+        col.append(img);
+        body.append(col);
+      });
+      const cap = pair.querySelector("figcaption");
+      if (cap) body.insertAdjacentHTML("beforeend", `<p class="expand-pair-cap">${cap.innerHTML}</p>`);
+      dialog.scrollTop = 0;
+    };
+    tabs.querySelectorAll("[role=tab]").forEach((t, i) => t.addEventListener("click", () => show(i)));
+    show(Math.max(0, pageTabs.findIndex((t) => t.getAttribute("aria-selected") === "true")));
+    dialog.style.width = `${Math.min(1440, innerWidth - 48)}px`;
+    slot.append(view);
+  }, "both screens"));
+  // Screenshots open at full dialog width; tall ones scroll inside the dialog.
+  shots.forEach((el) => addButton(el, () => {
+    const src = [...el.querySelectorAll("img")].find((i) => !i.hidden);
+    const img = new Image();
+    img.src = src.currentSrc || src.src;
+    img.alt = src.alt;
+    img.className = "expand-img";
+    dialog.style.width = `${Math.min(1280, innerWidth - 48, src.naturalWidth || 1280)}px`;
+    slot.append(img);
+  }));
 
   dialog.addEventListener("close", () => {
-    // The close event is async; skip it if another board has opened since.
+    // The close event is async; skip it if another asset has opened since.
     if (dialog.open) return;
     restore();
     opener?.focus();
@@ -948,10 +1131,389 @@ function initCollapseOnLeave() {
 
 renderChrome();
 renderProjects();
+// Mensio request flow: draws each person's rail and the route through the numbered stops.
+function initRequestFlow() {
+  const LANE_Y = [56, 150, 244];
+  const START = 96;
+  const ns = "http://www.w3.org/2000/svg";
+
+  document.querySelectorAll(".rq").forEach((card) => {
+    const map = card.querySelector(".rq-map");
+    const svg = map.querySelector(".rq-svg");
+    const detail = card.querySelector(".rq-detail");
+    const loopLabel = map.querySelector(".rq-loop-label");
+    const hint = "Hover a step to see what happened.";
+    // Stops spread evenly across the rail in each view
+    const gap = (n) => (map.clientWidth - START - 56) / (n - 1);
+    const place = (stops) => stops.map((b, i) => ({ b, x: START + i * gap(stops.length), y: LANE_Y[+b.dataset.lane] }));
+
+    const draw = (animate) => {
+      const view = card.dataset.view;
+      const group = map.querySelector(`.rq-stops[data-for="${view}"]`);
+      const pts = place([...group.querySelectorAll(".rq-stop")]);
+      map.querySelectorAll(".rq-lane").forEach((l) => (l.style.top = `${LANE_Y[+l.dataset.lane]}px`));
+      pts.forEach(({ b, x, y }) => {
+        b.style.left = `${x}px`; b.style.top = `${y}px`; b.style.width = `${gap(pts.length) - 6}px`;
+        // Client labels sit above the rail in the before view, clear of the route
+        b.classList.toggle("up", view === "before" && b.dataset.lane === "0");
+      });
+
+      // The route runs the full length of the rails, from the rail's start to its end
+      const railStart = START - 16, railEnd = map.clientWidth - 24;
+      let d = `M${railStart} ${pts[0].y} L${pts[0].x} ${pts[0].y}`;
+      pts.slice(1).forEach((p, i) => {
+        const a = pts[i];
+        if (a.y === p.y) d += ` L${p.x} ${p.y}`;
+        else { const m = (a.x + p.x) / 2; d += ` C${m} ${a.y} ${m} ${p.y} ${p.x} ${p.y}`; }
+      });
+      const last = pts[pts.length - 1];
+      d += ` L${railEnd} ${last.y}`;
+      const rails = LANE_Y.map((y) => `<line class="rq-rail" x1="${railStart}" y1="${y}" x2="${railEnd}" y2="${y}"${view === "after" && y !== LANE_Y[0] ? ' style="opacity:.45"' : ""}/>`).join("");
+      let loop = "";
+      if (view === "before") {
+        // Revise loops back to the pull
+        const a = pts[7], b = pts[3], top = a.y - 64;
+        loop = `<path class="rq-route loop" d="M${a.x} ${a.y - 14} C${a.x} ${top} ${b.x} ${top} ${b.x} ${b.y - 14}"/>`;
+        loopLabel.style.left = `${(a.x + b.x) / 2}px`;
+        loopLabel.style.top = `${a.y - 50}px`;
+      }
+      svg.innerHTML = rails + loop + `<path class="rq-route" d="${d}"/>`;
+
+      const route = svg.querySelector(".rq-route:not(.loop)");
+      map.querySelectorAll(".rq-stops").forEach((g) => g.classList.toggle("in", g === group && !animate));
+      if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const len = route.getTotalLength();
+        route.style.strokeDasharray = len;
+        route.style.strokeDashoffset = len;
+        route.getBoundingClientRect();
+        route.classList.add("draw");
+        route.style.strokeDashoffset = 0;
+        group.querySelectorAll(".rq-stop").forEach((b, i) => (b.style.transitionDelay = `${(i / pts.length) * 0.8}s`));
+        requestAnimationFrame(() => group.classList.add("in"));
+      } else {
+        group.querySelectorAll(".rq-stop").forEach((b) => (b.style.transitionDelay = "0s"));
+        group.classList.add("in");
+      }
+    };
+
+    const select = (stop) => {
+      card.querySelectorAll(".rq-stop.on").forEach((b) => b.classList.remove("on"));
+      if (!stop) { detail.textContent = hint; return; }
+      stop.classList.add("on");
+      detail.innerHTML = `<b>${stop.querySelector("span").innerHTML}</b>${stop.dataset.d}`;
+    };
+
+    card.querySelectorAll("[data-rq]").forEach((tab) => tab.addEventListener("click", () => {
+      if (card.dataset.view === tab.dataset.rq) return;
+      card.dataset.view = tab.dataset.rq;
+      card.querySelectorAll("[data-rq]").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+      select(null);
+      drawn = true;
+      draw(true);
+    }));
+    card.querySelectorAll(".rq-stop").forEach((b) => ["mouseenter", "focus", "click"].forEach((t) => b.addEventListener(t, () => select(b))));
+    map.addEventListener("mouseleave", () => select(null));
+    let drawn = false;
+    new ResizeObserver(() => drawn && draw(false)).observe(map);
+    select(null);
+
+    // Draw the route in the first time the diagram scrolls into view
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); drawn = true; draw(true); } }, { threshold: 0.4 });
+    io.observe(map);
+  });
+}
+
+// Mensio pivots: one pair of discarded and shipped designs at a time.
+function initPivots() {
+  document.querySelectorAll(".mess").forEach((panel) => {
+    const tabs = [...panel.querySelectorAll("[data-pivot][role=tab]")];
+    tabs.forEach((tab) => tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+      panel.querySelectorAll(".mess-pair").forEach((p) => (p.hidden = p.dataset.pivot !== tab.dataset.pivot));
+    }));
+  });
+}
+
+// Annotated screenshots: a marker or its list item zooms the image to that spot.
+function initAnnotations() {
+  const ZOOM = 2.2;
+  document.querySelectorAll(".annot").forEach((fig) => {
+    const stage = fig.querySelector(".annot-stage");
+    const hots = [...fig.querySelectorAll(".hot")];
+    const items = [...fig.querySelectorAll(".annot-list li")];
+    const show = (i) => {
+      const on = i != null;
+      fig.classList.toggle("on", on);
+      hots.forEach((h, k) => h.classList.toggle("on", k === i));
+      items.forEach((li, k) => li.classList.toggle("on", k === i));
+      const pct = (h, v) => parseFloat(h.style.getPropertyValue(v));
+      // Markers sit beside their target; while zoomed, pull the active one back inside the frame
+      hots.forEach((h) => { h.style.removeProperty("left"); h.style.removeProperty("top"); });
+      if (on) {
+        const h = hots[i], ox = pct(h, "--x"), oy = pct(h, "--y");
+        stage.style.setProperty("--zx", `${ox}%`);
+        stage.style.setProperty("--zy", `${oy}%`);
+        const fit = (o, m) => o + (Math.min(92, Math.max(8, o + (m - o) * ZOOM)) - o) / ZOOM;
+        h.style.left = `${fit(ox, pct(h, "--mx"))}%`;
+        h.style.top = `${fit(oy, pct(h, "--my"))}%`;
+      }
+      stage.style.setProperty("--z", on ? ZOOM : 1);
+    };
+    [...hots, ...items].forEach((el) => {
+      const i = +el.dataset.i;
+      el.addEventListener("mouseenter", () => show(i));
+      el.addEventListener("focus", () => show(i));
+      el.addEventListener("click", () => show(fig.classList.contains("on") && el.classList.contains("on") ? null : i));
+    });
+    fig.addEventListener("mouseleave", () => show(null));
+  });
+}
+
+// Mensio affinity board: notes scatter as raw interview notes, then stack under each finding.
+function initAffinity() {
+  document.querySelectorAll(".af").forEach((card) => {
+    const board = card.querySelector(".af-board");
+    const notes = [...board.querySelectorAll(".af-note")];
+    const heads = [...board.querySelectorAll(".af-head")];
+    // PEEK shows the first two lines of each stacked note; hovering one brings it to the front
+    const GAP = 16, PEEK = 45;
+    // Fixed scatter so the raw view looks the same on every visit
+    const rand = (i, k) => { const x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); };
+    board.classList.add("ready");
+
+    const layout = () => {
+      const W = board.clientWidth;
+      const cols = W >= 640 ? 4 : 2;
+      const colW = (W - GAP * (cols - 1)) / cols;
+      [...notes, ...heads].forEach((el) => (el.style.width = `${colW}px`));
+
+      // Grouped: each finding's header, then its notes stacked below it, later notes on top
+      const grouped = [];
+      let rowTop = 0, rowH = 0;
+      heads.forEach((h, g) => {
+        const col = g % cols;
+        if (col === 0 && g) { rowTop += rowH + 28; rowH = 0; }
+        const x = col * (colW + GAP);
+        h.style.transform = `translate(${x}px, ${rowTop}px)`;
+        // Stacks in a row start level, under the row's tallest header
+        const rowHeads = heads.slice(g - col, g - col + cols);
+        let y = rowTop + Math.max(...rowHeads.map((r) => r.offsetHeight)) + 12, bottom = y;
+        notes.filter((n) => +n.dataset.g === g).forEach((n, i) => {
+          grouped.push({ n, x: x + (i % 2 ? 4 : -2), y, r: i % 2 ? 1.4 : -1.2, z: i + 1 });
+          bottom = y + n.offsetHeight;
+          y += PEEK;
+        });
+        rowH = Math.max(rowH, bottom - rowTop);
+      });
+      const height = rowTop + rowH + 8;
+
+      if (card.dataset.view === "raw") {
+        notes.forEach((n, i) => {
+          const x = rand(i, 1) * (W - colW), y = rand(i, 2) * Math.max(0, height - n.offsetHeight);
+          n.style.transform = `translate(${x}px, ${y}px) rotate(${(rand(i, 3) - 0.5) * 10}deg)`;
+          n.style.zIndex = i + 1;
+        });
+      } else {
+        grouped.forEach(({ n, x, y, r, z }) => {
+          n.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+          n.style.zIndex = z;
+        });
+      }
+      board.style.height = `${height}px`;
+    };
+
+    const setView = (view) => {
+      card.dataset.view = view;
+      card.querySelectorAll("[data-af]").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.af === view)));
+      notes.forEach((n, i) => (n.style.transitionDelay = `${i * 0.03}s`));
+      layout();
+    };
+    card.querySelectorAll("[data-af]").forEach((t) => t.addEventListener("click", () => setView(t.dataset.af)));
+
+    // Start scattered, then sort into the findings the first time the board is in view
+    card.dataset.view = "raw";
+    card.querySelectorAll("[data-af]").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.af === "raw")));
+    layout();
+    new ResizeObserver(layout).observe(board);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setView("grouped"); return; }
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      setTimeout(() => setView("grouped"), 400);
+    }, { threshold: 0.5 });
+    io.observe(board);
+  });
+}
+
+// Left-to-right tracker. Reference mode shows the real Domino's Tracker; Mensio mode steps
+// through the stakeholders' stages, with skeleton options standing in for each stage's choices.
+// QA board: the spec doc's design QA and product requests as a board, grouped by priority or by step.
+function initQaBoard() {
+  // [title, step, type, reporter, priority]; design QA items were not given a priority in the doc
+  const ISSUES = [
+    ["Header shows the chart name", "Modal", "change", "design", ""],
+    ["Pills stay pinned on scroll", "Modal", "change", "design", ""],
+    ["Each step opens scrolled to the top", "Modal", "bug", "design", ""],
+    ["Next is Primary, Cancel Secondary, Back Tertiary", "Modal", "change", "design", ""],
+    ["“Other Options” chevron points up, not right", "Metrics", "change", "design", ""],
+    ["Tooltips missing across metric groupings", "Metrics", "bug", "design", ""],
+    ["Re-opening a chart drops the metric grouping", "Metrics", "bug", "design", ""],
+    ["“Other Options” collapsed by default", "Groupings", "change", "design", ""],
+    ["Pills name their slot, e.g. “Brands (Bars)”", "Groupings", "change", "design", ""],
+    ["Calendar sits right below the date fields", "Date range", "change", "design", ""],
+    ["Seasons starts with empty Start and End dates", "Date range", "change", "design", ""],
+    ["Trash icon only on added date ranges", "Date range", "change", "design", ""],
+    ["Next stays disabled after picking a date range", "Date range", "bug", "design", ""],
+    ["Add a filter pill only once a value is picked", "Filters", "bug", "design", ""],
+    ["Nested filters appear after their parent is picked", "Filters", "change", "design", ""],
+    ["Pill stays as “None Selected” after clearing Select All", "Filters", "bug", "design", ""],
+    ["Empty sections still show, as “None selected”", "Review", "change", "design", ""],
+    ["Edit buttons use the Secondary style", "Review", "change", "design", ""],
+    ["Don't pre-select a chart style", "Modal", "change", "product", "P0"],
+    ["Save & Fetch doesn't save", "Review", "bug", "product", "P0"],
+    ["“of of” typo under “How would you like to create this chart?”", "Modal", "bug", "product", "P0"],
+    ["Auto-scroll after a metric grouping goes too far", "Metrics", "bug", "product", "P0"],
+    ["Metric pills follow the recommended order", "Metrics", "change", "product", "P0"],
+    ["Multiple date ranges allow one data grouping, as bars", "Groupings", "change", "product", "P0"],
+    ["Scatterplot shows the Table's grouping copy", "Groupings", "bug", "product", "P0"],
+    ["Footer doesn't span the modal", "Modal", "bug", "product", "P1"],
+    ["Reorder the Seasons list", "Date range", "change", "product", "P1"],
+    ["Teams tooltip: both teams are counted", "Groupings", "change", "product", "P1"],
+    ["Show “(6 options)”", "Modal", "change", "product", "P2"],
+    ["Explain an empty Other Options", "Metrics", "change", "product", "P2"],
+    ["Keep the chosen league selected in the Seasons dropdown", "Date range", "bug", "product", "P2"],
+    ["Clicking a pill opens its step", "Modal", "change", "product", "P2"],
+    ["Clearing a filter pill leaves its dropdown value", "Filters", "bug", "product", "P3"],
+    ["Picking a value doesn't select its filter; ask customers after release", "Filters", "change", "product", "P4"],
+  ];
+  // Four columns, two cards each; the rest are counted, not shown
+  const COLS = [["Design QA", (p) => !p], ["P0", (p) => p === "P0"], ["P1", (p) => p === "P1"], ["P2–P4", (p) => /P[234]/.test(p)]];
+  const SHOW = 2;
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  document.querySelectorAll(".qa").forEach((card) => {
+    card.querySelector(".qa-board").innerHTML = COLS.map(([name, test]) => {
+      const items = ISSUES.filter((it) => test(it[4]));
+      const more = items.length - SHOW;
+      return `<section class="qa-col"><h4>${name} <span>${items.length}</span></h4><ul>${items.slice(0, SHOW).map(([t, step, type]) =>
+        `<li class="qa-card"><p>${esc(t)}</p><span class="qa-tag${type === "bug" ? " qa-bug" : ""}">${type === "bug" ? "Bug · " : ""}${step}</span></li>`).join("")}</ul>${more > 0 ? `<p class="qa-more">+${more} more</p>` : ""}</section>`;
+    }).join("");
+  });
+}
+
+// Chart examples: one tab per chart type
+function initChartTabs() {
+  document.querySelectorAll(".chart-tabs").forEach((panel) => {
+    const tabs = [...panel.querySelectorAll("[role=tab][data-chart]")];
+    tabs.forEach((tab) => tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+      panel.querySelectorAll("img[data-chart]").forEach((img) => (img.hidden = img.dataset.chart !== tab.dataset.chart));
+    }));
+  });
+}
+
+// TL;DR toggle: a short version keeps the marked sections and drops the blocks inside them marked to hide.
+function initTldr() {
+  const tabs = [...document.querySelectorAll(".tldr-toggle [data-tldr-mode]")];
+  if (!tabs.length) return;
+  document.body.append(document.querySelector(".tldr-toggle"));
+  const set = (mode, scroll) => {
+    document.body.classList.toggle("tldr", mode === "short");
+    tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tldrMode === mode)));
+    // Hide contents links whose section is gone in this mode
+    document.querySelectorAll("a[data-toc]").forEach((a) => {
+      const target = document.getElementById(a.dataset.toc);
+      a.hidden = !!target && !target.getClientRects().length;
+    });
+    try { localStorage.setItem("mensio-tldr", mode); } catch (e) {}
+    if (scroll) document.querySelector(".project-sections").scrollIntoView({ block: "start", behavior: "smooth" });
+  };
+  tabs.forEach((t) => t.addEventListener("click", () => set(t.dataset.tldrMode, true)));
+  let saved = "full";
+  try { saved = localStorage.getItem("mensio-tldr") || "full"; } catch (e) {}
+  set(saved, false);
+}
+
+// Guided Setup's steps light up in order, then start over.
+function initSteps() {
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll(".ms-steps").forEach((list) => {
+    const items = [...list.children];
+    let step = still ? items.length - 1 : 0, timer = 0;
+    const render = () => items.forEach((li, i) => { li.classList.toggle("done", i < step); li.classList.toggle("now", i === step); });
+    const play = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { step = (step + 1) % items.length; render(); play(); }, step === items.length - 1 ? 1800 : 1100);
+    };
+    render();
+    if (still) return;
+    new IntersectionObserver(([e]) => (e.isIntersecting ? play() : clearTimeout(timer)), { threshold: 0.4 }).observe(list);
+  });
+}
+
+// Stakeholders' tracker: Mensio's stages play through on their own; a stage can also be picked directly.
+function initTracker() {
+  const STAGES = [
+    ["Data type", "Pick one, and the next stages only show what fits it.", 6],
+    ["Metrics", "Only the metrics for that data type.", 7],
+    ["Data groupings", "Only the groupings for that data type.", 6],
+    ["Filters", "Only the filters for that data type.", 7],
+    ["Dates", "A date range, or a sports season.", 1],
+  ];
+  const WIDTHS = [32, 24, 40, 28, 36, 22, 30];
+  const HOLD = 1100, LAST = 1800;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll(".pt").forEach((card) => {
+    const stages = [...card.querySelectorAll(".pt-bar li")];
+    const label = card.querySelector(".pt-open-label");
+    const opts = card.querySelector(".pt-opts");
+    let step = 0, timer = 0, visible = false;
+
+    const render = () => {
+      stages.forEach((li, i) => { li.classList.toggle("done", i < step); li.classList.toggle("now", i === step); });
+      const [name, note, n] = STAGES[step];
+      label.innerHTML = `<b>${name}.</b> ${note}`;
+      opts.innerHTML = Array.from({ length: n }, (_, i) =>
+        `<span class="pt-skel${step === 0 && i === 1 ? " on" : ""}" style="width:${WIDTHS[(i + step * 2) % WIDTHS.length]}px; animation-delay:${i * 40}ms"></span>`).join("");
+      schedule();
+    };
+    // Advance after the current stage's hold, looping back to the start after Dates
+    const schedule = () => {
+      clearTimeout(timer);
+      if (still || !visible || card.dataset.mode !== "mensio") return;
+      timer = setTimeout(() => { step = (step + 1) % STAGES.length; render(); }, step === STAGES.length - 1 ? LAST : HOLD);
+    };
+
+    const setMode = (mode) => {
+      card.dataset.mode = mode;
+      card.querySelectorAll("[data-pt]").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.pt === mode)));
+      if (mode === "mensio") { step = 0; render(); } else clearTimeout(timer);
+    };
+    card.querySelectorAll("[data-pt]").forEach((t) => t.addEventListener("click", () => setMode(t.dataset.pt)));
+    stages.forEach((li, i) => {
+      li.tabIndex = 0;
+      const go = () => { step = i; render(); };
+      li.addEventListener("click", go);
+      li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: 0.4 }).observe(card);
+    render();
+  });
+}
+
 initScaledFrames();
 initCursorLabel();
 initScrollSpy();
 initCompare();
+initRequestFlow();
+initPivots();
+initAffinity();
+initTracker();
+initSteps();
+initQaBoard();
+initChartTabs();
+initTldr();
+initAnnotations();
 initDemoTabs();
 initIcons();
 initDemoMenu();
@@ -964,7 +1526,9 @@ initBreadcrumbs();
 initButtonMatrix();
 initModeToggle();
 initPaletteTabs();
-initExpandBoards();
+initGsFlow();
+initSession();
+initExpand();
 initVariablesPanel();
 initCollapseOnLeave();
 initFitToOpen();

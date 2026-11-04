@@ -6,7 +6,7 @@
   <title>Mensio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0..100,0..1;1,9..144,400,0..100,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@400;500&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0..100,0..1;1,9..144,400,0..100,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
   <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 </head>
@@ -16,7 +16,7 @@
       <div class="grid-12" style="flex:1">
         <main class="content">
           <article class="case-study fade-in d1">
-            <div class="project-hero" style="background:linear-gradient(135deg, #2b3a67, #7aaee9)"><img class="hero-shot" src="../media/mensio/modal-chart-type.jpg" alt="Create New Chart: choose Guided Setup or Preset Templates, then a chart style"></div>
+            <div class="project-hero" style="background:linear-gradient(135deg, #2b3a67, #7aaee9)"><iframe src="../media/mensio/hero.html" title="A chart built in Guided Setup: chart details, Guided Setup and Table, a metric group, date range, groupings, filters and review, then the data pull" loading="lazy" tabindex="-1"></iframe></div>
 
             <div class="project-measure">
               <h1 class="project-title">Redesigning Mensio's Data Explorer for self-serve analysis</h1>
@@ -25,21 +25,25 @@
                 <div><p class="project-meta-label">Timeline</p><p class="project-meta-value">June – September 2026</p></div>
                 <div><p class="project-meta-label">Scope</p><p class="project-meta-value">User Research</p><p class="project-meta-value">Product Design</p><p class="project-meta-value">Design QA, Acting PM</p></div>
               </div>
+              <div class="seg tldr-toggle" role="tablist" aria-label="Story length">
+                <button type="button" role="tab" aria-selected="true" data-tldr-mode="full">Full story</button>
+                <button type="button" role="tab" aria-selected="false" data-tldr-mode="short">TL;DR</button>
+              </div>
             </div>
 
             <div class="project-sections">
 
-              <section id="overview" data-toc="Overview" class="project-content-grid">
+              <section data-tldr id="overview" data-toc="Overview" class="project-content-grid">
                 <div class="project-content-text"><div class="divider"></div></div>
                 <p class="project-section-label project-content-text">Overview</p>
                 <div class="project-content-text"><h2>Mensio is a powerful tool that tracks brand exposure across TV and social…</h2></div>
-                <div class="project-content-text"><p>Brands, teams and networks use it for sponsorship and ad intelligence. It watches every second of 185 TV networks and 2,000+ social handles, and catches 13,000+ brand logos at 99%+ accuracy.</p></div>
+                <div data-tldr-hide class="project-content-text"><p>Brands, teams and networks use it for sponsorship and ad intelligence. It watches every second of 185 TV networks and 2,000+ social handles, and catches 13,000+ brand logos at 99%+ accuracy.</p></div>
                 <div class="project-content-media">
                   <div class="panel" style="background:#2b3a6722">
                     <p class="panel-label">Adding metrics, before and after</p>
                     <div class="panel-card compare-card">
                       <div class="compare" style="--pos: 50%; aspect-ratio: 1440 / 821">
-                        <img src="../media/mensio/metrics-selected.jpg" alt="Guided Setup's Metrics step: pick one metric group, and its usual metrics are pre-selected" style="object-position: top">
+                        <img src="../media/mensio/after-metrics.jpg" alt="Guided Setup Metrics step: TV Sponsorship [Visual] picked, with its usual metrics added as chips" style="object-position: top">
                         <img class="compare-before" src="../media/mensio/before-select-metric.jpg" alt="The old Add Metric dialog listing every metric in every group at once">
                         <div class="compare-handle" aria-hidden="true"></div>
                         <input type="range" min="0" max="100" value="50" aria-label="Drag to compare the old and new metric selection">
@@ -50,7 +54,8 @@
                   </div>
                 </div>
                 <div class="project-content-text"><h2>…but customers couldn't get the data out on their own.</h2></div>
-                <div class="project-content-text"><p>Data Explorer showed every metric, grouping and filter at once. Customers didn't know which combination answered their question, so they leaned on Mensio's analysts to pull the data for them.</p><p>We redesigned chart building into Guided Setup, a step-by-step wizard with presets, and shipped it in 14 weeks.</p></div>
+                <div data-tldr-hide class="project-content-text"><p>Data Explorer showed every metric, grouping and filter at once. Customers didn't know which combination answered their question, so they leaned on Mensio's analysts to pull the data for them.</p><p>We redesigned chart building into Guided Setup, a step-by-step wizard with presets, and shipped it in 14 weeks.</p></div>
+                <div data-tldr-only class="project-content-text"><p>We redesigned chart building into Guided Setup and shipped it in 14 weeks.</p></div>
               </section>
 
               <section id="assumption" data-toc="Starting assumption" class="project-content-grid">
@@ -64,57 +69,92 @@
                     <div><p>What we found</p><p>There were no documented customer pain points. Analysts were doing the work, so their workflow was what we needed to study.</p></div>
                   </div>
                 </div>
-                <div class="project-content-media"><div class="figure-grid cols-2"><figure><div class="figure-media mail-board" style="aspect-ratio:4 / 3" role="img" aria-label="Two anonymized customer emails. One asks analysts whether cutting the data to home games is the right way to avoid double counting. The other lists the filters a customer used and asks if the numbers look right."><div class="mail"><p class="mail-meta"><b>Subject:</b> RE: Retailer EMV by team</p><p class="mail-meta"><b>To:</b> Mensio analytics team</p><p>We've cut the data down to only home games as we think this is the cleanest way to isolate / keep from double counting. <mark>Is this correct?</mark></p><p>If the way we've cut the data for total EMV by team isn't the cleanest way to do it, <mark>could you please help us get there?</mark></p><p class="mail-sign">Consultant, strategy firm</p></div><div class="mail"><p>I was playing around with the dashboard and used these filters to pull the data for each brand individually into Excel.</p><div class="mail-chips"><span class="mail-chip mail-chip--metric"><i></i>Equivalent Media Value [Visual]</span><span class="mail-chip mail-chip--date"><i></i>2025-08-01 – 2026-09-08</span><span class="mail-chip mail-chip--group"><i></i>Teams (Bars)</span><span class="mail-chip mail-chip--group"><i></i>Leagues (Bar Segments)</span><span class="mail-chip mail-chip--filter"><i></i>Brands › Brand A</span><span class="mail-chip mail-chip--filter"><i></i>Networks (165) › A&amp;E, ABC, ACC…</span><span class="mail-chip mail-chip--filter"><i></i>Event Types › Home Games</span><span class="mail-chip mail-chip--filter"><i></i>Asset Types (47) › Ball, Basketball…</span><span class="mail-chip mail-chip--filter"><i></i>Program Sub-Genres (14) › NBA…</span></div><p><mark>I just wanted to double-check that I'm doing this correctly</mark> and that the numbers look right.</p><p class="mail-sign">Brand partner</p></div></div><figcaption>Customer emails asking for one-off pulls</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><span class="asset-note">Anonymized session clip</span></div><figcaption>A frustrated session in the old explorer</figcaption></figure></div></div>
+                <div class="project-content-media"><div class="figure-grid cols-2"><figure><div class="figure-media mail-board" style="aspect-ratio:4 / 3" role="img" aria-label="Two anonymized customer emails. One asks analysts whether cutting the data to home games is the right way to avoid double counting. The other lists the filters a customer used and asks if the numbers look right."><div class="mail"><p class="mail-meta"><b>Subject:</b> RE: Retailer EMV by team</p><p class="mail-meta"><b>To:</b> Mensio analytics team</p><p>We've cut the data down to only home games as we think this is the cleanest way to isolate / keep from double counting. <mark>Is this correct?</mark></p><p>If the way we've cut the data for total EMV by team isn't the cleanest way to do it, <mark>could you please help us get there?</mark></p><p class="mail-sign">Consultant, strategy firm</p></div><div class="mail"><p>I was playing around with the dashboard and used these filters to pull the data for each brand individually into Excel.</p><div class="mail-chips"><span class="mail-chip mail-chip--metric"><i></i>Equivalent Media Value [Visual]</span><span class="mail-chip mail-chip--date"><i></i>2025-08-01 – 2026-09-08</span><span class="mail-chip mail-chip--group"><i></i>Teams (Bars)</span><span class="mail-chip mail-chip--group"><i></i>Leagues (Bar Segments)</span><span class="mail-chip mail-chip--filter"><i></i>Brands › Brand A</span><span class="mail-chip mail-chip--filter"><i></i>Networks (165) › A&amp;E, ABC, ACC…</span><span class="mail-chip mail-chip--filter"><i></i>Event Types › Home Games</span><span class="mail-chip mail-chip--filter"><i></i>Asset Types (47) › Ball, Basketball…</span><span class="mail-chip mail-chip--filter"><i></i>Program Sub-Genres (14) › NBA…</span></div><p><mark>I just wanted to double-check that I'm doing this correctly</mark> and that the numbers look right.</p><p class="mail-sign">Brand partner</p></div></div><figcaption>Customer emails asking for one-off pulls</figcaption></figure><figure><div class="figure-media session" style="aspect-ratio:4 / 3"><div class="session-stage"><img src="../media/mensio/session/f203.jpg" alt="Every table requirement is met, but Fetch is disabled"><img src="../media/mensio/session/f234.jpg" alt="Hovering the info icon shows only: Invalid selection combinations"><img src="../media/mensio/session/f297.jpg" alt="Add Data Grouping with Network Owners checked"><img src="../media/mensio/session/f318.jpg" alt="Network Owners swapped for Brand Owners"><img src="../media/mensio/session/f339.jpg" alt="Fetch is enabled again"><img src="../media/mensio/session/f360.jpg" alt="The chart loads"><img src="../media/mensio/session/f443.jpg" alt="The table appears"><img src="../media/mensio/session/f464.jpg" alt="The chart is back to empty: nothing was saved"></div><span class="session-mark" aria-hidden="true"></span><p class="session-cap" aria-live="polite"></p></div><figcaption>A frustrated session in the old explorer</figcaption></figure></div></div>
               </section>
 
-              <section id="problem" data-toc="The problem" class="project-content-grid">
+              <section data-tldr id="problem" data-toc="The problem" class="project-content-grid">
                 <div class="project-content-text"><div class="divider"></div></div>
                 <p class="project-section-label project-content-text">The problem</p>
                 <div class="project-content-text"><h2>Every custom chart went through an analyst.</h2></div>
                 <div class="project-content-text"><p>A one-line customer email became an eight-step process across two people and three tools.</p></div>
                 <div class="project-content-media">
                   <div class="panel" style="background:#2b3a6722">
-                    <p class="panel-label">A custom request: 8 steps, 2 people, 3 tools</p>
-                    <div class="panel-card">
-                      <ol class="flow">
-                        <li>Client emails one line</li><li>Analyst follows up</li><li>Call if too complex</li><li>Analyst builds the pull</li>
-                        <li>Manager reviews</li><li>Export, clean in Excel</li><li>Send to client</li><li>Revise</li>
-                      </ol>
+                    <p class="panel-label">A custom request, before and after</p>
+                    <div class="panel-card rq" data-view="before">
+                      <div class="rq-top">
+                        <div class="seg" role="tablist" aria-label="Request flow">
+                          <button type="button" role="tab" aria-selected="true" data-rq="before">Before: analyst-run</button>
+                          <button type="button" role="tab" aria-selected="false" data-rq="after">After: customer-run</button>
+                        </div>
+                        <p class="rq-sum" data-for="before">8 steps · 2 people · 3 tools · ~1 work day</p>
+                        <p class="rq-sum" data-for="after">6 steps · 1 person · 1 tool</p>
+                      </div>
+                      <div class="rq-scroll">
+                        <div class="rq-map">
+                          <svg class="rq-svg" aria-hidden="true"></svg>
+                          <span class="rq-lane" data-lane="0">Client</span>
+                          <span class="rq-lane" data-lane="1">Analyst</span>
+                          <span class="rq-lane" data-lane="2">Manager</span>
+                          <span class="rq-loop-label" data-for="before">1 in 3 come back</span>
+                          <span class="rq-idle" data-for="after" style="top:150px">Not involved</span>
+                          <span class="rq-idle" data-for="after" style="top:244px">Not involved</span>
+                          <div class="rq-stops" data-for="before">
+                          <button type="button" class="rq-stop" data-lane="0" data-d="Usually just a metric and a TV program or brand."><b>1</b><span>Emails one line</span></button>
+                          <button type="button" class="rq-stop" data-lane="1" data-d="Date range, shoulder programming, live events, verbal or social data, other brands, every frame, asset breakdown. Needed almost every time."><b>2</b><span>Follows up</span></button>
+                          <button type="button" class="rq-stop" data-lane="0" data-d="When a request had too many open questions for email."><b>3</b><span>Call if too complex</span></button>
+                          <button type="button" class="rq-stop" data-lane="1" data-d="About 10 minutes. Analysts pulled more than needed, afraid to miss something."><b>4</b><span>Builds the pull</span></button>
+                          <button type="button" class="rq-stop" data-lane="2" data-d="A manager checked every pull before it was saved and exported."><b>5</b><span>Reviews</span></button>
+                          <button type="button" class="rq-stop" data-lane="1" data-d="Exporting and cleaning data took 35% of an analyst's day."><b>6</b><span>Exports, cleans in Excel</span></button>
+                          <button type="button" class="rq-stop" data-lane="1" data-d="Clients got the export, since they couldn't change the chart themselves."><b>7</b><span>Sends export</span></button>
+                          <button type="button" class="rq-stop" data-lane="1" data-d="1 in 3 requests came back, often a month later, about 1 hour each."><b>8</b><span>Revises</span></button>
+                          </div>
+                          <div class="rq-stops" data-for="after">
+                          <button type="button" class="rq-stop" data-lane="0" data-d="Presets for recurring questions, Guided Setup for everything else."><b>1</b><span>Picks a preset or Guided Setup</span></button>
+                          <button type="button" class="rq-stop" data-lane="0" data-d="Picking a category pre-selects its usual metrics."><b>2</b><span>Metrics</span></button>
+                          <button type="button" class="rq-stop" data-lane="0" data-d="Multiple date ranges and a Seasons picker, in one chart."><b>3</b><span>Date range</span></button>
+                          <button type="button" class="rq-stop" data-lane="0" data-d="Each grouping adds a column, and each unique value adds a row."><b>4</b><span>Data groupings</span></button>
+                          <button type="button" class="rq-stop" data-lane="0" data-d="Tooltips explain the exclusion and double-counting rules."><b>5</b><span>Filters</span></button>
+                          <button type="button" class="rq-stop" data-lane="0" data-d="The customer checks the setup and gets the chart in Mensio."><b>6</b><span>Review, Save &amp; Fetch</span></button>
+                          </div>
+                        </div>
+                      </div>
+                      <p class="rq-detail" aria-live="polite"></p>
                     </div>
                   </div>
                 </div>
-                <div class="project-content-media"><div class="figure-grid cols-2"><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/before-empty.jpg" alt="The old chart builder: an empty canvas with an Add button and a list of table requirements"></div><figcaption>The old builder started from a blank canvas</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/before-filters.jpg" alt="The old chart builder with metrics, groupings and filters stacked as chips above the chart"></div><figcaption>Filters stacked up as chips, with no guidance on which go together</figcaption></figure></div></div>
+                <div data-tldr-hide class="project-content-media"><div class="figure-grid cols-2"><figure class="annot"><div class="figure-media annot-media" style="aspect-ratio:1800 / 1015"><div class="annot-stage"><img src="../media/mensio/before-empty.jpg" alt="The old chart builder: an empty canvas with an Add button and a list of table requirements"><button type="button" class="hot" style="--x:9.6%;--y:12.4%;--mx:19%;--my:12.4%" data-i="0" aria-label="One Add button for every metric, grouping, filter and date.">1</button><button type="button" class="hot" style="--x:42%;--y:32%;--mx:58%;--my:32%" data-i="1" aria-label="Nothing appears until the requirements are met.">2</button><button type="button" class="hot" style="--x:23%;--y:54%;--mx:36%;--my:54%" data-i="2" aria-label="The only guidance is a count: 1–10 metrics, 1–10 groupings, 1 date range.">3</button></div></div><figcaption>The old builder started from a blank canvas</figcaption><ol class="annot-list"><li data-i="0">One Add button for every metric, grouping, filter and date.</li><li data-i="1">Nothing appears until the requirements are met.</li><li data-i="2">The only guidance is a count: 1–10 metrics, 1–10 groupings, 1 date range.</li></ol></figure><figure class="annot"><div class="figure-media annot-media" style="aspect-ratio:1800 / 1026"><div class="annot-stage"><img src="../media/mensio/before-filters.jpg" alt="The old chart builder with metrics, groupings and filters stacked as chips above the chart"><button type="button" class="hot" style="--x:48.9%;--y:14.6%;--mx:38%;--my:23.5%" data-i="0" aria-label="Every choice becomes a chip in one row, with nothing grouping related filters.">1</button><button type="button" class="hot" style="--x:18.6%;--y:61%;--mx:13%;--my:61%" data-i="1" aria-label="The requirements only count chips, so all three check off.">2</button><button type="button" class="hot" style="--x:89.4%;--y:12.5%;--mx:89.4%;--my:20.5%" data-i="2" aria-label="Fetch, top right, unlocks even if the filters don't belong together.">3</button></div></div><figcaption>Filters stacked up as chips, with no guidance on which go together</figcaption><ol class="annot-list"><li data-i="0">Every choice becomes a chip in one row, with nothing grouping related filters.</li><li data-i="1">The requirements only count chips, so all three check off.</li><li data-i="2">Fetch, top right, unlocks even if the filters don't belong together.</li></ol></figure></div></div>
 
                 <div id="analysts" data-toc="Impact on analysts" class="project-subsection project-content-text">
                   <p class="project-subsection-label">Impact on analysts</p>
                   <h2>Analysts spent most of their day fulfilling requests.</h2>
                 </div>
                 <div class="project-content-text">
-                  <div class="stats">
+                  <div class="stats accent">
                     <div><p class="stat">~1 day</p><p>end-to-end per request</p></div>
                     <div><p class="stat">85%</p><p>of an analyst's day on requests, exports and cleanup</p></div>
                     <div><p class="stat">1 in 3</p><p>requests came back for rework</p></div>
                   </div>
                 </div>
 
-                <div id="renewal" data-toc="Impact on the business" class="project-subsection project-content-text">
+                <div data-tldr-hide id="renewal" data-toc="Impact on the business" class="project-subsection project-content-text">
                   <p class="project-subsection-label">Impact on the business</p>
                   <h2>Customers couldn't see Mensio's value or potential unless they used it themselves.</h2>
                 </div>
-                <div class="project-content-text">
-                  <dl class="defs">
+                <div data-tldr-hide class="project-content-text">
+                  <dl class="defs accent">
                     <div><dt>Low adoption</dt><dd>Customers stopped using Mensio or relied on analysts.</dd></div>
                     <div><dt>Weak renewals</dt><dd>Buyers rarely used the product after the demo, so they couldn't speak to its value at renewal.</dd></div>
                     <div><dt>Capped value</dt><dd>Mensio's full value was only reachable through the analytics team.</dd></div>
                   </dl>
                 </div>
+                <div data-tldr-only class="project-content-text"><p class="mission"><span>The insight</span>The process lived in analysts' heads, so the product should ask the questions an analyst would.</p></div>
               </section>
 
               <section id="insight" data-toc="The insight" class="project-content-grid">
                 <div class="project-content-text"><div class="divider"></div></div>
                 <p class="project-section-label project-content-text">The insight</p>
                 <div class="project-content-text"><h2>The process lived in analysts' heads.</h2></div>
-                <div class="project-content-text"><p>Accurate pulls depend on knowing which filters and exclusions go together. Adding teams, for example, requires home, neutral and non-game filters to avoid double-counting. None of it was documented.</p></div>
+                <div data-tldr-hide class="project-content-text"><p>Accurate pulls depend on knowing which filters and exclusions go together. Adding teams, for example, requires home, neutral and non-game filters to avoid double-counting. None of it was documented.</p></div>
                 <div class="project-content-text"><p class="mission"><span>Design goal</span>Have the product ask the questions an analyst would.</p></div>
               </section>
 
@@ -126,16 +166,38 @@
                 <div class="project-content-media">
                   <div class="panel" style="background:#2b3a6722">
                     <p class="panel-label">What analysts told us</p>
-                    <div class="panel-card"><span class="asset-note">Interview synthesis: affinity map or key quotes</span></div>
+                    <div class="panel-card af" data-view="grouped">
+                      <div class="af-top">
+                        <div class="seg" role="tablist" aria-label="Interview notes">
+                          <button type="button" role="tab" aria-selected="false" data-af="raw">Raw notes</button>
+                          <button type="button" role="tab" aria-selected="true" data-af="grouped">Grouped</button>
+                        </div>
+                        <p class="af-key"><span class="af-a"></span>Analyst A <span class="af-b"></span>Analyst B</p>
+                      </div>
+                      <div class="af-board">
+                        <div class="af-head" data-g="0"><p>Follow-up questions were consistent</p><p>Date range, live vs. replay, competitors, asset breakdown. Customers rarely specified these upfront.</p></div>
+                        <div class="af-head" data-g="1"><p>Analysts over-pulled data</p><p>To avoid missing something, they pulled extra and filtered it in Excel.</p></div>
+                        <div class="af-head" data-g="2"><p>Errors surfaced a month later</p><p>Finding a missing filter took about an hour, plus explaining the change to the customer.</p></div>
+                        <div class="af-head" data-g="3"><p>Customers didn&#x27;t understand the data model</p><p>Groupings and filters, such as programs vs. episodes, caused the most confusion.</p></div>
+                        <blockquote class="af-note af-a" data-g="0">“Customers would email us with <span class="circ">one sentence</span> that usually just included the metric and TV program or brand.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="0">“We then have to follow up and ask for the date range, whether they want shoulder programming, whether they want live events…”</blockquote>
+                        <blockquote class="af-note af-a" data-g="0">“Sometimes it is too complex or there are too many questions, so we have to hop on a call to clarify.”</blockquote>
+                        <blockquote class="af-note af-b" data-g="0">“<span class="circ">0–2 times</span>, depending how specific they are in the original ask.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="1">“Often we pull way more data than we eventually need because we are afraid to miss something.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="1">“We export more data than we need and manually filter out what we don't need in Excel.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="1">“<span class="circ">35%</span> of the day is spent exporting the data and manually cleaning up the data exports.”</blockquote>
+                        <blockquote class="af-note af-b" data-g="1">“Usually it helps to see <span class="circ">4/5</span> different versions of a pull to fully contextualize the results.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="2">“The bulk of the time is when we have to go back and add a metric about <span class="circ">a month later</span>.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="2">“Usually <span class="circ">once in every three</span> data requests.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="2">“There is no checklist, so you are trying to remember off the top of your head…”</blockquote>
+                        <blockquote class="af-note af-a" data-g="2">“When you add teams, you want to add home, neutral site and non-game filters, but exclude away games to not double count.”</blockquote>
+                        <blockquote class="af-note af-b" data-g="3">“Understanding basic data groupings: Brands, Programs, Episodes, Asset Types, Logo Occurrences, Networks.”</blockquote>
+                        <blockquote class="af-note af-b" data-g="3">“Users often don't understand how to interpret the data when segmented in different ways.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="3">“Clients only get the Excel usually because they don't know how to modify the chart.”</blockquote>
+                        <blockquote class="af-note af-a" data-g="3">“We don't want them to change anything by accident and ruin the chart.”</blockquote>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="project-content-text">
-                  <ol class="numbered">
-                    <li><p>Follow-up questions were consistent</p><p>Date range, live vs. replay, competitors, asset breakdown. Customers rarely specified these upfront.</p></li>
-                    <li><p>Analysts over-pulled data</p><p>To avoid missing something, they pulled extra and filtered it in Excel.</p></li>
-                    <li><p>Errors surfaced a month later</p><p>Finding a missing filter took about an hour, plus explaining the change to the customer.</p></li>
-                    <li><p>Customers didn't understand the data model</p><p>Groupings and filters, such as programs vs. episodes, caused the most confusion.</p></li>
-                  </ol>
                 </div>
                 <div class="project-content-text"><blockquote>“There is no checklist, so you are trying to remember off the top of your head…”</blockquote></div>
                 <div class="project-content-text"><p>The analysts' follow-up questions became the structure of the wizard.</p></div>
@@ -149,10 +211,32 @@
                 <div class="project-content-media">
                   <div class="panel" style="background:#2b3a6722">
                     <p class="panel-label">The stakeholders' left-to-right vision</p>
-                    <div class="panel-card">
-                      <ol class="flow cols-3">
-                        <li>Data type</li><li>Visualization</li><li>Metrics</li><li>Groupings</li><li>Filters</li><li>Date range</li>
+                    <div class="panel-card pt" data-mode="pizza">
+                      <div class="pt-top">
+                        <div class="seg" role="tablist" aria-label="Tracker">
+                          <button type="button" role="tab" aria-selected="true" data-pt="pizza">Their reference</button>
+                          <button type="button" role="tab" aria-selected="false" data-pt="mensio">Their ask for Mensio</button>
+                        </div>
+                        <p class="pt-note" data-for="pizza">Stakeholders pointed to the Domino's Pizza Tracker: always show where you are.</p>
+                        <p class="pt-note" data-for="mensio">One page. Options open up as you move left to right.</p>
+                      </div>
+                      <div class="pt-ref" data-for="pizza">
+                        <figure>
+                          <img src="../media/mensio/story_tracker-15th-birthday_inline_01.jpg" alt="Domino's Tracker: Ordered, Prep, Bake, Quality Check and Ready, with Ordered lit up">
+                          <figcaption>Domino's Tracker. Image: <a href="https://media.dominos.com/stories/tracker-15th-birthday/">Domino's media room</a></figcaption>
+                        </figure>
+                      </div>
+                      <ol class="pt-bar" data-for="mensio" aria-label="Stages">
+                        <li><span>Data type</span></li>
+                        <li><span>Metrics</span></li>
+                        <li><span>Data groupings</span></li>
+                        <li><span>Filters</span></li>
+                        <li><span>Dates</span></li>
                       </ol>
+                      <div class="pt-open" data-for="mensio">
+                        <p class="pt-open-label"></p>
+                        <div class="pt-opts"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -174,17 +258,30 @@
                 </div>
                 <div class="project-content-media">
                   <div class="panel" style="background:#2b3a6722">
-                    <p class="panel-label">How often they use Mensio vs. how much they trust themselves</p>
-                    <div class="panel-card"><span class="asset-note">Customer map: four groups plotted on a 2×2</span></div>
+                    <p class="panel-label">Four customer groups, from most guidance to least</p>
+                    <div class="panel-card sp">
+                      <div class="sp-scale" aria-hidden="true"><span>Needs the most guidance</span><span>Lives in Data Explorer</span></div>
+                      <div class="sp-cols">
+                        <div class="sp-col sp-key" tabindex="0">
+                          <p class="sp-name">New users &amp; requesters</p>
+                          <p class="sp-desc">Need the most guidance, and are often the budget owners</p>
+                        </div>
+                        <div class="sp-col" tabindex="0">
+                          <p class="sp-name">High-involvement users</p>
+                          <p class="sp-desc">Settle for core modules, email the team every couple of weeks</p><p class="sp-size">About 20 people</p>
+                        </div>
+                        <div class="sp-col" tabindex="0">
+                          <p class="sp-name">Power users</p>
+                          <p class="sp-desc">Tweak custom dashboards, wouldn't build from scratch</p>
+                        </div>
+                        <div class="sp-col" tabindex="0">
+                          <p class="sp-name">Super users</p>
+                          <p class="sp-desc">Live in Data Explorer, still make mistakes they don't know about</p><p class="sp-size">5 to 10 people, about 5%</p>
+                        </div>
+                      </div>
+                      <p class="sp-callout"><b>The people who renew the contract</b> are the ones least able to use the tool. Guided Setup is built for them.</p>
+                    </div>
                   </div>
-                </div>
-                <div class="project-content-text">
-                  <dl class="defs">
-                    <div><dt>Super users</dt><dd>Live in Data Explorer, still make mistakes they don't know about</dd></div>
-                    <div><dt>Power users</dt><dd>Tweak custom dashboards, wouldn't build from scratch</dd></div>
-                    <div><dt>High-involvement users</dt><dd>Settle for core modules, email the team every couple of weeks</dd></div>
-                    <div><dt>New users &amp; requesters</dt><dd>Need the most guidance, and are often the budget owners</dd></div>
-                  </dl>
                 </div>
 
               </section>
@@ -195,83 +292,95 @@
                 <div class="project-content-text"><h2>Three flow variations led to our final wizard.</h2></div>
                 <div class="project-content-text"><p>Feedback from analysts, engineers and stakeholders shaped each version.</p></div>
                 <div class="project-content-media">
-                  <div class="explore-row">
-                    <div class="panel explore-panel">
-                      <p class="panel-label">Three separate flows</p>
-                      <div class="panel-card shot"><img src="../media/mensio/old-entry-three.jpg" alt="Discarded design: Guided Flow, Custom and Create Using Preset as three separate options"></div>
+                  <div class="panel explore-panel mess">
+                    <div class="seg mess-tabs" role="tablist" aria-label="Pivots">
+                      <button type="button" role="tab" aria-selected="true" data-pivot="0">Three paths → two</button>
+                      <button type="button" role="tab" aria-selected="false" data-pivot="1">Full page → modal</button>
+                      <button type="button" role="tab" aria-selected="false" data-pivot="2">Six steps → five</button>
                     </div>
-                    <div class="explore-caption">
-                      <p>Three paths became two</p>
-                      <p>Presets, Guided and Custom confused the analytics team. We folded Custom into Guided Setup as “Frequently Selected Options.”</p>
+                    <div class="mess-pair" data-pivot="0">
+                      <figure><p>Started with</p><div class="panel-card shot"><img src="../media/mensio/old-entry-three.jpg" alt="Discarded design: Guided Flow, Custom and Create Using Preset as three separate options"></div></figure>
+                      <figure><p>Ended with</p><div class="panel-card shot"><img src="../media/mensio/modal-chart-type.jpg" alt="Final design: choose Guided Setup or Preset Templates"></div></figure>
+                      <figcaption>Presets, Guided and Custom confused the analytics team. We folded Custom into Guided Setup as “Frequently Selected Options.”</figcaption>
                     </div>
-                  </div>
-                </div>
-                <div class="project-content-media">
-                  <div class="explore-row">
-                    <div class="panel explore-panel">
-                      <p class="panel-label">Full-page wizard</p>
-                      <div class="panel-card shot"><img src="../media/mensio/old-fullpage.jpg" alt="Discarded design: the wizard as a full page, with six steps listed on the left"></div>
+                    <div class="mess-pair" data-pivot="1" hidden>
+                      <figure><p>Started with</p><div class="panel-card shot"><img src="../media/mensio/old-fullpage.jpg" alt="Discarded design: the wizard as a full page, with six steps listed on the left" loading="lazy"></div></figure>
+                      <figure><p>Ended with</p><div class="panel-card shot"><img src="../media/mensio/modal-metrics-selected.jpg" alt="Final design: the wizard in a modal, on the Metrics step" loading="lazy"></div></figure>
+                      <figcaption>Backend constraints required a modal, so we redesigned the micro-interactions to avoid modal-on-modal.</figcaption>
                     </div>
-                    <div class="explore-caption">
-                      <p>A full-page wizard became a modal</p>
-                      <p>Backend constraints required a modal, so we redesigned the micro-interactions to avoid modal-on-modal.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="project-content-media">
-                  <div class="explore-row">
-                    <div class="panel explore-panel">
-                      <p class="panel-label">Six-step flow</p>
-                      <div class="panel-card shot"><img src="../media/mensio/old-schedule.jpg" alt="Discarded design: step 5 of 6, Frequency and Schedule, inside the modal"></div>
-                    </div>
-                    <div class="explore-caption">
-                      <p>Six steps became five</p>
-                      <p>We moved scheduling to the nav bar to keep the modal focused on building a chart.</p>
+                    <div class="mess-pair" data-pivot="2" hidden>
+                      <figure><p>Started with</p><div class="panel-card shot"><img src="../media/mensio/old-schedule.jpg" alt="Discarded design: step 5 of 6, Frequency and Schedule, inside the modal" loading="lazy"></div></figure>
+                      <figure><p>Ended with</p><div class="panel-card shot"><img src="../media/mensio/edit-chart.jpg" alt="Final design: Schedule Report in the chart's nav bar" loading="lazy"></div></figure>
+                      <figcaption>We moved scheduling to the nav bar to keep the modal focused on building a chart.</figcaption>
                     </div>
                   </div>
                 </div>
               </section>
 
-              <section id="solution" data-toc="The solution" class="project-content-grid">
+              <section data-tldr id="solution" data-toc="The solution" class="project-content-grid">
                 <div class="project-content-text"><div class="divider"></div></div>
                 <p class="project-section-label project-content-text">The solution</p>
-                <div class="project-content-text"><h2>Six design decisions shaped Guided Setup.</h2></div>
+                <div data-tldr-hide class="project-content-text"><h2>Six design decisions shaped Guided Setup.</h2></div>
+                <div data-tldr-only class="project-content-text"><h2>Guided Setup walks customers through five steps.</h2></div>
                 <div class="project-content-media">
-                  <div class="panel" style="background:#7aaee933">
-                    <p class="panel-label">A custom chart now: 6 steps, 1 person, 1 tool</p>
-                    <div class="panel-card">
-                      <ol class="flow cols-3">
-                        <li>Pick a preset or Guided Setup</li><li>Metrics</li><li>Date range</li><li>Data groupings</li><li>Filters</li><li>Review, Save &amp; Fetch</li>
+                  <div class="bento">
+                    <div class="bento-tile bento-full">
+                      <p class="bento-title">A custom chart now: 6 steps, 1 person, 1 tool</p>
+                      <ol class="ms-steps" aria-label="Steps">
+                        <li><span class="n">1</span><span class="l">Preset or Guided</span></li>
+                        <li><span class="n">2</span><span class="l">Metrics</span></li>
+                        <li><span class="n">3</span><span class="l">Date range</span></li>
+                        <li><span class="n">4</span><span class="l">Groupings</span></li>
+                        <li><span class="n">5</span><span class="l">Filters</span></li>
+                        <li><span class="n">6</span><span class="l">Review &amp; Fetch</span></li>
                       </ol>
                     </div>
+                    <figure data-tldr-hide class="bento-tile bento-full">
+                      <figcaption><span class="bento-n">01</span><span class="bento-title">One entry, two paths</span><span class="bento-desc">Six presets for common questions; Guided Setup for everything else.</span></figcaption>
+                      <div class="bento-shot"><img src="../media/mensio/sol-01-setup-crop.jpg" alt="Create New Chart, Chart Setup: Guided Setup or Preset Templates, then a chart style" loading="lazy"></div>
+                    </figure>
+                    <figure data-tldr-hide class="bento-tile">
+                      <figcaption><span class="bento-n">02</span><span class="bento-title">A linear flow</span><span class="bento-desc">Metrics → Date range → Grouping → Filters → Review, showing only options that fit.</span></figcaption>
+                      <div class="bento-shot"><img src="../media/mensio/sol-02-groupings-crop.jpg" alt="Guided Setup modal: the five steps down the left, with Data Groupings active" loading="lazy"></div>
+                    </figure>
+                    <figure data-tldr-hide class="bento-tile">
+                      <figcaption><span class="bento-n">03</span><span class="bento-title">Smart defaults</span><span class="bento-desc">Picking a metric group pre-selects the usual metrics.</span></figcaption>
+                      <div class="bento-shot"><img src="../media/mensio/sol-03-metrics-crop.jpg" alt="TV Sponsorship [Visual] selected, with its usual metrics added as pills at the top" loading="lazy"></div>
+                    </figure>
+                    <figure data-tldr-hide class="bento-tile">
+                      <figcaption><span class="bento-n">04</span><span class="bento-title">Built-in guardrails</span><span class="bento-desc">Each filter explains its rules, like double-counting; invalid combinations are blocked.</span></figcaption>
+                      <div class="bento-shot"><img src="../media/mensio/sol-04-tooltip-crop.jpg" alt="Filters step: each filter explains its rule, such as Teams double-counting games between two selected teams" loading="lazy"></div>
+                    </figure>
+                    <figure data-tldr-hide class="bento-tile">
+                      <figcaption><span class="bento-n">05</span><span class="bento-title">Advanced features, surfaced</span><span class="bento-desc">Multiple date ranges, a Seasons date picker, scatterplot and heatmap presets.</span></figcaption>
+                      <div class="bento-shot"><img src="../media/mensio/multi-dates.jpg" alt="Date Range step: compare multiple date ranges turned on, with two ranges added" loading="lazy"></div>
+                    </figure>
+                    <figure data-tldr-hide class="bento-tile bento-full">
+                      <figcaption><span class="bento-n">06</span><span class="bento-title">Shortcuts for power users</span><span class="bento-desc">Duplicate Chart, Add to Dashboard and Pin cut repeated work.</span></figcaption>
+                      <div class="bento-shot"><img src="../media/mensio/sol-06-duplicate-crop.jpg" alt="Chart page with Add to Dashboard, Schedule Report and Duplicate in the top bar" loading="lazy"></div>
+                    </figure>
                   </div>
                 </div>
                 <div class="project-content-media">
-                  <div class="panel" style="background:#7aaee933">
+                  <div class="panel gs-panel" style="background:#2b3a6722">
                     <div class="cx-label-row">
                       <p class="panel-label">Guided Setup, step by step</p>
                       <div class="cx-tabs" role="tablist" aria-label="Guided Setup step"><button type="button" role="tab" aria-selected="true" aria-controls="gs-metrics">Metrics</button><button type="button" role="tab" aria-selected="false" aria-controls="gs-date" tabindex="-1">Date range</button><button type="button" role="tab" aria-selected="false" aria-controls="gs-groupings" tabindex="-1">Groupings</button><button type="button" role="tab" aria-selected="false" aria-controls="gs-filters" tabindex="-1">Filters</button><button type="button" role="tab" aria-selected="false" aria-controls="gs-review" tabindex="-1">Review</button></div>
                     </div>
-                    <div class="panel-card shot">
-                      <img id="gs-metrics" role="tabpanel" src="../media/mensio/modal-metrics-selected.jpg" alt="Metrics step: TV Sponsorship [Visual] selected, with its usual metrics added as chips">
-                      <img id="gs-date" role="tabpanel" src="../media/mensio/modal-date-multiple.jpg" alt="Date range step: two date ranges compared in one chart" hidden>
-                      <img id="gs-groupings" role="tabpanel" src="../media/mensio/modal-groupings.jpg" alt="Data groupings step: frequently selected options checked, other options collapsed below" hidden>
-                      <img id="gs-filters" role="tabpanel" src="../media/mensio/modal-filters-exclusion.jpg" alt="Filters step: frequently selected filters, each with a description of when to use it" hidden>
-                      <img id="gs-review" role="tabpanel" src="../media/mensio/modal-review.jpg" alt="Review step: every selection summarised by section, each with an Edit button" hidden>
+                    <div class="panel-card shot gs-flow">
+                      <img id="gs-metrics" role="tabpanel" src="../media/mensio/gs-metrics-empty.jpg" data-picked="../media/mensio/sol-03-metrics.jpg" alt="Metrics step: In-Content and Paid metric categories, none picked yet">
+                      <img id="gs-date" role="tabpanel" src="../media/mensio/gs-date.jpg" alt="Date Range step: a date range picked and added as a pill" hidden>
+                      <img id="gs-groupings" role="tabpanel" src="../media/mensio/sol-02-groupings.jpg" alt="Data Groupings step: frequently selected options checked, other options collapsed below" hidden>
+                      <img id="gs-filters" role="tabpanel" src="../media/mensio/gs-filters.jpg" alt="Filters step: frequently selected filters with values picked, each with a description of when to use it" hidden>
+                      <img id="gs-review" role="tabpanel" src="../media/mensio/gs-review.jpg" alt="Review step: every selection summarised by section, each with an Edit button" hidden>
+                      <img class="gs-result" src="../media/mensio/gs-result.jpg" alt="The fetched chart: a table of dummy rows for the chosen metrics, dates, groupings and filters" hidden>
+                      <div class="gs-scroll" hidden><img src="" alt=""></div>
+                      <div class="gs-fetching" hidden><span></span>Fetching data…</div>
+                      <div class="gs-hotspots"></div>
                     </div>
+                    <p class="gs-hint">Try it: pick a metric, click Next or a step, and scroll inside the modal.</p>
                   </div>
                 </div>
-                <div class="project-content-text">
-                  <ol class="numbered">
-                    <li><p>One entry, two paths</p><p>Six presets for common questions; Guided Setup for everything else.</p></li>
-                    <li><p>A linear flow</p><p>Metrics → Date range → Grouping → Filters → Review, showing only options that fit.</p></li>
-                    <li><p>Smart defaults</p><p>Picking a metric group pre-selects the usual metrics.</p></li>
-                    <li><p>Built-in guardrails</p><p>Tooltips explain exclusion and double-counting rules; invalid combinations are blocked.</p></li>
-                    <li><p>Advanced features, surfaced</p><p>Multiple date ranges, a Seasons date picker, scatterplot and heatmap presets.</p></li>
-                    <li><p>Shortcuts for power users</p><p>Duplicate Chart, Add to Dashboard and Pin cut repeated work.</p></li>
-                  </ol>
-                </div>
-                <div class="project-content-media"><div class="figure-grid cols-2"><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/modal-preset-selected.jpg" alt="Chart setup: Guided Setup or Preset Templates, with the six presets listed below"></div><figcaption>01 / One entry, two paths</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/modal-groupings.jpg" alt="The modal's five steps listed on the left, with Data Groupings active"></div><figcaption>02 / A linear flow</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/modal-metrics-selected.jpg" alt="A metric group selected, with its usual metrics pre-selected as chips"></div><figcaption>03 / Smart defaults</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/modal-review-error.jpg" alt="Review step with a Missing Required Data Selection error and Save disabled"></div><figcaption>04 / Built-in guardrails</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/modal-date-multiple.jpg" alt="Two date ranges compared in one horizontal bar chart"></div><figcaption>05 / Advanced features, surfaced</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><img class="top" src="../media/mensio/edit-chart.jpg" alt="Chart page with Add to Dashboard and Duplicate in the top bar"></div><figcaption>06 / Shortcuts for power users</figcaption></figure></div></div>
               </section>
 
               <section id="engineering" data-toc="Design x Engineering" class="project-content-grid">
@@ -281,24 +390,33 @@
                 <div class="project-content-text"><p>We acted as our own PMs, worked within the rules for valid chart combinations, asked for a Seasons API, and triaged QA by priority across a 14-week build.</p><p>In parallel, we built a new design system now adopted across all Deploy products, and mapped its components to Mensio's production screens.</p><p>Along the way, we found capabilities, like multiple date ranges, that neither the analytics team nor the engineers knew existed, and turned them into features.</p></div>
                 <div class="project-content-media">
                   <div class="panel" style="background:color-mix(in srgb, var(--foreground) 6%, transparent)">
-                    <p class="panel-label">Design QA, triaged P0–P4</p>
-                    <div class="panel-card"><span class="asset-note">Screenshot of the QA tracker</span></div>
+                    <p class="panel-label">Design QA, triaged P0–P4: 34 issues</p>
+                    <div class="panel-card qa">
+                      <div class="qa-board"></div>
+                    </div>
                   </div>
                 </div>
               </section>
 
-              <section id="reflection" data-toc="Impact &amp; reflection" class="project-content-grid">
+              <section data-tldr id="reflection" data-toc="Impact &amp; reflection" class="project-content-grid">
                 <div class="project-content-text"><div class="divider"></div></div>
                 <p class="project-section-label project-content-text">Impact &amp; reflection</p>
                 <div class="project-content-text"><h2>Customers now build their own charts.</h2></div>
-                <div class="project-content-text">
-                  <ul class="bullets">
-                    <li>Clients now use scatterplots and heatmaps the team never built for them before.</li>
-                    <li>Multiple date ranges replace stitching several charts together in Excel.</li>
-                    <li>Customers know where the exclusion filters are, and why they matter.</li>
-                  </ul>
+                <div class="project-content-text"><p>Guided Setup shipped in September 2026. Customers now pull their own data without going through an analyst. They compare date ranges in one chart instead of stitching charts together in Excel, and they know where the exclusion filters are and why they matter.</p></div>
+                <div class="project-content-media">
+                  <div class="bento">
+                    <figure class="bento-tile bento-full chart-tabs bento-stack">
+                      <div class="bento-head">
+                        <figcaption><span class="bento-title">New chart types</span><span class="bento-desc">Customers now build scatterplots and heatmaps themselves, chart types the team never built for them before.</span></figcaption>
+                        <div class="seg" role="tablist" aria-label="Chart type"><button type="button" role="tab" aria-selected="true" data-chart="scatter">Scatterplot</button><button type="button" role="tab" aria-selected="false" data-chart="heatmap">Heatmap</button></div>
+                      </div>
+                      <div class="bento-shot">
+                        <img data-chart="scatter" src="../media/mensio/chart-scatter.jpg" alt="Scatterplot: brands plotted by average equivalency against duration">
+                        <img data-chart="heatmap" src="../media/mensio/chart-heatmap.jpg" alt="Heatmap: brands by asset type, shaded by value" hidden>
+                      </div>
+                    </figure>
+                  </div>
                 </div>
-                <div class="project-content-media"><div class="figure-grid cols-2"><figure><div class="figure-media" style="aspect-ratio:4 / 3"><span class="asset-note">Customer-built scatterplot</span></div><figcaption>Scatterplot preset</figcaption></figure><figure><div class="figure-media" style="aspect-ratio:4 / 3"><span class="asset-note">Customer-built heatmap</span></div><figcaption>Heatmap preset</figcaption></figure></div></div>
                 <div class="project-content-text">
                   <div class="takeaways">
                     <div><p>Encode expert knowledge into the product</p><p>Presets, defaults and tooltips now ask what analysts used to ask over email.</p></div>

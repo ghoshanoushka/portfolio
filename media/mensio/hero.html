@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mensio hero</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Three beats on a loop: a customer's question, Guided Setup flashing past as they build the chart themselves,
+       then the fetched chart as a table, scatterplot and heatmap. No analyst in the loop. Screens are exports of the Revamped Screens frames; the chart data is dummy data.
+       Drawn at 1456px wide. */
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { background: linear-gradient(135deg, #2b3a67, #7aaee9); font-family: Roboto, sans-serif; }
+    .scene { position: relative; width: 1456px; height: 100vh; }
+    /* The app window rises from the bottom edge and spans the hero with the same side margins as the Deploy hero */
+    .window {
+      position: absolute; left: 64px; right: 64px; top: 48px; bottom: 0; overflow: hidden;
+      border-radius: 14px 14px 0 0; background: #fff; box-shadow: 0 16px 60px rgba(13, 17, 27, 0.4);
+    }
+    /* Figma frame space: 1440px wide, scaled to the window's width. The window shows only part of the frame's height,
+       so each beat pans to what it's about (--y, in frame px). */
+    .stage { position: absolute; left: 0; top: 0; width: 1440px; height: 1024px; transform: scale(var(--s, 0.92)) translateY(calc(var(--y, 0) * -1px)); transform-origin: 0 0; transition: transform .8s cubic-bezier(.45, 0, .2, 1); }
+    .shot { position: absolute; left: 0; top: 0; width: 1440px; opacity: 0; }
+    .shot.on { opacity: 1; }
+    .fade { transition: opacity .45s ease; }
+
+    /* Beat 1: the customer's question, in the style of the case study's email cards, over the dimmed explorer.
+       Then the card clears and they click Create themselves. */
+    .dim { position: absolute; inset: 0; background: rgba(13, 17, 27, .45); opacity: 0; transition: opacity .45s ease; }
+    .mail {
+      position: absolute; left: 50%; top: 50%; width: 860px; box-sizing: border-box; padding: 44px 56px; border-radius: 24px; background: #fff;
+      font: 400 38px/1.4 Inter, sans-serif; color: #1f2937; box-shadow: 0 16px 40px -12px rgba(15, 23, 42, .35);
+      opacity: 0; transform: translate(-50%, -46%) rotate(-1deg); transition: opacity .45s ease, transform .6s cubic-bezier(.3, 0, .2, 1);
+    }
+    .mail p { margin: 0; }
+    .mail .meta { color: #6b7280; font-size: 28px; }
+    .mail .meta b { color: #374151; font-weight: 500; }
+    .mail .body { margin-top: 18px; }
+    .mail mark { background: transparent; color: inherit; transition: background .4s ease; }
+    .mail .sign { margin-top: 20px; color: #6b7280; font-size: 28px; }
+    .beat-ask .dim { opacity: 1; }
+    .beat-ask .mail { opacity: 1; transform: translate(-50%, -50%) rotate(-1deg); }
+    .beat-ask.marked .mail mark { background: #fff1a8; }
+    .beat-create .mail { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+
+    /* Cursor and click ring, positioned in frame px */
+    .cursor { position: absolute; left: 0; top: 0; z-index: 5; width: 40px; height: 40px; opacity: 0; transition: transform .8s cubic-bezier(.45, 0, .2, 1), opacity .3s ease; }
+    .beat-create .cursor { opacity: 1; }
+    .cursor svg { width: 40px; height: 40px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); }
+    .ring { position: absolute; left: -20px; top: -20px; width: 40px; height: 40px; border-radius: 50%; border: 4px solid #206cfd; opacity: 0; }
+    .cursor.click .ring { animation: ring .45s ease-out; }
+    @keyframes ring { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(1.6); } }
+
+    /* Beat 2: the steps flash past, slightly soft so they read as speed, not as something to study */
+    .beat-squeeze .flash { filter: blur(.6px); }
+    .fetching { position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(13, 17, 27, .6); color: #fff; font: 500 18px/1 Roboto, sans-serif; opacity: 0; transition: opacity .25s ease; }
+    .fetching span { width: 26px; height: 26px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .4); border-top-color: #fff; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .beat-fetch .fetching { opacity: 1; }
+
+    /* Beat 3: the fetched chart; its card switches to a scatterplot, then a heatmap */
+    .card { position: absolute; left: 28px; top: 304px; width: 1159px; height: 692px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 14px; background: #fff; overflow: hidden; opacity: 0; transition: opacity .45s ease; }
+    .card img { position: absolute; left: 0; top: 0; width: 100%; opacity: 0; transition: opacity .45s ease; }
+    .card img.on, .card.on { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) { .shot, .card, .card img, .mail, .dim, .fetching { transition: none; } .cursor { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="window">
+      <div class="stage">
+        <img class="shot fade on" src="hero/s00.jpg" alt="">
+        <img class="shot flash" src="hero/s06.jpg" alt="">
+        <img class="shot flash" src="hero/s07.jpg" alt="">
+        <img class="shot flash" src="hero/s08.jpg" alt="">
+        <img class="shot flash" src="hero/s09.jpg" alt="">
+        <img class="shot flash" src="hero/s10.jpg" alt="">
+        <img class="shot flash" src="hero/s11.jpg" alt="">
+        <img class="shot fade" src="gs-result.jpg" alt="">
+        <div class="card"><img src="chart-scatter.jpg" alt=""><img src="chart-heatmap.jpg" alt=""></div>
+        <div class="dim"></div>
+        <div class="mail">
+          <p class="meta">A brand partner wants to know</p>
+          <p class="body">What's <mark>our NFL exposure on NBC</mark> this season?</p>
+          <p class="sign">They build the chart themselves.</p>
+        </div>
+        <div class="cursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l15 9.5-6.6 1.3 3.9 7.4-3 1.6-3.9-7.4L4.6 19z" fill="#151b2d" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="ring"></span></div>
+      </div>
+      <div class="fetching"><span></span>Fetching data…</div>
+    </div>
+  </div>
+  <script>
+    const scene = document.querySelector(".scene");
+    const shots = [...document.querySelectorAll(".shot")];
+    const card = document.querySelector(".card");
+    const charts = [...card.querySelectorAll("img")];
+    const [LANDING, RESULT] = [0, shots.length - 1];
+    // The window fills the hero's width; scale the 1440 x 1024 frames to it, and pan so a frame y sits in view
+    const win = document.querySelector(".window");
+    const stage = document.querySelector(".stage");
+    let panY = 0;
+    const fit = () => {
+      const s = win.clientWidth / 1440;
+      const visible = win.clientHeight / s;
+      stage.style.setProperty("--s", s);
+      const y = Math.max(0, Math.min(1024 - visible, panY));
+      stage.style.setProperty("--y", y);
+      // The question card sits in the middle of whatever part of the frame is showing
+      document.querySelector(".mail").style.top = `${y + visible / 2}px`;
+    };
+    // Show the frame from y down (frame px), clamped to the frame
+    const at = (y) => { panY = y; fit(); };
+    const toTop = () => at(0);
+    addEventListener("resize", fit);
+    fit();
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const show = (i) => shots.forEach((s, k) => s.classList.toggle("on", k === i));
+    const beat = (name) => { scene.className = "scene" + (name ? " beat-" + name : ""); };
+    const cursor = document.querySelector(".cursor");
+    const move = (x, y) => { cursor.style.transform = `translate(${x - 6}px, ${y - 3}px)`; };
+    const click = () => { cursor.classList.remove("click"); void cursor.offsetWidth; cursor.classList.add("click"); };
+    const chart = (i) => { card.classList.toggle("on", i >= 0); charts.forEach((c, k) => c.classList.toggle("on", k === i)); };
+    function payoff() { beat(""); show(RESULT); toTop(); }
+    async function loop() {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { payoff(); return; }
+      for (;;) {
+        // 1. The ask
+        chart(-1);
+        show(LANDING);
+        // Jump, don't scroll, back to the top when the loop restarts
+        stage.style.transition = "none";
+        toTop();
+        void stage.offsetWidth;
+        stage.style.transition = "";
+        beat("ask");
+        await wait(1300);
+        scene.classList.add("marked");
+        await wait(2700);
+        // The customer opens Create on their own
+        move(900, 560);
+        toTop();
+        beat("create");
+        await wait(80);
+        move(1361, 108);
+        await wait(900);
+        click();
+        await wait(350);
+        // 2. The squeeze: Metrics to Review in about a second and a half
+        beat("squeeze");
+        // The modal's header and stepper, from just above its top edge
+        at(40);
+        for (let i = 1; i < RESULT; i++) { show(i); await wait(250); }
+        beat("fetch");
+        await wait(700);
+        // 3. The payoff: table, scatterplot, heatmap
+        payoff();
+        await wait(1800);
+        // The chart card, from just above its heading
+        at(290);
+        chart(0);
+        await wait(1800);
+        chart(1);
+        await wait(2000);
+      }
+    }
+    loop();
+  </script>
+</body>
+</html>
