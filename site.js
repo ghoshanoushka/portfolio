@@ -21,7 +21,6 @@ const SITE = {
   projects: [
     { title: "Mensio", sub: "Shipped 2026", href: "projects/mensio.html", cursor: "View project", ratio: 16 / 9, media: "media/mensio/hero.html", colors: ["#2b3a67", "#7aaee9"] },
     { title: "Deploy Design System", sub: "Shipped 2026", href: "projects/deploy-design-system.html", cursor: "View project", ratio: 16 / 9, media: "media/deploy/hero.html", colors: ["#050a1f", "#2f6bff"] },
-    { title: "Project One", sub: "Concept 2025", href: "projects/project-one.html", cursor: "View project", ratio: 16 / 9, colors: ["#e98d34", "#d0a8d8"] },
     { title: "Deploy Chat", sub: "Shipping 2026", cursor: "Coming soon", ratio: 16 / 9, colors: ["#0b1430", "#4a7dff"] },
   ],
 };
@@ -701,7 +700,7 @@ function initGsFlow() {
     const col = !fetched && (step > 0 || picked) && COLUMNS[step];
     scroller.hidden = !col;
     if (col) {
-      const src = `../media/mensio/gs-col-${col}.jpg`;
+      const src = `../media/mensio/gs-col-${col}.svg`;
       if (!scroller.firstChild.src.endsWith(src.slice(2))) { scroller.firstChild.src = src; scroller.scrollTop = 0; }
     }
     if (fetched) return spot(EDIT, "Edit Chart, back to Review", () => go(tabs.length - 1), "always");
@@ -1423,6 +1422,19 @@ function initTldr() {
   const tabs = [...document.querySelectorAll(".tldr-toggle [data-tldr-mode]")];
   if (!tabs.length) return;
   document.body.append(document.querySelector(".tldr-toggle"));
+  const toggle = document.querySelector(".tldr-toggle");
+  const bubble = toggle.querySelector(".tldr-say");
+  let timer;
+  const say = (ms = 2600) => {
+    const short = document.body.classList.contains("tldr");
+    bubble.textContent = short ? "You're reading the short version. Want the details? Try Full story." : "Short on time? TL;DR has the highlights.";
+    bubble.hidden = false;
+    clearTimeout(timer);
+    timer = setTimeout(() => (bubble.hidden = true), ms);
+  };
+  const sayOnLoad = () => setTimeout(() => say(5000), 900);
+  toggle.addEventListener("pointerenter", () => say(60000));
+  toggle.addEventListener("pointerleave", () => { clearTimeout(timer); timer = setTimeout(() => (bubble.hidden = true), 250); });
   const set = (mode, scroll) => {
     document.body.classList.toggle("tldr", mode === "short");
     tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tldrMode === mode)));
@@ -1431,13 +1443,15 @@ function initTldr() {
       const target = document.getElementById(a.dataset.toc);
       a.hidden = !!target && !target.getClientRects().length;
     });
-    try { localStorage.setItem("mensio-tldr", mode); } catch (e) {}
+    try { localStorage.setItem("story-mode", mode); } catch (e) {}
     if (scroll) document.querySelector(".project-sections").scrollIntoView({ block: "start", behavior: "smooth" });
   };
-  tabs.forEach((t) => t.addEventListener("click", () => set(t.dataset.tldrMode, true)));
-  let saved = "full";
-  try { saved = localStorage.getItem("mensio-tldr") || "full"; } catch (e) {}
+  tabs.forEach((t) => t.addEventListener("click", () => { set(t.dataset.tldrMode, true); say(); }));
+  // The short version is the default; a speech bubble, like Valentino's, points to the other one.
+  let saved = "short";
+  try { saved = localStorage.getItem("story-mode") || "short"; } catch (e) {}
   set(saved, false);
+  sayOnLoad();
 }
 
 // Guided Setup's steps light up in order, then start over.

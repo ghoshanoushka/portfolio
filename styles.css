@@ -19,7 +19,7 @@
 /* Ink shades are derived from --foreground. They are re-declared on white cards (and the one
    opaque light panel) so text there follows light-mode colours in dark mode. Tinted panels are
    translucent, so their labels follow the page theme. */
-:root, .panel-card, .panel[style*="#ECF2FF"], .bento-tile {
+:root, .panel-card, .panel[style*="#ECF2FF"], .bento-tile, .cgp {
   --ink-25: color-mix(in srgb, var(--foreground) 25%, transparent);
   --ink-40: color-mix(in srgb, var(--foreground) var(--mute-40), transparent);
   --ink-45: color-mix(in srgb, var(--foreground) var(--mute-45), transparent);
@@ -33,10 +33,10 @@
 
 /* Dark mode: set by the toggle (data-theme on <html>), otherwise follows the system. */
 :root[data-theme="dark"] { --background: #15171C; --foreground: #E4E7EC; --primary: #A493E3; --primary-ink: #A493E3; --mute-40: 58%; --mute-45: 62%; --mute-55: 66%; color-scheme: dark; }
-:root[data-theme="dark"] :is(.panel-card, .panel[style*="#ECF2FF"], .bento-tile) { --background: #fff; --foreground: #32404f; --primary: #8F7CD6; --primary-ink: #7058CB; --mute-40: 72%; --mute-45: 74%; --mute-55: 76%; }
+:root[data-theme="dark"] :is(.panel-card, .panel[style*="#ECF2FF"], .bento-tile, .cgp) { --background: #fff; --foreground: #32404f; --primary: #8F7CD6; --primary-ink: #7058CB; --mute-40: 72%; --mute-45: 74%; --mute-55: 76%; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) { --background: #15171C; --foreground: #E4E7EC; --primary: #A493E3; --primary-ink: #A493E3; --mute-40: 58%; --mute-45: 62%; --mute-55: 66%; color-scheme: dark; }
-  :root:not([data-theme="light"]) :is(.panel-card, .panel[style*="#ECF2FF"], .bento-tile) { --background: #fff; --foreground: #32404f; --primary: #8F7CD6; --primary-ink: #7058CB; --mute-40: 72%; --mute-45: 74%; --mute-55: 76%; }
+  :root:not([data-theme="light"]) :is(.panel-card, .panel[style*="#ECF2FF"], .bento-tile, .cgp) { --background: #fff; --foreground: #32404f; --primary: #8F7CD6; --primary-ink: #7058CB; --mute-40: 72%; --mute-45: 74%; --mute-55: 76%; }
 }
 
 @media (min-width: 769px) {
@@ -410,6 +410,9 @@ footer .links a:hover { color: var(--primary-ink); }
 
 .project-section-label, .project-subsection-label { color: var(--ink-55); margin: 0 0 4px; }
 .project-subsection { margin-top: 40px; scroll-margin-top: 24px; }
+/* Key sections sit on a light purple band so they stand out from the running copy */
+.section-fill { padding: 32px 20px; border-radius: 20px; background: color-mix(in srgb, var(--primary) 5%, var(--bg, transparent)); }
+.section-fill > .project-content-text:first-child:has(> .divider:only-child) { display: none; }
 
 .case-study h2, .case-study h3 {
   font-family: var(--font-serif);
@@ -426,7 +429,11 @@ footer .links a:hover { color: var(--primary-ink); }
 
 @media (min-width: 768px) {
   .project-measure, .project-content-grid { width: calc((100% - 7 * var(--grid-gutter)) / 8 * 6 + 5 * var(--grid-gutter)); margin-inline: auto; }
-  .project-meta { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .project-meta { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+}
+/* The band grows outward so its copy stays on the same column as the unfilled sections */
+@media (min-width: 768px) {
+  .project-content-grid.section-fill { box-sizing: content-box; padding: 40px 36px; }
 }
 
 @media (min-width: 1200px) {
@@ -542,7 +549,7 @@ footer .links a:hover { color: var(--primary-ink); }
 .defs.accent dt { font-weight: 500; color: var(--primary-ink); }
 .defs.accent dd { color: var(--ink-80); }
 /* Three takeaways sit in one row on desktop */
-@media (min-width: 768px) { .takeaways:has(> :nth-child(3)) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 768px) { .takeaways:has(> :nth-child(3)) { grid-template-columns: repeat(3, minmax(0, 1fr)); } .takeaways:has(> :nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .bullets { margin: 0; padding-left: 1.1em; color: var(--ink-55); display: flex; flex-direction: column; gap: 6px; }
 .bullets li::marker { color: var(--ink-25); }
@@ -1646,7 +1653,8 @@ footer .links a:hover { color: var(--primary-ink); }
   font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
   transition: background-color .15s, color .15s, transform .15s;
 }
-.rq-stop span { font-size: 12px; line-height: 1.3; color: var(--ink-80); background: #fff; padding: 1px 3px; border-radius: 4px; transition: color .15s; }
+/* No backing behind labels, so the route never looks cut; labels beside a dip are nudged off the line (--dx) */
+.rq-stop span { font-size: 12px; line-height: 1.3; color: var(--ink-80); padding: 1px 3px; translate: var(--dx, 0) 0; transition: color .15s; }
 .rq-stop.up { flex-direction: column-reverse; translate: -50% calc(-100% + 11px); }
 .rq-idle { position: absolute; left: 50%; translate: -50% -50%; font-size: 12px; color: var(--ink-55); background: #fff; padding: 0 8px; }
 .rq-stop:hover b, .rq-stop.on b { background: var(--primary); color: #fff; transform: scale(1.15); }
@@ -1681,6 +1689,23 @@ footer .links a:hover { color: var(--primary-ink); }
 .sp-size { font-size: 12px; color: var(--ink-55); margin-top: auto; padding-top: 6px; }
 .sp-callout { font-size: 14px; color: var(--ink-80); border-left: 2px solid var(--primary); padding-left: 10px; }
 .sp-callout b { font-weight: 500; color: var(--ink-100); }
+
+/* Customer personas, from most guidance to least; the meter shows each group's place in that order. */
+.cgp-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .cgp-grid { grid-template-columns: 1fr; } }
+.cgp { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 12px; background: #fff; border: 1px solid var(--border); }
+.cgp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cgp-name { font-size: 15px; font-weight: 500; color: var(--ink-100); line-height: 1.3; }
+.cgp-desc { font-size: 14px; color: var(--ink-80); line-height: 1.45; }
+.cgp-built { margin-top: 8px; }
+.cgp-built > p { font-size: 12px; color: var(--ink-55); margin-bottom: 6px; }
+.cgp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cgp-chip { font-size: 12px; font-weight: 500; line-height: 22px; padding: 0 10px; border-radius: 999px; color: var(--ink-80); background: color-mix(in srgb, var(--ink-55) 10%, transparent); }
+.cgp-meta { margin-top: auto; padding-top: 10px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; font-size: 12px; color: var(--ink-55); }
+.cgp-meter { display: flex; align-items: center; gap: 8px; }
+.cgp-meter b { display: flex; gap: 3px; }
+.cgp-meter i { width: 14px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ink-55) 18%, transparent); }
+.cgp-meter i.on { background: var(--primary); }
 
 /* Navigating the mess: one pivot at a time, discarded design next to the shipped one */
 .mess { gap: 16px; }
@@ -1784,7 +1809,14 @@ footer .links a:hover { color: var(--primary-ink); }
 /* TL;DR toggle: the short version keeps marked sections and drops marked blocks */
 /* Sticks at the top right, beside the theme toggle (moved to <body> in site.js so no ancestor transform traps it) */
 .tldr-toggle { position: fixed; top: 16px; right: calc(var(--grid-margin) + 44px); z-index: 60; height: 36px; align-items: center; border: 1px solid var(--border); background: var(--background); }
-.tldr-toggle button[aria-selected="true"] { background: color-mix(in srgb, var(--foreground) 8%, var(--background)); box-shadow: none; }
+.tldr-toggle { overflow: visible; box-shadow: 0 4px 14px -6px rgba(50, 64, 79, .25); }
+.tldr-toggle button { font-weight: 500; }
+.tldr-toggle button[aria-selected="true"] { background: var(--primary); color: #fff; box-shadow: none; }
+/* Speech bubble under the toggle, in the style of Valentino's */
+.tldr-say { position: absolute; top: calc(100% + 10px); right: 0; width: max-content; max-width: 220px; margin: 0; padding: 8px 12px; background: var(--background); color: var(--ink-80); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 16px -8px rgba(50, 64, 79, .25); font: 12px/1.4 var(--font-sans); animation: vc-pop .35s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: 85% 0; pointer-events: none; }
+.tldr-say[hidden] { display: none; }
+.tldr-say::before { content: ""; position: absolute; right: 28px; top: -5px; width: 8px; height: 8px; background: inherit; border-left: 1px solid var(--border); border-top: 1px solid var(--border); transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) { .tldr-say { animation: none; } }
 .tldr .project-sections > section:not([data-tldr]), .tldr [data-tldr-hide], body:not(.tldr) [data-tldr-only] { display: none; }
 /* QA board: a tracker-style summary of the spec doc's QA list */
 .panel-card.qa { display: block; padding: 12px; min-height: 0; color: #172033; }
