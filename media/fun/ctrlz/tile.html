@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ctrl z</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600..700&display=swap" rel="stylesheet">
+<style>
+  /* Thumbnail for the Fun page: drawn at 1456 x 819 and scaled by the page */
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    display: grid; place-items: center; background-color: #FFF6EA; font-family: "Fredoka", system-ui, sans-serif;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' fill='none' stroke='%23EFE2CF' stroke-width='6' stroke-linecap='round'%3E%3Cpath d='M-10 40c40-30 60 30 100 0s60-30 100 0 40 20 60 0'/%3E%3Cpath d='M-10 120c30 20 60-40 100-10s70 40 110 0'/%3E%3Cpath d='M20 200c30-40 70 20 100-10s50-30 110 10'/%3E%3C/svg%3E");
+  }
+  .scene { position: relative; width: 900px; height: 520px; }
+  .ticket { position: absolute; left: 50%; top: 50%; width: 360px; height: 220px; margin: -110px 0 0 -180px; border-radius: 28px; }
+  .ticket:nth-child(1) { background: #4F8EF0; transform: translate(-300px, -40px) rotate(-14deg); animation: bob 4s ease-in-out infinite; }
+  .ticket:nth-child(2) { background: #F07A3A; transform: translate(300px, -60px) rotate(12deg); animation: bob 4s ease-in-out -1.3s infinite; }
+  .ticket:nth-child(3) { background: #1FAE8A; transform: translate(220px, 150px) rotate(-6deg); animation: bob 4s ease-in-out -2.6s infinite; }
+  .keys { position: absolute; left: 50%; top: 50%; display: flex; gap: 28px; translate: -50% -50%; rotate: -4deg; }
+  .key {
+    display: grid; place-items: center; height: 190px; padding: 0 48px; border-radius: 36px;
+    background: linear-gradient(#D9CCFA, #C3B1F4); color: #4B3BA8; font-size: 92px; font-weight: 700;
+    box-shadow: 0 22px 0 #4B3BA8, 0 34px 40px rgba(43, 38, 32, .25); animation: press 2.4s infinite;
+  }
+  .key.z { animation-delay: .08s; }
+  .spark { position: absolute; font-size: 64px; color: #F2B33D; animation: twinkle 2.4s infinite; }
+  @keyframes press { 0%, 70%, 100% { translate: 0 0; box-shadow: 0 22px 0 #4B3BA8, 0 34px 40px rgba(43, 38, 32, .25); } 78% { translate: 0 18px; box-shadow: 0 4px 0 #4B3BA8, 0 10px 16px rgba(43, 38, 32, .2); } }
+  @keyframes bob { 50% { margin-top: -124px; } }
+  @keyframes twinkle { 0%, 70%, 100% { scale: .6; opacity: .4; } 82% { scale: 1.2; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="ticket"></div><div class="ticket"></div><div class="ticket"></div>
+    <div class="keys"><div class="key">CTRL</div><div class="key z">Z</div></div>
+    <span class="spark" style="left: 60px; top: 330px">✦</span>
+    <span class="spark" style="right: 70px; top: 40px; animation-delay: .2s">✦</span>
+    <span class="spark" style="left: 420px; top: 10px; animation-delay: .4s">✦</span>
+  </div>
+</body>
+</html>

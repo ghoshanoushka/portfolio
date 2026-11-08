@@ -2,3 +2,12 @@
 *.fig
 figma_plugins/
 media/reference/
+
+# Lounge personal mode: real apps and API keys stay on this laptop
+media/fun/tv/lounge.local.js
+
+# Kept local: paused Lounge project, and Mensio source files that must not be published
+media/fun/tv/
+projects/tv.html
+media/mensio/Forget to save and lose progress.mp4
+media/mensio/Data Explorer Revamp Technical Specs.docx

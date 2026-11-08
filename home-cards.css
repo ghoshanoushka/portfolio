@@ -1,0 +1,144 @@
+/* Card carousel home (index.html), after gahanrao.com. Loaded after styles.css.
+   One screen, no page scroll: wheel, arrow keys, swipe or the tabs move between projects. */
+
+.home-cards { --stage-bg: #F2F2F3; --tab-bg: #fff; }
+:root[data-theme="dark"] .home-cards { --stage-bg: #15171C; --tab-bg: #22252c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .home-cards { --stage-bg: #15171C; --tab-bg: #22252c; } }
+
+html:has(.home-cards .projects:not(.is-grid)), .home-cards:has(.projects:not(.is-grid)) { height: 100dvh; overflow: hidden; }
+.home-cards { background: var(--stage-bg); }
+.home-cards :is(.sidebar, .mobile-nav, .dock, footer) { display: none; }
+.home-cards .content { grid-column: 1 / -1; padding: 0; min-height: 100dvh; display: flex; flex-direction: column; }
+.home-cards .content:has(.projects:not(.is-grid)) { height: 100dvh; }
+
+/* ---------- Stage ---------- */
+
+.home-cards .projects[data-layout="cards"] { position: relative; flex: 1; display: block; }
+.stage { position: absolute; inset: 0 calc(-1 * var(--grid-margin)); perspective: 1100px; overflow: hidden; }
+
+.stage-card {
+  --w: min(540px, 80vw, (100dvh - 260px) * 1.17);
+  --ar: calc(460 / 540);
+  /* Every layout drives the same transform through these variables, so switching layouts tweens each
+     part (slide, cylinder radius, turn, tilt, size) instead of snapping between unlike transforms. */
+  --k-tx: 0px; --k-ty: 0%; --k-rr: 0px; --k-ry: 0deg; --k-rot: 0deg; --k-s: 1;
+  position: absolute; left: 50%; top: 46%; width: var(--w); height: calc(var(--w) * var(--ar));
+  transform: translate(-50%, -50%) translateX(var(--k-tx)) translateY(var(--k-ty)) translateZ(calc(-1 * var(--k-rr))) rotateY(var(--k-ry)) translateZ(var(--k-rr)) rotate(var(--k-rot)) scale(var(--k-s));
+  display: flex; flex-direction: column; justify-content: space-between; gap: 16px; padding: 22px;
+  color: #fff; isolation: isolate; transform-style: preserve-3d;
+  transition: transform .8s cubic-bezier(.65, 0, .25, 1), width .8s cubic-bezier(.65, 0, .25, 1), height .8s cubic-bezier(.65, 0, .25, 1), opacity .8s, filter .8s;
+}
+.stage-card.jump { transition: none; }
+/* Card face */
+.stage-card::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: 22px; background: radial-gradient(120% 90% at 80% 10%, var(--c2), var(--c1) 70%); box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--c1) 70%, transparent); }
+/* Colour smear behind the side cards */
+.stage-card::before { content: ""; position: absolute; inset: 4% -70%; z-index: -2; pointer-events: none; border-radius: 50%; background: linear-gradient(90deg, var(--c1), var(--c2), var(--c1)); filter: blur(46px); opacity: 0; transition: opacity .8s; }
+
+.stage-card[data-pos="center"] { z-index: 2; }
+.projects[data-mode="bend"] .stage-card[data-pos="left"] { --k-tx: calc(-50vw + var(--w) * .18); --k-ry: 64deg; --k-s: 1.12; filter: saturate(1.15); }
+.projects[data-mode="bend"] .stage-card[data-pos="right"] { --k-tx: calc(50vw - var(--w) * .18); --k-ry: -64deg; --k-s: 1.12; filter: saturate(1.15); }
+.projects[data-mode="bend"] .stage-card[data-pos="far-left"] { --k-tx: -110vw; --k-ry: 80deg; opacity: 0; }
+.projects[data-mode="bend"] .stage-card[data-pos="far-right"] { --k-tx: 110vw; --k-ry: -80deg; opacity: 0; }
+/* The side cards trail a soft glow of their colours in every carousel layout */
+.projects:not(.is-grid) .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: .55; }
+/* Stack hides its glow behind the front card, and Drum turns it in 3D into a halo: both get a fainter, wider blur */
+.projects:is([data-mode="stack"], [data-mode="drum"]) .stage-card::before { inset: 10% -40%; filter: blur(80px); }
+.projects[data-mode="stack"] .stage-card[data-pos="right"]::before { opacity: .22; }
+.projects[data-mode="drum"] .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: .28; }
+.stage-card:is([data-pos="left"], [data-pos="right"]) { cursor: pointer; }
+.stage-card[data-pos="center"][data-cursor="coming-soon"] { cursor: default; }
+
+.stage-top { display: flex; flex-direction: column; gap: 4px; }
+.stage-title { font-size: 19px; font-weight: 500; letter-spacing: -0.01em; }
+.stage-tag { font-size: 14px; opacity: .72; }
+.stage-card .thumb { border-radius: 10px; box-shadow: 0 16px 30px -18px rgba(0, 0, 0, .5); transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
+.stage-card .thumb::after { border-radius: inherit; }
+a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
+.stage-soon { display: grid; place-items: center; flex: 1; font-family: var(--font-serif); font-size: 26px; opacity: .85; }
+.stage-bottom { display: flex; justify-content: space-between; font-size: 14px; opacity: .9; }
+
+/* ---------- Tabs ---------- */
+
+.stage-tabs { position: fixed; left: 50%; bottom: 28px; align-items: center; translate: -50% 0; z-index: 5; display: flex; gap: 2px; padding: 5px; border-radius: 999px; background: var(--tab-bg); box-shadow: 0 8px 24px -10px rgba(20, 24, 32, .3); max-width: calc(100vw - 2 * var(--grid-margin)); overflow-x: auto; scrollbar-width: none; }
+.stage-tabs::-webkit-scrollbar { display: none; }
+.stage-tabs button { border: 0; padding: 9px 16px; border-radius: 999px; background: none; font: inherit; font-size: 14px; color: var(--ink-55); white-space: nowrap; cursor: pointer; transition: color .2s, background-color .3s; }
+.stage-tabs button:hover { color: var(--ink-100); }
+.stage-tabs button[aria-pressed="true"] { background: var(--foreground); color: var(--background); }
+.stage-modes { display: flex; gap: 2px; }
+.stage-sep { width: 1px; height: 20px; margin: 0 6px; background: var(--border); }
+.stage-tabs .view-toggle { padding: 0; background: none; }
+.stage-tabs .view-toggle button { width: 36px; height: 36px; padding: 0; border-radius: 50%; }
+.stage-tabs .view-toggle button[aria-pressed="true"] { box-shadow: none; }
+.stage-tabs button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+@media (max-width: 520px) { .stage-tabs button { padding: 8px 11px; font-size: 13px; } }
+
+@media (max-width: 640px) {
+  .projects[data-mode="bend"] .stage-card[data-pos="left"] { --k-tx: calc(-50vw - var(--w) * .12); --k-ry: 55deg; --k-s: .9; }
+  .projects[data-mode="bend"] .stage-card[data-pos="right"] { --k-tx: calc(50vw + var(--w) * .12); --k-ry: -55deg; --k-s: .9; }
+}
+
+/* ---------- Other ways for the cards to move ---------- */
+
+/* Stack: a vertical deck. The next cards wait below and behind; the current one lifts up and away. */
+.projects[data-mode="stack"] .stage-card[data-pos="right"] { --k-ty: 9%; --k-s: .92; filter: brightness(.9); z-index: 1; }
+.projects[data-mode="stack"] .stage-card[data-pos="far-right"] { --k-ty: 17%; --k-s: .84; filter: brightness(.8); opacity: .6; z-index: 0; }
+.projects[data-mode="stack"] .stage-card[data-pos="left"] { --k-ty: -115%; --k-rot: -3deg; --k-s: 1.02; opacity: 0; }
+.projects[data-mode="stack"] .stage-card[data-pos="far-left"] { --k-ty: -130%; opacity: 0; }
+.projects[data-mode="stack"] .stage-card:is([data-pos="left"], [data-pos="far-left"]) { pointer-events: none; }
+
+/* Flat: a plain slide, neighbours peeking in at the sides */
+.projects[data-mode="flat"] .stage-card[data-pos="left"] { --k-tx: calc(-1 * var(--w) - 40px); --k-s: .86; opacity: .5; }
+.projects[data-mode="flat"] .stage-card[data-pos="right"] { --k-tx: calc(var(--w) + 40px); --k-s: .86; opacity: .5; }
+.projects[data-mode="flat"] .stage-card[data-pos="far-left"] { --k-tx: calc(-2 * var(--w) - 80px); --k-s: .8; opacity: 0; }
+.projects[data-mode="flat"] .stage-card[data-pos="far-right"] { --k-tx: calc(2 * var(--w) + 80px); --k-s: .8; opacity: 0; }
+
+/* Bulge: taller cards wrapped round the front of a wide cylinder. Each is 18deg from the next and the
+   radius is set so neighbouring edges meet, so the middle card is biggest and the outer edges fall away */
+/* Bulge and Drum use taller cards; width and height tween when switching to or from them */
+.projects:is([data-mode="bulge"], [data-mode="drum"]) .stage-card { --w: min(420px, 27vw, (100dvh - 280px) * .9); --ar: calc(600 / 540); }
+.projects[data-mode="bulge"] .stage-card {
+  --k-tx: 0px !important; --k-ty: 0% !important; --k-rot: 0deg !important; --k-s: 1 !important;
+  --k-rr: calc((var(--w) + 14px) / .3129); --k-ry: calc(var(--d) * 18deg);
+}
+.projects[data-mode="bulge"] .stage-card:not([data-d="0"]) { filter: brightness(.92); }
+.projects[data-mode="bulge"] .stage-card:not([data-d="0"]):not([data-d="1"]):not([data-d="-1"]):not([data-d="2"]):not([data-d="-2"]) { opacity: 0; pointer-events: none; }
+.projects[data-mode="bulge"] .stage-card:is([data-d="2"], [data-d="-2"]) { cursor: pointer; }
+
+/* Drum: the cards sit round a cylinder that turns. Eight cards, 45deg apart */
+.projects[data-mode="drum"] .stage-card { --k-tx: 0px !important; --k-ty: 0% !important; --k-rot: 0deg !important; --k-s: 1 !important; --k-rr: calc((var(--w) + 14px) / .765); --k-ry: calc(var(--d) * 45deg); }
+.projects[data-mode="drum"] .stage-card:not([data-d="0"]) { filter: brightness(.85); }
+.projects[data-mode="drum"] .stage-card:not([data-d="0"]):not([data-d="1"]):not([data-d="-1"]) { opacity: 0; pointer-events: none; }
+
+
+/* ---------- Grid view: every project at once, page scrolls ---------- */
+
+.projects.is-grid .stage { position: static; inset: auto; perspective: none; overflow: visible; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 32px 0 64px; }
+@media (min-width: 760px) { .projects.is-grid .stage { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+/* The motion modes set transform, opacity and filter per position; on the grid none of them apply. */
+.projects.is-grid .stage-card[data-pos] { position: relative; left: auto; top: auto; width: auto; height: auto; aspect-ratio: 540 / 420; transform: none !important; opacity: 1 !important; filter: none !important; pointer-events: auto !important; cursor: pointer; transition: none; }
+.projects.is-grid .stage-card .thumb { transition: none; }
+.projects.is-grid .stage-card[data-cursor="coming-soon"] { cursor: default; }
+/* The grid has no side cards, so no glow, and the wide glow layer must not widen the page */
+.projects.is-grid .stage-card::before { display: none; }
+.projects.is-grid { overflow-x: clip; }
+.projects.is-grid .stage-card.dup { display: none; }
+.projects.is-grid :is(.stage-modes, .stage-sep) { display: none; }
+.content:has(.projects.is-grid) .home-made { padding-bottom: 96px; }
+
+@media (prefers-reduced-motion: reduce) { .stage-card, .stage-card::before { transition: none; } }
+
+/* Built with Claude Code: bottom-left corner on the carousel, after the cards on the grid */
+.home-made { position: fixed; left: var(--grid-margin); bottom: 28px; z-index: 5; }
+.content:has(.projects.is-grid) .home-made { position: static; padding: 0 0 32px; }
+@media (max-width: 640px) { .content:has(.projects:not(.is-grid)) .home-made { display: none; } }
+
+/* Grid view: a narrower centred grid so the cards read as thumbnails, with room under it for the pinned bar */
+.projects.is-grid .stage { max-width: 900px; margin: 0 auto; padding-bottom: 120px; }
+/* The fade-in's blur would trap the fixed bar inside .projects, so this block fades with opacity only */
+.projects.fade-in { filter: none; animation-name: fade-op; }
+/* Home has no Next / back-to-top buttons, so the cat sits bottom right there, clear of "Built with Claude Code" */
+.home-cards .vc-tree { left: auto; right: 16px; transform-origin: 100% 100%; }
+.home-cards .vc-say { translate: -100% 0; }
+.home-cards .vc-say-val { left: 74px; }
+.home-cards .vc-say::after { left: auto; right: 14px; }
+.home-cards .vc-panel { left: auto; right: 20px; transform-origin: bottom right; }

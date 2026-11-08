@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Guided Setup prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Recreated from the Data Explorer Redesign Figma file (Guided Setup - Table page).
+   All sizes are Figma px at a 1440px-wide frame. */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  width: 1440px; overflow: hidden; position: relative;
+  font-family: Roboto, sans-serif; color: #151b2d; background: #fafcff;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+img { display: block; }
+.bg { position: absolute; left: 0; width: 1440px; }
+.bg-top { top: 0; height: 144px; }
+.bg-body { top: 144px; height: 880px; }
+.scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); }
+
+.modal {
+  position: absolute; left: 95px; top: 36px; bottom: 0; width: 1250px;
+  background: #fff; display: flex; flex-direction: column;
+}
+.m-head {
+  height: 92px; flex: none; background: #f1f5f9; padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.m-title { font-weight: 600; font-size: 20px; line-height: 28px; color: #0f172a; }
+.m-sub { font-size: 18px; line-height: 28px; color: #151b2d; margin-top: 4px; }
+.m-body { flex: 1; min-height: 0; display: flex; }
+
+.side { width: 260px; flex: none; border-right: 1px solid #e2e8f0; padding: 8px 8px 24px; }
+.tab {
+  width: 244px; height: 56px; padding: 16px; border-radius: 4px;
+  display: flex; align-items: center; gap: 8px; cursor: default;
+}
+.tab .n {
+  width: 20px; height: 20px; border-radius: 50%; background: #94a3b8; color: #fff;
+  display: grid; place-items: center; font-weight: 600; font-size: 12px; line-height: 16px;
+}
+.tab .l { font-weight: 600; font-size: 16px; line-height: 24px; color: #94a3b8; }
+.tab.active { background: #e6eeff; }
+.tab.active .n { background: #206cfd; }
+.tab.active .l { color: #206cfd; }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+.scroll::-webkit-scrollbar { width: 11px; }
+.scroll::-webkit-scrollbar-thumb { background: #64748b; border-radius: 10px; border: 2px solid #fff; }
+.scroll { scrollbar-color: #64748b transparent; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 24px; }
+.chips:empty { display: none; }
+.chip {
+  height: 30px; display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 7px 1px 1px; border: 1px solid #6a82fb; border-radius: 8px; background: #fff;
+  font-size: 12px; line-height: 16px; color: #0f172a; white-space: nowrap;
+}
+.chip button { width: 20px; height: 20px; }
+
+.content { padding: 12px 24px; display: flex; flex-direction: column; gap: 24px; }
+.h20 { font-weight: 600; font-size: 20px; line-height: 28px; margin: 0; }
+.h18 { font-weight: 600; font-size: 18px; line-height: 28px; margin: 0; }
+.h16 { font-weight: 600; font-size: 16px; line-height: 24px; margin: 0; }
+.desc { font-size: 14px; line-height: 20px; color: #475569; margin: 8px 0 0; }
+
+.grouping { display: flex; flex-direction: column; gap: 24px; }
+.grouping.ruled { border-bottom: 1px solid #cbd5e1; padding-bottom: 24px; }
+.cats { display: flex; flex-direction: column; gap: 24px; }
+.cat-group { display: flex; flex-direction: column; gap: 16px; }
+
+.radio { display: flex; gap: 8px; cursor: pointer; text-align: left; width: 100%; }
+.radio .dot {
+  width: 16px; height: 16px; margin-top: 4px; flex: none; border-radius: 50%;
+  border: 1px solid #64748b; background: #fff; position: relative;
+}
+.radio[aria-checked="true"] .dot { border-color: #206cfd; }
+.radio[aria-checked="true"] .dot::after {
+  content: ""; position: absolute; inset: 3px; border-radius: 50%; background: #206cfd;
+}
+.radio .t { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 16px; line-height: 24px; color: #151b2d; }
+.radio .q { font-size: 14px; line-height: 20px; color: #64748b; margin-top: 4px; }
+
+.info { position: relative; display: inline-block; width: 20px; height: 20px; }
+.tip {
+  position: absolute; left: 24px; top: 36px; z-index: 2; width: max-content;
+  background: #475569; color: #fff; padding: 8px; font-weight: 400; font-size: 12px; line-height: 16px;
+  opacity: 0; pointer-events: none; transition: opacity 0.12s;
+}
+.info:hover .tip { opacity: 1; }
+
+.metrics { display: flex; flex-direction: column; gap: 16px; }
+.metrics[hidden] { display: none; }
+.row-head { display: flex; justify-content: space-between; align-items: center; }
+.metrics .desc { margin: -8px 0 0; }
+.metrics.collapsed .opt-wrap { display: none; }
+.metrics.collapsed .toggle-all img { transform: rotate(180deg); }
+.freq { background: #f4f7fe; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 16px; }
+.cols { display: flex; gap: 12px; }
+.col { width: 453px; display: flex; flex-direction: column; gap: 16px; }
+.check { display: flex; gap: 8px; align-items: center; cursor: pointer; font-size: 16px; line-height: 24px; color: #151b2d; text-align: left; }
+.check .box {
+  width: 16px; height: 16px; flex: none; border-radius: 3px;
+  border: 1px solid #64748b; background: #fff; display: grid; place-items: center;
+}
+.check[aria-checked="true"] .box { background: #206cfd; border-color: #206cfd; }
+.check[aria-checked="true"] .box::after {
+  content: ""; width: 10px; height: 7px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -1 12.1 9.1'%3E%3Cpath d='M0 3.554L3.425 7.11L10.075 0' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.check .lbl { display: inline-flex; align-items: center; gap: 4px; }
+.other { padding-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
+.other .box-wrap { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; }
+.other.closed .box-wrap { display: none; }
+.other.closed .toggle-other img { transform: rotate(180deg); }
+
+.bar { height: 64px; flex: none; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+.bar .right { display: flex; gap: 12px; }
+.btn {
+  height: 40px; padding: 10px 24px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;
+  font-weight: 600; font-size: 14px; line-height: 20px;
+}
+.btn-outline { border: 1px solid #206cfd; color: #206cfd; background: #fff; padding: 9px 23px; }
+.btn-primary { background: #206cfd; color: #fff; }
+.btn:disabled { opacity: 0.5; }
+/* Close, Cancel and Next are shown for context only */
+button[tabindex="-1"] { cursor: default; }
+
+</style>
+</head>
+<body>
+<img class="bg bg-top" src="../explorer-bg-top.jpg" alt="">
+<img class="bg bg-body" src="../explorer-bg-body.jpg" alt="">
+<div class="scrim"></div>
+
+<div class="modal" role="dialog" aria-label="Guided Flow">
+  <div class="m-head">
+    <div><div class="m-title">Chart Name</div><div class="m-sub">Guided Flow</div></div>
+    <button type="button" aria-label="Close" tabindex="-1"><img src="ic-close.svg" width="32" height="32" alt=""></button>
+  </div>
+  <div class="m-body">
+    <nav class="side" aria-label="Steps">
+      <div class="tab active"><span class="n">1</span><span class="l">Metrics</span></div>
+      <div class="tab"><span class="n">2</span><span class="l">Date Range</span></div>
+      <div class="tab"><span class="n">3</span><span class="l">Data Groupings</span></div>
+      <div class="tab"><span class="n">4</span><span class="l">Filters</span></div>
+      <div class="tab"><span class="n">5</span><span class="l">Review</span></div>
+    </nav>
+    <div class="main">
+      <div class="scroll">
+        <div class="chips"></div>
+        <div class="content">
+
+          <div>
+            <div class="grouping">
+              <div><p class="h20">Metrics</p><p class="desc">Select a category within In-Content or Paid to view the available metrics.</p></div>
+              <div class="cats"></div>
+            </div>
+            <div class="metrics" hidden>
+              <div class="row-head">
+                <p class="h18">What data metrics do you want data columns for?</p>
+                <button type="button" class="toggle-all" aria-label="Collapse metrics"><img src="ic-chev28.svg" width="28" height="28" alt=""></button>
+              </div>
+              <p class="desc">The below pre-selected metrics are most commonly helpful but expand “Other Options” to see full set of options:</p>
+              <div class="opt-wrap" style="display:flex;flex-direction:column;gap:16px">
+                <div class="freq">
+                  <div class="row-head">
+                    <p class="h16">Frequently Selected Options</p>
+                    <button type="button" class="check" data-act="all" role="checkbox"><span class="box"></span><span class="lbl">Select All</span></button>
+                  </div>
+                  <div class="cols freq-cols"></div>
+                </div>
+                <div class="other closed">
+                  <div class="row-head">
+                    <p class="h16">Other Options</p>
+                    <button type="button" class="toggle-other" aria-label="Show other options"><img src="ic-chev24.svg" width="24" height="24" alt=""></button>
+                  </div>
+                  <div class="box-wrap"><div class="cols other-cols"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+      <div class="bar">
+        <button type="button" class="btn btn-outline" tabindex="-1">Cancel</button>
+        <div class="right">
+          <button type="button" class="btn btn-primary" data-act="next" tabindex="-1">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Metric lists per category, copied from the "Complete Modals" frames in Figma.
+// "(i)" marks options that carry an info icon.
+const CATS = [
+  { group: "In-Content", name: "TV Sponsorship [Visual]", q: "Do you want data on TV sponsorship [visual] exposures within a broadcast?",
+    freq: ["Duration (HH:MM:SS)", "Avg. Equivalency (%)", "Equivalent 30s Units", "Equivalent Media Value [Visual]", "Sample Detection URL [Visual]", "Number of Programs [Visual] (i)", "Visual Occurrence Count"],
+    other: ["Avg. Brand Prominence Score [Visual]", "Duration (HH:MM:SS) [Location] (i)", "Duration (HH:MM:SS) - Non Weighted [Visual] (i)", "Equivalent 30s Units - Non Weighted [Visual] (i)"] },
+  { group: "In-Content", name: "TV Sponsorship [Verbal]", q: "Do you want data on brand mentions within a broadcast?",
+    freq: ["Verbal Count", "Equivalent Units [Verbal]", "Equivalent Media Value [Verbal]", "Number of Programs [Verbal]", "Verbal Transcription Example", "Verbal Transcription Preview"],
+    other: ["Logo Impressions (i)", "Episode Impressions (i)", "Equivalent Impressions (i)"] },
+  { group: "In-Content", name: "TV Sponsorship [Visual & Verbal]", q: "Do you want data on both TV sponsorship [visual] and brand mentions within a broadcast?",
+    tip: "Note that selecting this will limit access to certain visual and verbal metrics.",
+    freq: ["Duration (HH:MM:SS)", "Avg. Equivalency (%)", "Equivalent 30s Units", "Equivalent Media Value [Visual]", "Sample Detection URL [Visual]", "Number of Programs [Visual] (i)", "Visual Occurrence Count", "Verbal Count", "Equivalent Units [Verbal]", "Equivalent Media Value [Verbal]", "Number of Programs [Verbal]", "Verbal Transcription Example", "Verbal Transcription Preview"],
+    other: ["Avg. Brand Prominence Score [Visual]", "Duration (HH:MM:SS) [Location] (i)", "Logo Impressions (i)", "Equivalent Impressions (i)", "Duration (HH:MM:SS) - Non Weighted [Visual] (i)", "Equivalent 30s Units - Non Weighted [Visual] (i)", "Episode Impressions (i)"] },
+  { group: "In-Content", name: "Social Media Sponsorship", q: "Do you want logo and brand text mention exposures across our set of ~2,000 social media accounts?",
+    freq: ["Avg. Equivalency (%) [Social]", "Number of Posts [Social]", "Est. Person Impressions [Social]", "Total Engagements [Social]", "Brand Text Mentions Media Value [Social]", "Equivalent Media Value [Social]", "Sample Post URL [Social]"],
+    other: ["Sample Detection URL [Social]", "Video Length [Social]", "Comments [Social]", "Handle [Social]", "Number of Followers [Social]", "Shares/Retweets [Social]", "Seconds on Screen [Social]", "Brand Text Mentions Media Value [Social]", "Likes/Favorites [Social]", "Post Text [Social]", "Total Engagement [Social]"] },
+  { group: "In-Content", name: "Streaming Originals & Theatrical Releases Branded Content", q: "Do you want data on logo exposures in movies and streaming original content?",
+    freq: ["Avg. Equivalency (%) [Ent]", "Equivalent 30s Units [Ent]", "Count of Unique Titles - Brand Level [Ent]", "Occurrence Count [Ent]", "Sample Detection URL [Ent]"],
+    other: ["Count of Unique Episodes - Brand Level [Ent]", "Seconds on Screen [Ent]", "Count of Unique Titles - Dynamic [Ent]"] },
+  { group: "Paid", name: "TV Paid Ad Intelligence", q: "Do you want data on traditional paid advertisements aired on Linear TV?",
+    freq: ["Airings", "TV Estimated Spend ($)"],
+    other: ["TV Estimated Spend - Market Value ($)", "Audience Index", "Ad Ratings (GRP/TRP)"] },
+  { group: "Paid", name: "Digital Paid Ad Intelligence", q: "Do you want data on advertisements across digital platforms (e.g., OTT, Web, Mobile, Social)?",
+    freq: ["Digital Estimated Spend ($)", "Digital Person Impressions"],
+    other: ["Combined Ad Estimated Spend"] },
+  { group: "Paid", name: "Cross-Platform Paid Ad Intelligence", q: "Do you want data on advertisements across both Linear TV and digital platforms?",
+    freq: ["Airings", "TV Estimated Spend ($)", "Combined Ad Estimated Spend ($)"],
+    other: ["TV Estimated Spend - Market Value ($)", "Audience Index", "Ad Ratings (GRP/TRP)"] },
+];
+const INFO = '<span class="info"><img src="ic-info.svg" width="20" height="20" alt=""></span>';
+const label = (s) => s.replace(" (i)", "");
+const $ = (s) => document.querySelector(s);
+
+let state;
+function reset(cat) {
+  state = { cat, picked: [] };
+  if (cat != null) state.picked = CATS[cat].freq.map((_, i) => "f" + i);
+  $(".metrics").classList.remove("collapsed");
+  $(".other").classList.add("closed");
+  render();
+  $(".scroll").scrollTop = 0;
+}
+
+// Category radios, grouped under In-Content and Paid.
+const cats = $(".cats");
+["In-Content", "Paid"].forEach((g) => {
+  const wrap = document.createElement("div");
+  wrap.className = "cat-group";
+  wrap.innerHTML = `<p class="h18">${g}</p>` + CATS.map((c, i) => c.group !== g ? "" :
+    `<button type="button" class="radio" role="radio" data-cat="${i}">
+      <span class="dot"></span>
+      <span><span class="t">${c.name}${c.tip ? INFO.replace("</span>", `<span class="tip">${c.tip}</span></span>`) : ""}</span><span class="q" style="display:block">${c.q}</span></span>
+    </button>`).join("");
+  cats.appendChild(wrap);
+});
+
+const checkbox = (id, text) =>
+  `<button type="button" class="check" role="checkbox" data-opt="${id}"><span class="box"></span><span class="lbl">${label(text)}${text.endsWith("(i)") ? INFO : ""}</span></button>`;
+const columns = (list, prefix) => {
+  const half = Math.ceil(list.length / 2);
+  const col = (items, offset) => `<div class="col">${items.map((t, i) => checkbox(prefix + (i + offset), t)).join("")}</div>`;
+  return col(list.slice(0, half), 0) + col(list.slice(half), half);
+};
+
+function render() {
+  const c = CATS[state.cat];
+  document.querySelectorAll(".radio").forEach((r) => r.setAttribute("aria-checked", String(+r.dataset.cat === state.cat)));
+
+  // Option lists for the chosen category
+  $(".metrics").hidden = !c;
+  $(".grouping").classList.toggle("ruled", !!c);
+  if (c && $(".metrics").dataset.cat !== String(state.cat)) {
+    $(".metrics").dataset.cat = state.cat;
+    $(".freq-cols").innerHTML = columns(c.freq, "f");
+    $(".other-cols").innerHTML = columns(c.other, "o");
+  }
+  document.querySelectorAll("[data-opt]").forEach((b) => b.setAttribute("aria-checked", String(state.picked.includes(b.dataset.opt))));
+  const allOn = c && c.freq.every((_, i) => state.picked.includes("f" + i));
+  $('[data-act="all"]').setAttribute("aria-checked", String(!!allOn));
+
+  // Chips: picked metrics in list order, then the date range once chosen
+  const text = (id) => label((id[0] === "f" ? c.freq : c.other)[+id.slice(1)]);
+  const order = c ? [...c.freq.map((_, i) => "f" + i), ...c.other.map((_, i) => "o" + i)].filter((id) => state.picked.includes(id)) : [];
+  $(".chips").innerHTML = order.map((id) =>
+    `<span class="chip"><img src="ic-metric.svg" width="26" height="26" alt="">${text(id)}<button type="button" data-unpick="${id}" aria-label="Remove ${text(id)}"><img src="ic-chip-x.svg" width="20" height="20" alt=""></button></span>`).join("");
+
+  // Next is a static button here; it only shows the disabled state from Figma.
+  $('[data-act="next"]').disabled = !order.length;
+}
+
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.dataset.cat != null) { reset(+t.dataset.cat); return; }
+  if (t.dataset.opt) {
+    const id = t.dataset.opt;
+    state.picked = state.picked.includes(id) ? state.picked.filter((x) => x !== id) : [...state.picked, id];
+  }
+  if (t.dataset.unpick) state.picked = state.picked.filter((x) => x !== t.dataset.unpick);
+  const act = t.dataset.act;
+  if (act === "all") {
+    const ids = CATS[state.cat].freq.map((_, i) => "f" + i);
+    const on = ids.every((id) => state.picked.includes(id));
+    state.picked = on ? state.picked.filter((x) => !ids.includes(x)) : [...new Set([...state.picked, ...ids])];
+  }
+  if (t.classList.contains("toggle-all")) $(".metrics").classList.toggle("collapsed");
+  if (t.classList.contains("toggle-other")) $(".other").classList.toggle("closed");
+  render();
+});
+
+reset(0);
+</script>
+</body>
+</html>

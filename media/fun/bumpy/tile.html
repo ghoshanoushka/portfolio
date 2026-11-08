@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bumpy AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
+<style>
+  /* Thumbnail for the Fun page: drawn at 1456 x 819 and scaled by the page. The app icon with a chat going on around it. */
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { display: grid; place-items: center; background: linear-gradient(160deg, #EEF0FB, #F8E9F1); font-family: Inter, system-ui, sans-serif; }
+  .scene { position: relative; width: 1000px; height: 600px; }
+  .icon { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 52px; box-shadow: 0 30px 60px -24px rgba(60, 52, 104, .5); }
+  .b { position: absolute; padding: 22px 30px; border-radius: 28px; font-size: 34px; line-height: 1.25; white-space: nowrap; animation: bob 5s ease-in-out infinite; }
+  .me { background: #8379BC; color: #fff; border-bottom-right-radius: 8px; }
+  .ai { background: #fff; color: #23203A; border-bottom-left-radius: 8px; box-shadow: 0 16px 30px -18px rgba(60, 52, 104, .4); }
+  @keyframes bob { 50% { translate: 0 -10px; } }
+  @media (prefers-reduced-motion: reduce) { .b { animation: none; } }
+</style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="b me" style="left: 20px; top: 40px">Is this safe to eat?</div>
+    <div class="b ai" style="right: 0; top: 120px; animation-delay: -1.6s">Here are some stretches ✨</div>
+    <div class="b me" style="left: 60px; bottom: 70px; animation-delay: -3.2s">Add it to my calendar</div>
+    <img class="icon" src="mark.png" alt="">
+  </div>
+</body>
+</html>

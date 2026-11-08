@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1456">
+  <title>Denials app</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Recreated screens for the denials case study. Layouts follow the team's Figma redesign; every name and number is made up,
+       and the client's name, logo and product name are left out. Drawn at 1456px wide; the case study scales it down.
+       ?v= picks the view: dashboard, cases, case, start, before-dashboard, before-cases, before-case, tour (hero loop).
+       A parent page can also switch views with postMessage({ v: "cases" }). */
+    :root {
+      --blue: #2F5BEA; --blue-soft: #E8EEFE; --blue-mid: #B9C8F8;
+      --ink: #1F2A44; --ink-2: #4B5568; --ink-3: #8A93A6; --line: #E5E8EF; --bg: #F4F6FA; --card: #fff;
+      --red: #E5484D; --red-soft: #FDECEC; --amber: #E8A317; --amber-soft: #FDF4E1; --green: #2F9E6B; --green-soft: #E3F4EC;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { width: 1456px; background: var(--bg); color: var(--ink); font: 400 14px/1.45 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    button { font: inherit; color: inherit; }
+    #app { position: relative; height: 100%; }
+    .view { position: absolute; inset: 0; overflow: hidden; background: var(--bg); transition: opacity .45s ease; }
+    /* Opened large from the case study (?scroll=1): each screen scrolls, so long tables and open panels are reachable */
+    .scroll .view { overflow-y: auto; overscroll-behavior: contain; }
+    .view.out { opacity: 0; }
+
+    /* ---------- App chrome ---------- */
+    .top { height: 60px; display: flex; align-items: center; gap: 28px; padding: 0 32px; background: var(--blue); color: #fff; }
+    .mark { width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,.18); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+    .nav { display: flex; gap: 24px; font-size: 14px; }
+    .nav span { opacity: .75; } .nav span.on { opacity: 1; font-weight: 500; }
+    .top .sp { flex: 1; }
+    .ic { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.16); }
+    .av { width: 32px; height: 32px; border-radius: 50%; background: #fff; color: var(--blue); display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+    .page { padding: 28px 40px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+    h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+    h3 { margin: 0; font-size: 15px; font-weight: 600; }
+    .muted { color: var(--ink-3); }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+    .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .p-high { background: var(--red-soft); color: var(--red); } .p-med { background: var(--amber-soft); color: #B07A06; } .p-low { background: var(--blue-soft); color: var(--blue); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .btn.dark { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .btn.on { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+    .up { color: var(--red); } .down { color: var(--green); }
+
+    /* ---------- Dashboard ---------- */
+    .welcome { background: var(--blue); color: #fff; padding: 22px 40px 26px; }
+    .welcome-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .welcome h1 { color: #fff; }
+    .band { display: grid; grid-template-columns: 2fr 2fr 1.1fr; gap: 16px; }
+    .band .card { padding: 16px 18px; color: var(--ink); display: grid; gap: 10px; }
+    .band .split { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; }
+    .kpi b { display: block; font-size: 22px; font-weight: 600; } .kpi span { font-size: 12px; color: var(--ink-3); }
+    .kpi .d { font-size: 12px; font-weight: 500; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; padding: 3px 0; }
+    .task { justify-content: flex-start; gap: 0; }
+    .task .muted { margin-left: auto; padding-left: 12px; }
+    .task::before { content: ""; display: inline-block; width: 12px; height: 12px; border: 1.5px solid var(--ink-3); border-radius: 3px; margin-right: 8px; vertical-align: -2px; }
+    .perf { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-top: 20px; }
+    .perf .card { padding: 18px 20px; }
+    .chart { position: relative; height: 230px; margin-top: 14px; display: flex; align-items: flex-end; gap: 22px; padding: 0 8px 26px 34px; border-bottom: 1px solid var(--line); }
+    .chart .ax { position: absolute; left: 0; bottom: 26px; top: 0; display: flex; flex-direction: column-reverse; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
+    .chart .grid { position: absolute; left: 34px; right: 0; top: 0; bottom: 26px; background: repeating-linear-gradient(to top, var(--line) 0 1px, transparent 1px 25%); pointer-events: none; }
+    .bar { position: relative; flex: 1; display: flex; flex-direction: column-reverse; cursor: pointer; }
+    .bar i { display: block; } .bar .reg { background: var(--blue-mid); border-radius: 0 0 3px 3px; } .bar .pri { background: var(--blue); border-radius: 3px 3px 0 0; }
+    .bar.on i { filter: brightness(.92); }
+    .bar small { position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+    .tip { position: absolute; z-index: 3; padding: 8px 10px; border-radius: 8px; background: var(--ink); color: #fff; font-size: 12px; line-height: 1.5; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, -100%); transition: opacity .15s; }
+    .tip.on { opacity: 1; }
+    .legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); }
+    .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .stack { display: flex; height: 12px; border-radius: 3px; overflow: hidden; margin: 14px 0 6px; }
+    .stat-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .stat-row i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; }
+
+    /* ---------- Cases list ---------- */
+    .tabs { display: flex; gap: 40px; border-bottom: 1px solid var(--line); margin: 18px 0 16px; font-size: 14px; }
+    .tabs span { padding: 10px 2px; color: var(--ink-3); } .tabs span.on { color: var(--blue); border-bottom: 2px solid var(--blue); font-weight: 500; }
+    .tabs em { font-style: normal; font-size: 11px; padding: 1px 6px; margin-left: 6px; border-radius: 5px; background: var(--blue-soft); color: var(--blue); }
+    .tools { display: flex; gap: 10px; align-items: center; position: relative; }
+    .search { flex: 1; height: 36px; display: flex; align-items: center; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink-3); font-size: 13px; }
+    .search input { border: 0; outline: 0; flex: 1; font: inherit; color: var(--ink); background: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tbl { margin-top: 14px; overflow: hidden; }
+    th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-2); padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; cursor: pointer; user-select: none; }
+    th .s { margin-left: 4px; color: var(--ink-3); } th.sorted .s { color: var(--blue); }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: #FAFBFD; }
+    .flag { width: 30px; color: var(--ink-3); } .flag.on { color: var(--green); }
+    .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid #C5CBD8; border-radius: 3px; vertical-align: -2px; }
+    .panel { position: absolute; top: 44px; z-index: 5; width: 300px; padding: 14px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 40px -12px rgba(31,42,68,.25); display: none; }
+    .panel.on { display: block; }
+    .panel h4 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+    .tg { display: flex; justify-content: space-between; align-items: center; padding: 6px 2px; font-size: 13px; cursor: pointer; }
+    .sw { width: 30px; height: 18px; border-radius: 999px; background: #D5DAE5; position: relative; transition: background .2s; }
+    .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .2s; }
+    .tg.on .sw { background: var(--blue); } .tg.on .sw::after { transform: translateX(12px); }
+    .field { display: grid; gap: 6px; margin-bottom: 10px; font-size: 12px; color: var(--ink-2); }
+    /* Column picker: the app's own dropdown, not the browser's native menu */
+    .dd { position: relative; }
+    .dd-btn { display: flex; width: 100%; height: 34px; align-items: center; justify-content: space-between; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+    .dd-btn svg { width: 12px; height: 12px; stroke: var(--ink-3); fill: none; stroke-width: 1.6; transition: transform .15s; }
+    .dd.open .dd-btn { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+    .dd.open .dd-btn svg { transform: rotate(180deg); }
+    .dd-list { position: absolute; left: 0; right: 0; top: 38px; z-index: 6; display: none; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 28px -10px rgba(31,42,68,.25); }
+    .dd.open .dd-list { display: block; }
+    .dd-list button { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 7px 8px; border: 0; border-radius: 6px; background: none; font: inherit; font-size: 13px; color: var(--ink); text-align: left; cursor: pointer; }
+    .dd-list button:hover { background: var(--bg); }
+    .dd-list button[aria-selected="true"] { color: var(--blue); font-weight: 500; }
+    .dd-list button[aria-selected="true"]::after { content: "✓"; font-size: 12px; }
+    .field select, .field input { height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; }
+    /* Values that exist in the chosen column, so a filter never comes back empty by accident */
+    .sugg { display: flex; flex-wrap: wrap; gap: 6px; margin: -2px 0 12px; }
+    .sugg button { border: 1px solid var(--line); border-radius: 999px; background: #fff; padding: 3px 9px; font: inherit; font-size: 12px; color: var(--ink-2); cursor: pointer; }
+    .sugg button:hover { border-color: var(--blue); color: var(--blue); }
+    .chips { display: flex; gap: 8px; margin-top: 12px; min-height: 26px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 500; }
+    .chip b { cursor: pointer; font-weight: 600; }
+    .foot { display: flex; justify-content: space-between; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+
+    /* ---------- Case page ---------- */
+    .case-head { display: flex; align-items: center; gap: 18px; }
+    .case-head .sp { flex: 1; }
+    .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin: 22px 0; }
+    .kpis .card { padding: 14px 16px; } .kpis b { display: block; margin-top: 8px; font-size: 22px; font-weight: 600; }
+    .kpis .hl { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+    .case-body { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+    .case-body .card { padding: 18px 20px; }
+    .sel { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; background: var(--blue); color: #fff; font-size: 13px; font-weight: 500; }
+    .mbar { flex: 1; position: relative; cursor: pointer; }
+    .mbar i { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 3px 3px 0 0; background: var(--blue-mid); transition: background .2s; }
+    .mbar.spike i { background: var(--blue); }
+    .mbar.on i { background: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+    .cmts { display: grid; gap: 10px; align-content: start; }
+    .cmt { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; background: #fff; cursor: pointer; transition: border-color .2s, background .2s; }
+    .cmt b { display: block; font-size: 12px; margin-bottom: 2px; }
+    .cmt.on, .cmt:hover { border-color: var(--blue); background: var(--blue-soft); }
+    .link-line { position: absolute; height: 0; border-top: 1.5px dashed var(--blue); pointer-events: none; opacity: 0; transition: opacity .2s; }
+    .link-line.on { opacity: 1; }
+    .rc { display: grid; gap: 8px; margin-top: 10px; }
+    .rc div { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; }
+
+    /* ---------- Start an intervention ---------- */
+    .scrim { position: absolute; inset: 60px 0 0; background: rgba(31,42,68,.42); display: grid; place-items: center; }
+    .modal { width: 520px; padding: 22px 26px 22px; border-radius: 14px; background: #fff; box-shadow: 0 30px 70px -20px rgba(15,23,42,.45); }
+    .prog { text-align: center; font-size: 12px; color: var(--ink-3); }
+    .prog-bar { height: 3px; margin: 8px 0 18px; border-radius: 3px; background: var(--line); overflow: hidden; }
+    .prog-bar i { display: block; height: 100%; background: var(--blue); transition: width .35s ease; }
+    .modal h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+    .modal p { margin: 0 0 16px; color: var(--ink-2); font-size: 13px; }
+    .opt { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .opt button { height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: 13px; cursor: pointer; }
+    .opt button.on { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); font-weight: 500; }
+    .modal .acts { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    .modal .back { color: var(--blue); background: none; border: 0; cursor: pointer; font-size: 13px; }
+    .btn[disabled] { opacity: .45; cursor: default; }
+    .done { text-align: center; padding: 18px 0 6px; }
+    .done .tick { width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: var(--green-soft); color: var(--green); display: grid; place-items: center; font-size: 22px; }
+
+    /* ---------- Before: grey wireframes of the old layouts ---------- */
+    .wf { --g1: #E3E6EC; --g2: #CDD2DC; --g3: #B3BAC7; background: #F6F7F9; }
+    .wf .top { background: #9AA3B2; }
+    .wf .blk { background: #fff; border: 1px solid var(--g1); border-radius: 8px; }
+    .wf .ln { height: 8px; border-radius: 4px; background: var(--g1); }
+    .wf .ln.d { background: var(--g2); }
+    .wf .lbl { font-size: 12px; color: #7A8394; }
+    .wf .hdr { background: #A9B1BF; padding: 24px 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 24px; }
+    .wf .hdr .s { display: flex; gap: 10px; align-items: center; }
+    .wf .hdr .s i { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.45); }
+    .wf .hdr .s span { display: grid; gap: 6px; } .wf .hdr .s span b { width: 70px; height: 9px; border-radius: 4px; background: rgba(255,255,255,.8); } .wf .hdr .s span u { width: 90px; height: 7px; border-radius: 4px; background: rgba(255,255,255,.45); }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    const $ = (s, r = document) => r.querySelector(s);
+    const app = $("#app");
+    const money = (n) => (n < 0 ? "−" : "+") + "$" + Math.abs(n).toLocaleString("en-US");
+    const chrome = (on) => `<div class="top"><div class="mark">D</div><div class="nav">${["Home", "Cases", "Interventions", "Reports"].map((n) => `<span class="${n === on ? "on" : ""}">${n}</span>`).join("")}</div><div class="sp"></div><div class="ic"></div><div class="ic"></div><div class="av">JR</div></div>`;
+
+    // Made-up cases. Alerting groups are payer + denial code pairs; payers are fictional.
+    const CASES = [
+      { id: 1042, flag: 1, group: "Summit Shield PPO · CO-29", pri: "High", change: 612520, status: "Not started", region: "North", added: "06/18/2025", worked: "07/02/2025", owner: "J. Rivera" },
+      { id: 1038, flag: 1, group: "Medicare · CO-197", pri: "High", change: 284310, status: "In progress", region: "Central", added: "06/12/2025", worked: "07/01/2025", owner: "A. Chen" },
+      { id: 1035, flag: 0, group: "Lakeshore PPO · CO-16", pri: "Medium", change: 131966, status: "Identified", region: "North", added: "06/09/2025", worked: "06/30/2025", owner: "M. Patel" },
+      { id: 1029, flag: 1, group: "Keystone HMO · CO-50", pri: "High", change: 98450, status: "In progress", region: "South", added: "06/02/2025", worked: "06/29/2025", owner: "J. Rivera" },
+      { id: 1027, flag: 0, group: "Harbor PPO · CO-4", pri: "Medium", change: 54780, status: "Not started", region: "East", added: "05/28/2025", worked: "06/27/2025", owner: "S. Okafor" },
+      { id: 1021, flag: 0, group: "Medicaid · CO-18", pri: "Low", change: -12400, status: "Completed", region: "Central", added: "05/21/2025", worked: "06/20/2025", owner: "A. Chen" },
+      { id: 1019, flag: 0, group: "Riverbend Health · CO-97", pri: "Medium", change: 41230, status: "Identified", region: "South", added: "05/19/2025", worked: "06/18/2025", owner: "M. Patel" },
+      { id: 1014, flag: 1, group: "Lakeshore PPO · CO-11", pri: "Low", change: 8920, status: "Not started", region: "East", added: "05/12/2025", worked: "06/11/2025", owner: "S. Okafor" },
+      { id: 1008, flag: 0, group: "Summit Shield PPO · CO-45", pri: "Low", change: -3150, status: "Completed", region: "North", added: "05/05/2025", worked: "06/02/2025", owner: "J. Rivera" },
+    ];
+    const COLS = [
+      { k: "id", t: "Case ID", on: 1 }, { k: "group", t: "Alerting group", on: 1 }, { k: "pri", t: "Priority", on: 1 },
+      { k: "change", t: "Weekly $ change", on: 1 }, { k: "status", t: "Status", on: 1 }, { k: "region", t: "Region", on: 1 },
+      { k: "added", t: "Date added", on: 1 }, { k: "worked", t: "Last worked", on: 0 }, { k: "owner", t: "Owner", on: 0 },
+    ];
+    const priPill = (p) => `<span class="pill ${p === "High" ? "p-high" : p === "Medium" ? "p-med" : "p-low"}">${p}</span>`;
+
+    // ---------- Views ----------
+    const VIEWS = {
+      dashboard() {
+        const weeks = [[32, 2], [26, 30], [12, 5], [36, 9], [2, 11], [13, 3], [14, 12]];
+        const max = 60;
+        return `${chrome("Home")}
+        <div class="welcome"><div class="welcome-row"><h1>Welcome back, Jordan</h1><span class="btn dark" style="border-color:rgba(255,255,255,.3)">Jun 30 – Jul 6</span></div>
+          <div class="band">
+            <div class="card"><div class="split">
+              <div style="display:grid;gap:12px"><h3>All cases</h3><div class="kpi"><b>1,284</b><span>Total cases</span> <span class="d up">↑ 8.2%</span></div><div class="kpi"><b>12</b><span>Priority alerts</span> <span class="d up">+3</span></div></div>
+              <div><h3 style="margin-bottom:8px">High priority</h3>${CASES.filter((c) => c.pri === "High").map((c) => `<div class="row"><span>${c.group}</span>${priPill(c.pri)}</div>`).join("")}</div>
+            </div></div>
+            <div class="card"><div class="split">
+              <div style="display:grid;gap:12px"><h3>All interventions</h3><div class="kpi"><b>86</b><span>Total interventions</span> <span class="d down">↑ 4.1%</span></div><div class="kpi"><b>5</b><span>Overdue</span> <span class="d up">+1</span></div></div>
+              <div><h3 style="margin-bottom:8px">High priority</h3><div class="row"><span>Prior auth for imaging</span>${priPill("High")}</div><div class="row"><span>Timely filing, North</span>${priPill("High")}</div><div class="row"><span>Duplicate claim edits</span>${priPill("Low")}</div></div>
+            </div></div>
+            <div class="card"><h3>My tasks</h3><div class="row task">Send example accounts <span class="muted">Jul 8</span></div><div class="row task">Review case 1038 <span class="muted">Jul 9</span></div><div class="row task">Update root cause <span class="muted">Jul 11</span></div></div>
+          </div>
+        </div>
+        <div class="page" style="padding-top:22px">
+          <h3 style="font-size:18px">Performance overview</h3>
+          <div class="perf">
+            <div class="card"><div class="row"><h3>New cases <span class="muted" style="font-weight:400">· 214 this week</span></h3><div class="legend"><span><i style="background:var(--blue-mid)"></i>Regular</span><span><i style="background:var(--blue)"></i>Priority</span></div></div>
+              <div class="chart" id="wk"><div class="grid"></div><div class="ax"><span>0</span><span>15</span><span>30</span><span>45</span><span>60</span></div>
+                ${weeks.map(([r, p], i) => `<div class="bar" data-r="${r}" data-p="${p}" data-d="Jul ${i + 1}" style="height:${((r + p) / max) * 100}%"><i class="reg" style="height:${(r / (r + p)) * 100}%"></i><i class="pri" style="height:${(p / (r + p)) * 100}%"></i><small>Jul ${i + 1}</small></div>`).join("")}
+                <div class="tip" id="tip"></div>
+              </div>
+            </div>
+            <div class="card"><h3>Cases by status</h3>
+              <div class="stack"><i style="flex:37;background:#9FD8BC"></i><i style="flex:12;background:#5CC08F"></i><i style="flex:25;background:#3BA675"></i><i style="flex:16;background:#2A8059"></i><i style="flex:10;background:#1E5E41"></i></div>
+              ${[["Not started", "37.5%", "#9FD8BC", 481], ["In progress", "12.3%", "#5CC08F", 158], ["Identified", "24.7%", "#3BA675", 317], ["Completed", "15.5%", "#2A8059", 199], ["Intervention started", "10.0%", "#1E5E41", 129]].map(([n, p, c, v]) => `<div class="stat-row"><span><i style="background:${c}"></i>${n}</span><span><b style="font-weight:600">${p}</b> <span class="muted">&nbsp;${v}</span></span></div>`).join("")}
+            </div>
+          </div>
+        </div>`;
+      },
+
+      cases() {
+        return `${chrome("Cases")}<div class="page">
+          <div class="row"><h1>Cases</h1><div style="display:flex;gap:10px"><span class="btn primary">Create case</span><span class="btn">Import</span></div></div>
+          <div class="tabs"><span class="on">Primary<em>1,284</em></span><span>Persistent<em>44</em></span><span>Groups<em>6</em></span><span>Priority<em>12</em></span><span>Saved</span></div>
+          <div class="tools">
+            <label class="search">⌕&nbsp;&nbsp;<input id="q" placeholder="Search by case, payer or code"></label>
+            <button class="btn" id="bClosed">Show closed</button>
+            <button class="btn" id="bFilter">Filters</button>
+            <button class="btn" id="bCols">Columns</button>
+            <button class="btn">CSV</button>
+            <div class="panel" id="pCols" style="right:70px"><h4>Columns</h4>${COLS.map((c, i) => `<div class="tg ${c.on ? "on" : ""}" data-c="${i}"><span>${c.t}</span><span class="sw"></span></div>`).join("")}</div>
+            <div class="panel" id="pFilter" style="right:170px"><h4>Filter</h4>
+              <div class="field">Column<div class="dd" id="fCol"><button type="button" class="dd-btn" aria-haspopup="listbox"><span></span><svg viewBox="0 0 12 12"><path d="M3 4.5l3 3 3-3"/></svg></button><div class="dd-list" role="listbox">${COLS.filter((c) => c.k !== "change").map((c) => `<button type="button" role="option" data-v="${c.k}">${c.t}</button>`).join("")}</div></div></div>
+              <label class="field">Contains<input id="fVal" placeholder="e.g. High" autocomplete="off"></label><div class="sugg" id="fSugg"></div>
+              <div style="display:flex;justify-content:space-between"><button class="btn" id="fReset">Reset</button><button class="btn primary" id="fApply">Apply</button></div>
+            </div>
+          </div>
+          <div class="chips" id="chips"></div>
+          <div class="card tbl"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+          <div class="foot"><span id="count"></span><span>1 of 1</span></div>
+        </div>`;
+      },
+
+      case() {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"];
+        const vals = [420, 395, 820, 215, 500, 980, 240, 745, 350, 140];
+        return `${chrome("Cases")}<div class="page">
+          <div class="case-head"><span style="font-size:22px">←</span><h1>Case 1042</h1><div class="sp"></div>
+            <span>Priority</span>${priPill("High")}<span style="margin-left:10px">Status</span><span class="btn dark">Not started ▾</span><span class="btn">Add to group</span></div>
+          <div class="kpis">
+            <div class="card"><span class="muted">Date added</span><b>Jun 18</b></div>
+            <div class="card"><span class="muted">Alert type</span><b>Payer + code</b></div>
+            <div class="card hl" id="kDollar"><span class="muted">Denied dollars change</span><b class="up">+$612,520</b></div>
+            <div class="card"><span class="muted">Concentration</span><b>95%</b></div>
+            <div class="card"><span class="muted">Specificity</span><b>68%</b></div>
+          </div>
+          <div class="case-body">
+            <div class="card" style="position:relative" id="cBox">
+              <div class="row"><div style="display:flex;gap:10px;align-items:center"><span class="sel">Denied accounts ▾</span><span class="muted">vs</span><span class="sel">Month ▾</span></div><div style="display:flex;gap:8px"><span class="btn">Bar ▾</span><span class="btn">Jan – Oct ▾</span></div></div>
+              <div class="chart" style="height:300px;gap:18px" id="mChart"><div class="grid"></div><div class="ax"><span>0</span><span>250</span><span>500</span><span>750</span><span>1k</span></div>
+                ${vals.map((v, i) => `<div class="mbar ${i === 5 ? "spike" : ""}" data-i="${i}" style="height:100%"><i style="height:${v / 10}%"></i><small style="position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--ink-3)">${months[i]}</small></div>`).join("")}
+              </div>
+              <div class="link-line" id="lnk"></div>
+            </div>
+            <div class="card"><div class="row"><h3>Comments</h3><span class="btn" style="height:28px">+ Add</span></div>
+              <div class="cmts" style="margin-top:10px">
+                <div class="cmt" data-bar="5"><b>Spike lines up with a payer policy change</b>New prior-auth rule took effect Jun 18.<div class="muted" style="margin-top:4px">A. Chen · Jul 2</div></div>
+                <div class="cmt" data-bar="2"><b>March: one-off coding backlog</b>Cleared by Apr 4.<div class="muted" style="margin-top:4px">M. Patel · Apr 6</div></div>
+                <div class="cmt" data-bar="7"><b>August is climbing again</b>Checking whether it's the same rule.<div class="muted" style="margin-top:4px">J. Rivera · Sep 3</div></div>
+              </div>
+              <h3 style="margin-top:18px">Root cause</h3>
+              <div class="rc"><div><span><b>Not set</b><br><span class="muted">Category</span></span><span class="btn" style="height:26px">Set</span></div><div><span><b>Not set</b><br><span class="muted">Detail</span></span><span class="btn" style="height:26px">Set</span></div></div>
+            </div>
+          </div>
+        </div>`;
+      },
+
+      start() {
+        return `${chrome("Interventions")}<div class="page" id="ivPage" style="filter:blur(1px)">
+          <div class="row"><h1>Interventions</h1><button class="btn primary" id="ivNew">Start an intervention</button></div>
+          <div class="card tbl" id="ivList" style="min-height:520px;margin-top:20px"></div></div>
+          <div class="scrim" id="ivScrim"><div class="modal" id="wiz"></div></div>`;
+      },
+
+      "before-dashboard"() {
+        const blocks = (n, h) => Array.from({ length: n }, () => `<div class="blk" style="height:${h}px;padding:14px;display:grid;gap:8px;align-content:start"><div class="ln d" style="width:40%"></div><div class="ln"></div><div class="ln" style="width:80%"></div></div>`).join("");
+        return `<div class="view wf">${chrome("Home")}
+          <div class="hdr" style="grid-template-columns:repeat(4,1fr)">${Array.from({ length: 4 }, () => `<div class="s"><i></i><span><b></b><u></u></span></div>`).join("")}</div>
+          <div class="page" style="display:grid;gap:14px">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">${blocks(3, 130)}</div>
+            <div class="blk" style="height:90px;padding:14px"><div class="ln d" style="width:20%"></div><div style="height:14px;margin-top:20px;border-radius:3px;background:var(--g2)"></div></div>
+            <div class="blk" style="height:250px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:20px"><div style="display:flex;align-items:flex-end;gap:10px">${[40, 70, 30, 55, 20, 35, 50].map((h) => `<i style="flex:1;height:${h}%;background:var(--g2);border-radius:2px"></i>`).join("")}</div><div style="display:grid;gap:12px;align-content:center">${Array.from({ length: 5 }, () => `<div class="ln"></div>`).join("")}</div></div>
+            <div class="blk" style="height:250px"></div>
+          </div></div>`;
+      },
+
+      "before-cases"() {
+        return `<div class="view wf">${chrome("Cases")}<div class="page">
+          <div class="ln d" style="width:120px;height:14px"></div>
+          <div style="display:flex;gap:40px;margin:22px 0 14px">${Array.from({ length: 5 }, (_, i) => `<div class="ln ${i ? "" : "d"}" style="width:90px"></div>`).join("")}</div>
+          <div style="display:flex;gap:10px;align-items:center"><div class="blk" style="flex:1;height:36px;display:flex;align-items:center;padding:0 12px"><span class="lbl">Type a filter, e.g. region = North and priority = High</span></div>${["Hide closed", "Filters", "Layout", "CSV"].map((b) => `<div class="blk" style="height:36px;padding:0 14px;display:flex;align-items:center"><span class="lbl">${b}</span></div>`).join("")}</div>
+          <div class="lbl" style="margin:12px 0">+ Add filter</div>
+          <div class="blk" style="overflow:hidden"><table><thead><tr>${["Case ID", "Alerting group", "Alert type", "Region", "Priority", "Date added", "Last worked", "Weekly change", "Inpatient %", "Secondary payer %", "Tier", "Score"].map((h) => `<th style="color:#7A8394;cursor:default">${h}</th>`).join("")}</tr></thead>
+          <tbody>${Array.from({ length: 9 }, () => `<tr>${Array.from({ length: 12 }, (_, i) => `<td><div class="ln ${i === 0 ? "d" : ""}" style="width:${50 + ((i * 17) % 40)}px"></div></td>`).join("")}</tr>`).join("")}</tbody></table></div>
+        </div></div>`;
+      },
+
+      "before-case"() {
+        return `<div class="view wf">${chrome("Cases")}
+          <div class="hdr" style="grid-template-columns:repeat(4,1fr);padding-top:30px;padding-bottom:40px">${Array.from({ length: 11 }, () => `<div class="s"><i></i><span><b></b><u></u></span></div>`).join("")}</div>
+          <div class="page" style="display:grid;grid-template-columns:300px 1fr;gap:24px">
+            <div style="display:grid;gap:12px;align-content:start"><div class="lbl">Ownership</div>${Array.from({ length: 2 }, () => `<div class="blk" style="height:64px"></div>`).join("")}<div class="lbl">Rankings</div>${Array.from({ length: 2 }, () => `<div class="blk" style="height:64px"></div>`).join("")}</div>
+            <div><div style="display:flex;gap:26px;margin-bottom:16px">${["Denials", "Cases", "Hotspots", "Accounts", "Tasks", "Client notes", "Team comments", "History"].map((t, i) => `<span class="lbl" style="${i === 0 ? "color:#4B5568;font-weight:500" : ""}">${t}</span>`).join("")}</div>
+              <div class="blk" style="height:260px;padding:16px;position:relative"><svg viewBox="0 0 800 200" preserveAspectRatio="none" style="position:absolute;inset:40px 16px 16px;width:calc(100% - 32px);height:calc(100% - 56px)"><polyline fill="none" stroke="#B3BAC7" stroke-width="2" points="0,150 60,140 120,155 180,130 240,145 300,120 340,40 380,135 440,140 500,125 560,150 620,138 680,145 740,130 800,142"/></svg><div class="ln d" style="width:160px"></div></div>
+              <div class="blk" style="height:160px;margin-top:14px"></div></div>
+          </div></div>`;
+      },
+    };
+
+    // ---------- Behaviour per view ----------
+    const WIRE = {
+      dashboard(root) {
+        const tip = $("#tip", root), chart = $("#wk", root);
+        root.querySelectorAll(".bar").forEach((b) => {
+          const show = () => {
+            root.querySelectorAll(".bar").forEach((x) => x.classList.toggle("on", x === b));
+            const r = b.getBoundingClientRect(), c = chart.getBoundingClientRect();
+            tip.innerHTML = `<b>${b.dataset.d}</b><br>Priority ${b.dataset.p} · Regular ${b.dataset.r}`;
+            tip.style.left = `${r.left - c.left + r.width / 2}px`; tip.style.top = `${r.top - c.top - 8}px`; tip.classList.add("on");
+          };
+          b.addEventListener("mouseenter", show); b.show = show;
+        });
+        chart.addEventListener("mouseleave", () => { tip.classList.remove("on"); root.querySelectorAll(".bar").forEach((x) => x.classList.remove("on")); });
+      },
+
+      cases(root) {
+        const st = { q: "", filters: [], sort: "change", dir: -1, closed: false };
+        const vis = () => COLS.filter((c) => c.on);
+        const draw = () => {
+          $("#th", root).innerHTML = `<tr><th class="flag"></th><th style="width:30px"><span class="chk"></span></th>${vis().map((c) => `<th data-k="${c.k}" class="${st.sort === c.k ? "sorted" : ""}">${c.t}<span class="s">${st.sort === c.k ? (st.dir > 0 ? "↑" : "↓") : "↕"}</span></th>`).join("")}</tr>`;
+          let rows = CASES.filter((c) => st.closed || c.status !== "Completed");
+          if (st.q) rows = rows.filter((c) => Object.values(c).join(" ").toLowerCase().includes(st.q.toLowerCase()));
+          st.filters.forEach(([k, v]) => (rows = rows.filter((c) => String(c[k]).toLowerCase().includes(v.toLowerCase()))));
+          rows = rows.slice().sort((a, b) => (a[st.sort] > b[st.sort] ? 1 : -1) * st.dir);
+          $("#tb", root).innerHTML = rows.map((c) => `<tr><td class="flag ${c.flag ? "on" : ""}">⚑</td><td><span class="chk"></span></td>${vis().map((col) => `<td>${col.k === "pri" ? priPill(c.pri) : col.k === "change" ? `<span class="${c.change > 0 ? "up" : "down"}">${money(c.change)}</span>` : col.k === "id" ? `<b style="font-weight:500">${c.id}</b>` : c[col.k]}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="9" class="muted" style="padding:24px">No cases match.</td></tr>`;
+          $("#count", root).textContent = `${rows.length} results`;
+          $("#chips", root).innerHTML = st.filters.map(([k, v], i) => `<span class="chip">${COLS.find((c) => c.k === k).t} contains “${v}” <b data-x="${i}">×</b></span>`).join("");
+        };
+        draw();
+        const panel = (id) => { ["#pCols", "#pFilter"].forEach((p) => $(p, root).classList.toggle("on", p === id && !$(p, root).classList.contains("on"))); $("#bCols", root).classList.toggle("on", $("#pCols", root).classList.contains("on")); $("#bFilter", root).classList.toggle("on", $("#pFilter", root).classList.contains("on")); };
+        $("#bCols", root).onclick = () => panel("#pCols");
+        $("#bFilter", root).onclick = () => panel("#pFilter");
+        $("#bClosed", root).onclick = (e) => { st.closed = !st.closed; e.currentTarget.classList.toggle("on", st.closed); draw(); };
+        root.querySelectorAll(".tg").forEach((t) => (t.onclick = () => { const c = COLS[+t.dataset.c]; c.on = c.on ? 0 : 1; t.classList.toggle("on", !!c.on); draw(); }));
+        $("#q", root).oninput = (e) => { st.q = e.target.value; draw(); };
+        // The column dropdown keeps a .value like a select, so the demo can set it
+        const dd = $("#fCol", root), ddOpts = [...dd.querySelectorAll("[data-v]")];
+        let ddVal = "pri";
+        const fVal = $("#fVal", root), fSugg = $("#fSugg", root);
+        const suggest = (k) => {
+          const vals = [...new Set(CASES.map((c) => String(c[k])))].slice(0, 6);
+          fVal.placeholder = `e.g. ${vals[0]}`;
+          fSugg.innerHTML = vals.map((v) => `<button type="button">${v}</button>`).join("");
+        };
+        fSugg.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { e.stopPropagation(); fVal.value = b.textContent; fVal.focus(); } });
+        fVal.addEventListener("keydown", (e) => e.key === "Enter" && $("#fApply", root).click());
+        Object.defineProperty(dd, "value", { get: () => ddVal, set: (v) => { ddVal = v; ddOpts.forEach((o) => o.setAttribute("aria-selected", String(o.dataset.v === v))); dd.querySelector(".dd-btn span").textContent = ddOpts.find((o) => o.dataset.v === v).textContent; suggest(v); } });
+        dd.value = ddVal;
+        dd.querySelector(".dd-btn").onclick = (e) => { e.stopPropagation(); dd.classList.toggle("open"); };
+        ddOpts.forEach((o) => (o.onclick = (e) => { e.stopPropagation(); dd.value = o.dataset.v; dd.classList.remove("open"); }));
+        root.addEventListener("click", () => dd.classList.remove("open"));
+        $("#fApply", root).onclick = () => { const v = $("#fVal", root).value.trim(); if (v) st.filters.push([$("#fCol", root).value, v]); $("#fVal", root).value = ""; panel(null); draw(); };
+        $("#fReset", root).onclick = () => { st.filters = []; draw(); };
+        root.addEventListener("click", (e) => {
+          const th = e.target.closest("th[data-k]"); if (th) { const k = th.dataset.k; st.dir = st.sort === k ? -st.dir : 1; st.sort = k; draw(); }
+          const x = e.target.closest("[data-x]"); if (x) { st.filters.splice(+x.dataset.x, 1); draw(); }
+        });
+        root.api = { panel, st, draw, setFilter: (k, v) => { st.filters = [[k, v]]; draw(); } };
+      },
+
+      case(root) {
+        const lnk = $("#lnk", root), box = $("#cBox", root);
+        const pick = (i) => {
+          root.querySelectorAll(".mbar").forEach((b) => b.classList.toggle("on", +b.dataset.i === i));
+          root.querySelectorAll(".cmt").forEach((c) => c.classList.toggle("on", +c.dataset.bar === i));
+          const bar = root.querySelector(`.mbar[data-i="${i}"] i`);
+          if (!bar) return lnk.classList.remove("on");
+          const r = bar.getBoundingClientRect(), b = box.getBoundingClientRect();
+          lnk.style.left = `${r.right - b.left + 4}px`; lnk.style.top = `${r.top - b.top}px`; lnk.style.width = `${b.right - r.right + 6}px`; lnk.classList.add("on");
+        };
+        root.querySelectorAll(".cmt").forEach((c) => c.addEventListener("mouseenter", () => pick(+c.dataset.bar)));
+        root.querySelectorAll(".mbar").forEach((b) => b.addEventListener("mouseenter", () => pick(+b.dataset.i)));
+        root.api = { pick };
+        setTimeout(() => pick(5), 50);
+      },
+
+      start(root) {
+        const STEPS = [
+          { h: "Start an intervention", p: "Interventions are where you document the steps to fix what the investigation found.", f: `<label class="field">Intervention name<input id="nm" placeholder="e.g. Prior auth for imaging" value=""></label>`, ok: () => $("#nm", root).value.trim() },
+          { h: "Set the region", p: "Pick the region for this group. You'll choose its cases once the region and billing type are set.", opts: ["North", "Central", "South", "East"] },
+          { h: "Set the billing type", p: "Interventions are grouped by billing type so the right team picks them up.", opts: ["Hospital", "Professional", "Both"] },
+          { h: "Confirm the root cause", p: "A root cause is required once a case moves from investigation to intervention.", opts: ["Authorization", "Eligibility", "Coding", "Timely filing"] },
+        ];
+        let i = 0; const pickd = {};
+        const wiz = $("#wiz", root);
+        // Done closes the modal onto the Interventions list with the new one on top; the list itself is a sketch
+        const IV = [["Prior auth for imaging", "North", "Hospital", "Authorization", "In progress", "Jul 2"], ["Timely filing, North", "North", "Professional", "Timely filing", "Not started", "Jun 28"], ["Duplicate claim edits", "Central", "Both", "Coding", "Completed", "Jun 20"]];
+        const list = (fresh) => {
+          const rows = IV;
+          $("#ivList", root).innerHTML = `<table><thead><tr>${["Intervention", "Region", "Billing type", "Root cause", "Status", "Created"].map((h) => `<th style="cursor:default">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr${r === fresh ? ' style="background:var(--blue-soft,#EEF2FF)"' : ""}>${r.map((c, j) => `<td>${j ? c : `<b style="font-weight:500">${c}</b>`}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+        };
+        const open = (on) => { $("#ivScrim", root).style.display = on ? "" : "none"; $("#ivPage", root).style.filter = on ? "blur(1px)" : "none"; };
+        const finish = () => { const fresh = [pickd.name || "New intervention", pickd[1] || "", pickd[2] || "", pickd[3] || "", "Not started", "Jul 6"]; IV.unshift(fresh); list(fresh); open(false); };
+        list();
+        $("#ivNew", root).onclick = () => { i = 0; Object.keys(pickd).forEach((k) => delete pickd[k]); draw(); open(true); };
+        const draw = () => {
+          if (i === STEPS.length) { wiz.innerHTML = `<div class="done"><div class="tick">✓</div><h2>Intervention created</h2><p>${pickd.name || "New intervention"} · ${pickd[1] || ""} · ${pickd[2] || ""} · ${pickd[3] || ""}</p><button class="btn primary" id="again">Done</button></div>`; $("#again", root).onclick = finish; return; }
+          const s = STEPS[i];
+          wiz.innerHTML = `<div class="prog">${i + 1} of ${STEPS.length}</div><div class="prog-bar"><i style="width:${((i + 1) / STEPS.length) * 100}%"></i></div><h2>${s.h}</h2><p>${s.p}</p>${s.f || `<div class="opt">${s.opts.map((o) => `<button class="${pickd[i] === o ? "on" : ""}" data-o="${o}">${o}</button>`).join("")}</div>`}<div class="acts"><button class="back" id="bk">${i ? "Back" : "Cancel"}</button><button class="btn primary" id="nx">${i === STEPS.length - 1 ? "Create intervention" : "Next"}</button></div>`;
+          const nx = $("#nx", root);
+          const valid = () => (s.f ? !!s.ok() : !!pickd[i]);
+          nx.disabled = !valid();
+          if (s.f) { const nm = $("#nm", root); nm.value = pickd.name || ""; nm.oninput = () => { pickd.name = nm.value; nx.disabled = !valid(); }; nx.disabled = !valid(); }
+          wiz.querySelectorAll("[data-o]").forEach((b) => (b.onclick = () => { pickd[i] = b.dataset.o; wiz.querySelectorAll("[data-o]").forEach((x) => x.classList.toggle("on", x === b)); nx.disabled = false; }));
+          nx.onclick = () => { if (valid()) { i++; draw(); } };
+          $("#bk", root).onclick = () => { if (i) { i--; draw(); } };
+        };
+        draw();
+        root.api = { set: (k, v) => { if (k === "name") pickd.name = v; else pickd[k] = v; draw(); }, next: () => { i = Math.min(i + 1, STEPS.length); draw(); }, reset: () => { i = 0; Object.keys(pickd).forEach((k) => delete pickd[k]); draw(); } };
+      },
+    };
+
+    let current = null;
+    const show = (v) => {
+      if (!VIEWS[v]) v = "dashboard";
+      const el = document.createElement("div");
+      el.className = "view out";
+      const html = VIEWS[v]();
+      el.innerHTML = html.startsWith('<div class="view') ? html.replace(/^<div class="view[^"]*">/, "").replace(/<\/div>$/, "") : html;
+      if (v.startsWith("before")) el.classList.add("wf");
+      app.appendChild(el);
+      WIRE[v] && WIRE[v](el);
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove("out")));
+      if (current) { const old = current; old.classList.add("out"); setTimeout(() => old.remove(), 500); }
+      current = el;
+      return el;
+    };
+
+    // ---------- Hero loop: alert on the dashboard → filter the cases → read the spike → start an intervention ----------
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    async function tour() {
+      for (;;) {
+        let v = show("dashboard"); await wait(900);
+        const bars = v.querySelectorAll(".bar"); for (const k of [1, 3, 6]) { bars[k].show(); await wait(700); }
+        v = show("cases"); await wait(1100);
+        v.api.panel("#pFilter"); await wait(700);
+        $("#fCol", v).value = "pri"; $("#fVal", v).value = "High"; await wait(800);
+        v.api.panel(null); v.api.setFilter("pri", "High"); await wait(1500);
+        v = show("case"); await wait(1000);
+        for (const k of [2, 7, 5]) { v.api.pick(k); await wait(900); }
+        v = show("start"); await wait(800);
+        v.api.set("name", "Prior auth for imaging"); await wait(800); v.api.next(); await wait(600);
+        v.api.set(1, "North"); await wait(500); v.api.next(); await wait(600);
+        v.api.set(2, "Hospital"); await wait(500); v.api.next(); await wait(600);
+        v.api.set(3, "Authorization"); await wait(500); v.api.next(); await wait(1800);
+      }
+    }
+
+    // Filtering on a loop, for the Cases section: open Filters, filter to High, sort by dollars, then clear.
+    // It stops for good the moment someone clicks into it, so they can try it themselves.
+    async function casesDemo() {
+      const v = show("cases");
+      let paused = false;
+      addEventListener("pointerdown", () => (paused = true), { once: true });
+      const wait = async (ms) => { await new Promise((r) => setTimeout(r, ms)); if (paused) throw 0; };
+      try { for (;;) {
+        await wait(1200);
+        v.api.panel("#pFilter"); await wait(800);
+        $("#fCol", v).value = "pri"; await wait(500);
+        const f = $("#fVal", v); f.value = ""; for (const ch of "High") { f.value += ch; await wait(140); }
+        await wait(600); v.api.panel(null); v.api.setFilter("pri", "High"); await wait(1600);
+        v.api.st.sort = "change"; v.api.st.dir = -1; v.api.draw(); await wait(1400);
+        v.api.st.filters = []; v.api.st.sort = "id"; v.api.st.dir = 1; v.api.draw(); await wait(1000);
+        v.api.st.sort = "change"; v.api.st.dir = -1; v.api.draw();
+      } } catch { v.api.panel(null); }
+    }
+
+    // Still states for the case study's images: ?v=cases&state=filter, ?v=start&step=2 …
+    const qs = new URLSearchParams(location.search);
+    if (qs.get("scroll")) document.documentElement.classList.add("scroll");
+    const v = qs.get("v") || "dashboard";
+    if (v === "tour") tour();
+    else if (v === "cases-demo") casesDemo();
+    else {
+      const el = show(v), state = qs.get("state"), step = +qs.get("step");
+      if (v === "cases" && state === "filter") { el.api.panel("#pFilter"); $("#fCol", el).value = "pri"; $("#fVal", el).value = "High"; el.api.setFilter("region", "North"); }
+      if (v === "start" && step) {
+        const picks = [["name", "Prior auth for imaging"], [1, "North"], [2, "Hospital"], [3, "Authorization"]];
+        for (let k = 0; k < step - 1; k++) { el.api.set(...picks[k]); el.api.next(); }
+        if (step <= 4 && qs.get("picked")) el.api.set(...picks[step - 1]);
+      }
+    }
+    addEventListener("message", (e) => { if (e.data && e.data.v && VIEWS[e.data.v]) show(e.data.v); });
+  </script>
+</body>
+</html>

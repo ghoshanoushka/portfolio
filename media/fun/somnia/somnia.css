@@ -1,0 +1,13 @@
+/* Somnia: reuses the ctrl z page layout (ctrlz.css) with the app's night blues. */
+.sm { --cream: #EEF1FA; --purple: #4A5BA8; --purple-deep: #142A5B; --orange: #F4C86A; --green: #7C9BE6; }
+.sm .cz-try { background: linear-gradient(160deg, #E6EBF8, #EDE8F6); }
+.sm .steps button { color: #6E7591; }
+.sm .steps button:hover, .sm .steps button[aria-current="step"] { color: #1B2140; }
+.sm .steps .n { color: #A6ADC6; }
+.sm .steps small { color: #5A6180; }
+.sm .steps .mine { margin-left: 6px; font-size: 11px; font-weight: 500; color: #4A5BA8; }
+.sm .proto-nav { color: #6E7591; }
+.sm .proto-nav button { background: #142A5B; color: #fff; }
+.sm .cz-frame { background: #142858; }
+.sm .cz-more summary { color: #1B2140; }
+.sm .steps b { display: inline; }

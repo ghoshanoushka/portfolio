@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claim Denials hero</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* A small task on a loop, like the Mensio hero: a manager's question, then Jordan answers it in the redesigned app
+       (the live prototype, driven by a cursor): spot the spike, filter to High, read why on the case page, start an
+       intervention. It ends on the new intervention at the top of the list. Drawn at 1456px wide. */
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { background: linear-gradient(135deg, #0f5c59, #4fc1a6); font-family: Inter, sans-serif; }
+    .scene { position: relative; width: 1456px; height: 100vh; }
+    .window { position: absolute; left: 64px; right: 64px; top: 48px; bottom: 0; overflow: hidden; border-radius: 14px 14px 0 0; background: #F4F6FA; box-shadow: 0 16px 60px rgba(8, 30, 28, .4); }
+    /* The app is drawn 1456 wide (860 tall, or taller to fill the window) and scaled to the window's width */
+    iframe { position: absolute; left: 0; top: 0; width: 1456px; height: 860px; border: 0; transform: scale(var(--s, .912)); transform-origin: 0 0; pointer-events: none; }
+
+    /* Beat 1: the question, over the dimmed dashboard */
+    .dim { position: absolute; inset: 0; background: rgba(13, 17, 27, .45); opacity: 0; transition: opacity .45s ease; }
+    .mail { position: absolute; left: 50%; top: 46%; width: 820px; box-sizing: border-box; padding: 44px 56px; border-radius: 24px; background: #fff;
+      font: 400 38px/1.4 Inter, sans-serif; color: #1f2937; box-shadow: 0 16px 40px -12px rgba(15, 23, 42, .35);
+      opacity: 0; transform: translate(-50%, -46%) rotate(-1deg); transition: opacity .45s ease, transform .6s cubic-bezier(.3, 0, .2, 1); }
+    .mail p { margin: 0; }
+    .mail .meta { color: #6b7280; font-size: 28px; }
+    .mail .body { margin-top: 18px; }
+    .mail mark { background: transparent; color: inherit; transition: background .4s ease; }
+    .mail .sign { margin-top: 20px; color: #6b7280; font-size: 28px; }
+    .beat-ask .dim { opacity: 1; }
+    .beat-ask .mail { opacity: 1; transform: translate(-50%, -50%) rotate(-1deg); }
+    .beat-ask.marked .mail mark { background: #fff1a8; }
+    .beat-task .mail { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+
+    /* Cursor and click ring, in window px */
+    .cursor { position: absolute; left: 0; top: 0; z-index: 5; width: 36px; height: 36px; opacity: 0; transition: transform .7s cubic-bezier(.45, 0, .2, 1), opacity .3s ease; }
+    .beat-task .cursor { opacity: 1; }
+    .cursor svg { width: 36px; height: 36px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); }
+    .ring { position: absolute; left: -18px; top: -18px; width: 36px; height: 36px; border-radius: 50%; border: 4px solid #2F5BEA; opacity: 0; }
+    .cursor.click .ring { animation: ring .45s ease-out; }
+    @keyframes ring { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(1.6); } }
+    @media (prefers-reduced-motion: reduce) { .mail, .dim { transition: none; } .cursor { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="window">
+      <iframe src="app.html?v=dashboard" title="" tabindex="-1" aria-hidden="true"></iframe>
+      <div class="dim"></div>
+      <div class="mail">
+        <p class="meta">Monday morning, a manager asks</p>
+        <p class="body">Denials jumped this week. <mark>What happened, and who's fixing it?</mark></p>
+        <p class="sign">Jordan finds out in the app, not a spreadsheet.</p>
+      </div>
+      <div class="cursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l15 9.5-6.6 1.3 3.9 7.4-3 1.6-3.9-7.4L4.6 19z" fill="#151b2d" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="ring"></span></div>
+    </div>
+  </div>
+  <script>
+    const scene = document.querySelector(".scene"), win = document.querySelector(".window"), frame = document.querySelector("iframe");
+    const cursor = document.querySelector(".cursor");
+    let s = .912;
+    // The app fills the window: scaled to its width, and drawn at least as tall as the window shows
+    const fit = () => { s = win.clientWidth / 1456; frame.style.setProperty("--s", s); frame.style.height = `${Math.max(860, Math.ceil(win.clientHeight / s))}px`; };
+    addEventListener("resize", fit); fit();
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const beat = (name) => { scene.className = "scene" + (name ? " beat-" + name : ""); };
+    // The prototype's own view switcher and elements, reached through the frame (same origin)
+    const app = () => frame.contentWindow;
+    const view = (v) => app().eval(`show(${JSON.stringify(v)})`);
+    const q = (sel, root) => (root || app().document).querySelector(sel);
+    // Point the cursor at an element in the app, or at a spot inside it (fx, fy as shares of its box)
+    const to = (el, fx = .5, fy = .5) => { const r = el.getBoundingClientRect(); cursor.style.transform = `translate(${(r.left + r.width * fx) * s - 6}px, ${(r.top + r.height * fy) * s - 3}px)`; };
+    const click = () => { cursor.classList.remove("click"); void cursor.offsetWidth; cursor.classList.add("click"); };
+    const nav = (root, name) => [...root.querySelectorAll(".nav span")].find((n) => n.textContent === name);
+    const type = async (input, text) => { input.value = ""; for (const ch of text) { input.value += ch; input.dispatchEvent(new Event("input", { bubbles: true })); await wait(90); } };
+
+    async function loop() {
+      await new Promise((r) => (frame.contentDocument?.readyState === "complete" ? r() : frame.addEventListener("load", r, { once: true })));
+      await wait(300);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      for (;;) {
+        // 1. The ask
+        let v = view("dashboard");
+        await wait(500);
+        beat("ask");
+        await wait(1200); scene.classList.add("marked"); await wait(2400);
+
+        // 2. Spot the spike on the dashboard
+        to(q(".bar", v), .5, .3);
+        beat("task");
+        await wait(100);
+        const bar = v.querySelectorAll(".bar")[1];
+        to(bar, .5, .3); await wait(750); bar.show(); await wait(1300);
+
+        // 3. Cases: filter to High (the list already leads with the biggest dollar change)
+        to(nav(v, "Cases")); await wait(750); click(); await wait(250);
+        v = view("cases"); await wait(700);
+        to(q("#bFilter", v)); await wait(750); click(); v.api.panel("#pFilter"); await wait(500);
+        to(q("#fVal", v), .3); await wait(650); await type(q("#fVal", v), "High"); await wait(300);
+        to(q("#fApply", v)); await wait(650); click(); q("#fApply", v).click(); await wait(900);
+
+        // 4. The case: the comment beside the chart explains the spike
+        to(q("#tb tr", v), .25); await wait(700); click(); await wait(250);
+        v = view("case"); await wait(800);
+        const cmt = q(".cmt", v);
+        to(cmt, .4); await wait(800); v.api.pick(+cmt.dataset.bar); await wait(1800);
+
+        // 5. Start an intervention, and land on it in the list
+        to(nav(v, "Interventions")); await wait(750); click(); await wait(250);
+        v = view("start"); await wait(700);
+        to(q("#nm", v), .3); await wait(600); await type(q("#nm", v), "Summit Shield prior auth"); await wait(250);
+        for (const pick of [null, "North", "Hospital", "Authorization"]) {
+          if (pick) { const b = [...v.querySelectorAll("[data-o]")].find((x) => x.dataset.o === pick); to(b); await wait(600); click(); b.click(); await wait(350); }
+          const nx = q("#nx", v); to(nx); await wait(600); click(); nx.click(); await wait(500);
+        }
+        const done = q("#again", v); to(done); await wait(700); click(); done.click();
+        await wait(400); to(q("#ivList tbody tr", v), .2); await wait(2600);
+        beat("");
+      }
+    }
+    loop();
+  </script>
+</body>
+</html>

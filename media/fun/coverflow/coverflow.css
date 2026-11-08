@@ -1,0 +1,6 @@
+/* Coverflow: reuses the ctrl z page layout (ctrlz.css), with a dark frame and the F1 red as the accent. */
+.cf { --orange: #E8473C; }
+.cf .cz-frame { background: #111216; }
+.cf-proto .cz-frame { aspect-ratio: 16 / 10; }
+.cf-proto iframe { display: block; width: 100%; height: 100%; border: 0; }
+.cf-proto figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-55); }

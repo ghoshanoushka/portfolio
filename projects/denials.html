@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claim Denials</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1;1,9..144,400,0..100,0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+</head>
+<body data-root="../" data-page="project" data-title="Claim Denials">
+  <!-- The client is under NDA: no company name, logo or product name. Every screen is recreated in media/denials/app.html with made-up data. -->
+  <div class="shell">
+    <div class="page-margin" style="flex:1;display:flex;flex-direction:column">
+      <div class="grid-12" style="flex:1">
+        <main class="content">
+          <article class="case-study fade-in d1">
+            <div class="project-hero" style="background:linear-gradient(135deg, #0f5c59, #4fc1a6)"><iframe src="../media/denials/hero.html" title="A manager asks why denials jumped; Jordan spots the spike on the dashboard, filters cases to High, reads the comment that explains it, and starts an intervention" loading="lazy" tabindex="-1"></iframe></div>
+
+            <div class="project-measure">
+              <h1 class="project-title">Redesigning a denials platform so revenue cycle teams go from alert to fix faster</h1>
+              <div class="project-meta">
+                <div><p class="project-meta-label">Role</p><p class="project-meta-value">Product designer on a student team</p><p class="project-meta-value">Shared the design work</p></div>
+                <div><p class="project-meta-label">Team</p><p class="project-meta-value">Anna, Anoushka, Ashita, Deeksha</p></div>
+                <div><p class="project-meta-label">Client</p><p class="project-meta-value">A healthcare revenue cycle company</p><p class="project-meta-value">University of Michigan capstone</p></div>
+                <div><p class="project-meta-label">Timeline</p><p class="project-meta-value">September – December 2025</p></div>
+                <div><p class="project-meta-label">Scope</p><p class="project-meta-value">User Research</p><p class="project-meta-value">Product Design</p><p class="project-meta-value">Prototyping</p></div>
+              </div>
+              <div class="seg tldr-toggle" role="tablist" aria-label="Story length">
+                <button type="button" role="tab" aria-selected="true" data-tldr-mode="short">TL;DR</button>
+                <button type="button" role="tab" aria-selected="false" data-tldr-mode="full">Full story</button>
+                <p class="tldr-say" aria-live="polite" hidden></p>
+              </div>
+            </div>
+
+            <div class="project-sections">
+
+              <section data-tldr id="overview" data-toc="Overview" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Overview</p>
+                <div class="project-content-text"><h2>Hospitals lose money every time an insurer denies a claim…</h2></div>
+                <div data-tldr-hide class="project-content-text"><p>Our client's platform helps hospital revenue cycle teams track denied claims, find the root cause, and stop the same denials from coming back. It groups denials into cases. Teams investigate each case, then open an intervention to fix the cause.</p><p>The client's own users called the interface clunky, and they were planning a new version. For our University of Michigan mastery course, our team spent a semester redesigning it with them.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#4fc1a622">
+                    <p class="panel-label">The case page, before and after</p>
+                    <div class="panel-card compare-card">
+                      <div class="compare" style="--pos: 50%; aspect-ratio: 1456 / 860">
+                        <img src="../media/denials/case.webp" alt="Redesigned case page: five score cards, a bar chart with the June spike linked to the comment that explains it, and the root cause beside it">
+                        <img class="compare-before" src="../media/denials/before-case.webp" alt="Wireframe of the old case page: a header of same-size numbers, eight tabs, and a line chart with nothing explaining its spike">
+                        <div class="compare-handle" aria-hidden="true"></div>
+                        <input type="range" min="0" max="100" value="50" aria-label="Drag to compare the old and new case page">
+                        <button type="button" class="compare-tag compare-tag-before" data-pos="100">Before</button>
+                        <button type="button" class="compare-tag compare-tag-after" data-pos="0">After</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-text"><h2>…but finding out why took too many clicks, filters typed by hand, and a trip to Excel.</h2></div>
+                <div data-tldr-hide class="project-content-text"><p>We rebuilt the four screens on the path from an alert to a fix: the dashboard, the cases list, the case page and starting an intervention. The thread through all of them was the same. Show the dollar impact first, keep the next step on the screen you're on, and let people filter like they do in a spreadsheet.</p></div>
+                <div data-tldr-only class="project-content-text"><p>We rebuilt the dashboard, cases list, case page and intervention flow around one idea: show the dollar impact first, and keep the next step on the screen you're on.</p></div>
+              </section>
+
+              <section id="users" data-toc="Who uses it" class="project-content-grid section-fill">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Who uses it</p>
+                <div class="project-content-text"><h2>People whose job is to get denied claims paid, and to stop them happening again.</h2></div>
+                <div class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>Denial specialists</p><p>Work the cases: investigate a spike, find the root cause, open an intervention.</p></div>
+                    <div><p>A/R follow-up and billing teams</p><p>Pick up interventions for their region and billing type, and close them out.</p></div>
+                    <div><p>Revenue cycle leaders</p><p>Need to see trends, team progress and the dollars at stake, without digging.</p></div>
+                    <div><p>The client's success team</p><p>Walk customers through the platform and pass on what they hear.</p></div>
+                  </div>
+                </div>
+              </section>
+
+              <section data-tldr id="research" data-toc="Research" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Research</p>
+                <div class="project-content-text"><h2>We asked how people handle denials today, before looking at the screens.</h2></div>
+                <div data-tldr-hide class="project-content-text"><p>Our professor pushed us to step back from the demo environment. A usability test shows where people get stuck, but not what they're trying to find out, so we needed users to tell us the story of their last denial.</p><p>We ran five sessions with the client's stakeholders and users, two of them usability tests of the current product. I scheduled the client sessions. We then mapped every interaction, ran a heuristic evaluation, sorted the findings in an affinity map, and did a cognitive walkthrough with the client's product owner, from an alert to a resolved denial.</p></div>
+                <div class="project-content-text">
+                  <div class="stats accent">
+                    <div><p class="stat">5</p><p>sessions with stakeholders and users</p></div>
+                    <div><p class="stat">2</p><p>usability tests of the current product</p></div>
+                    <div><p class="stat">1</p><p>cognitive walkthrough, alert to resolution</p></div>
+                  </div>
+                </div>
+                <div data-tldr-hide class="project-content-text"><p class="pair-label">What the tests looked at</p></div>
+                <div data-tldr-hide class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>Spotting trends</p><p>How people find and investigate a denial spike in the charts.</p></div>
+                    <div><p>Filtering cases</p><p>How they filter and organize cases in the tables.</p></div>
+                    <div><p>Key workflows</p><p>How easily they finish the core denial-management tasks.</p></div>
+                    <div><p>Grouping</p><p>How they group and review related cases.</p></div>
+                  </div>
+                </div>
+              </section>
+
+              <section data-tldr id="problem" data-toc="The problem" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">The problem</p>
+                <div class="project-content-text"><h2>The data was there. Getting to it was the work.</h2></div>
+                <div class="project-content-text">
+                  <div class="takeaways quotes">
+                    <div><p>“It's a lot of clicking.”</p><p>Client user</p></div>
+                    <div><p>“Typing filters manually is tedious.”</p><p>Client user</p></div>
+                    <div><p>“I'd need Excel to really understand this.”</p><p>Client user</p></div>
+                    <div><p>“It almost feels like I'm documenting things twice.”</p><p>Client user</p></div>
+                  </div>
+                </div>
+                <div data-tldr-hide class="project-content-text"><p>Our heuristic evaluation put the same issues on the screens. These wireframes show the old layouts, redrawn without the client's interface.</p></div>
+                <div data-tldr-hide class="project-content-media"><div class="figure-grid cols-2">
+                  <figure class="annot"><div class="figure-media annot-media" style="aspect-ratio:1456 / 860"><div class="annot-stage"><img src="../media/denials/before-cases.webp" alt="Wireframe of the old cases list: a typed filter field, twelve columns and a CSV button"><button type="button" class="hot" style="--x:20%;--y:22%;--mx:20%;--my:30%" data-i="0" aria-label="Filters were typed by hand, as text.">1</button><button type="button" class="hot" style="--x:58%;--y:30%;--mx:58%;--my:38%" data-i="1" aria-label="Twelve columns, with the dollar change far to the right.">2</button><button type="button" class="hot" style="--x:94%;--y:22%;--mx:94%;--my:30%" data-i="2" aria-label="To rank by dollar impact, people exported to CSV and sorted in Excel.">3</button></div></div><figcaption>Cases list</figcaption><ol class="annot-list"><li data-i="0">Filters were typed by hand, as text.</li><li data-i="1">Twelve columns, with the dollar change far to the right.</li><li data-i="2">To rank by dollar impact, people exported to CSV and sorted in Excel.</li></ol></figure>
+                  <figure class="annot"><div class="figure-media annot-media" style="aspect-ratio:1456 / 860"><div class="annot-stage"><img src="../media/denials/before-case.webp" alt="Wireframe of the old case page: a header of numbers, eight tabs and a line chart"><button type="button" class="hot" style="--x:50%;--y:16%;--mx:50%;--my:24%" data-i="0" aria-label="Every number at the same size. The dollar impact didn't stand out.">1</button><button type="button" class="hot" style="--x:45%;--y:34%;--mx:45%;--my:42%" data-i="1" aria-label="Eight tabs. Comments and notes sat on different tabs from the chart.">2</button><button type="button" class="hot" style="--x:56%;--y:46%;--mx:66%;--my:46%" data-i="2" aria-label="A spike in the chart, with nothing next to it explaining why.">3</button></div></div><figcaption>Case page</figcaption><ol class="annot-list"><li data-i="0">Every number at the same size. The dollar impact didn't stand out.</li><li data-i="1">Eight tabs. Comments and notes sat on different tabs from the chart.</li><li data-i="2">A spike in the chart, with nothing next to it explaining why.</li></ol></figure>
+                </div></div>
+                <div data-tldr-only class="project-content-text"><p class="mission"><span>The insight</span>People weren't missing data. They were missing a short path from “what spiked?” to “who's fixing it?”</p></div>
+              </section>
+
+              <section id="principles" data-toc="Principles" class="project-content-grid section-fill">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Principles</p>
+                <div class="project-content-text"><h2>Four rules for every screen.</h2></div>
+                <div class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>Dollars first</p><p>Lead with the dollar impact, so the costliest denials get worked first.</p></div>
+                    <div><p>Filter like a spreadsheet</p><p>Filter and sort from the column, instead of typing filters.</p></div>
+                    <div><p>Next step on the same screen</p><p>Fewer clicks between spotting a problem and acting on it.</p></div>
+                    <div><p>Same cues everywhere</p><p>One layout and one set of controls across cases, interventions and reports.</p></div>
+                  </div>
+                </div>
+              </section>
+
+              <section data-tldr id="design" data-toc="The redesign" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">The redesign</p>
+                <div class="project-content-text"><h2>Every complaint got an answer on the screen.</h2></div>
+                <div data-tldr-hide class="project-content-text"><p>Pick a quote to see the part of the redesign that answers it. All screens are recreations of our designs with made-up data.</p></div>
+                <div class="project-content-media">
+                  <div class="spot-demo" data-spot>
+                    <div class="spot-quotes" role="tablist" aria-label="User quotes">
+                      <button type="button" role="tab" data-img="media/denials/dashboard.webp" data-alt="Redesigned dashboard with its top band highlighted" data-box="1.5,14,97,24" data-note="Cases, interventions and tasks share one band at the top, with the high-priority items beside their totals. The most urgent case is one click from home.">“It's a lot of clicking.”</button>
+                      <button type="button" role="tab" data-img="media/denials/cases-filter.webp" data-alt="Cases list with the Filters panel open and a Region filter shown as a chip" data-box="1,14.5,85.5,42" data-note="Typed filters became a panel: pick a column, type what it contains, apply. Each filter shows as a chip you can remove with one click.">“Typing filters manually is tedious.”</button>
+                      <button type="button" role="tab" data-img="media/denials/cases.webp" data-alt="Cases list with the Weekly dollar change column highlighted" data-box="48.5,32,12.5,42" data-note="Weekly dollar change sits near the front and sorts from its header, so the costliest cases go to the top without exporting to Excel.">“I'd need Excel to really understand this.”</button>
+                      <button type="button" role="tab" data-img="media/denials/start-1.webp" data-alt="Start an intervention, step 1 of 4" data-box="30.5,35,39,36" data-note="We cut the steps and added a progress bar so it's clear where you are. Carrying case notes forward is our top recommendation for the next version.">“It almost feels like I'm documenting things twice.”</button>
+                    </div>
+                    <div class="spot-stage"><img src="../media/denials/dashboard.webp" alt=""><div class="spot-box"></div></div>
+                    <p class="spot-note" aria-live="polite"></p>
+                  </div>
+                </div>
+              </section>
+
+              <section id="dashboard" data-toc="Dashboard" class="project-subsection project-content-grid">
+                <div class="project-content-text"><p class="project-subsection-label">Dashboard</p><h2>Goal: fewer steps, clearer insights, faster decisions.</h2></div>
+                <div class="project-content-text"><p>The old home stacked numbers, lists and charts in one long column. Hover the markers to see what each part of the new one does.</p></div>
+                <div class="project-content-media"><figure class="annot" style="margin:0"><div class="figure-media annot-media" style="aspect-ratio:1456 / 860"><div class="annot-stage"><img src="../media/denials/dashboard.webp" alt="Redesigned dashboard: a band of case, intervention and task cards, then a weekly cases chart and a status breakdown"><div class="annot-state" data-i="2" aria-hidden="true"><i class="annot-bar" style="left:13.9%;top:57%;width:5.9%;height:21.9%"></i><span class="annot-tip" style="left:16.85%;top:56%"><b>Jul 2</b><br>Priority 30 · Regular 26</span></div><button type="button" class="hot" style="--x:9%;--y:20%;--mx:9%;--my:28%" data-f="2.7,16,38.9,37.4" data-i="0" aria-label="Totals and the high-priority list share a card, so the most urgent case is one click from home.">1</button><button type="button" class="hot" style="--x:84%;--y:20%;--mx:84%;--my:28%" data-f="77.3,16,97.2,37.4" data-i="1" aria-label="My tasks keeps each person's follow-ups on the home screen.">2</button><button type="button" class="hot" style="--x:18%;--y:62%;--mx:26%;--my:62%" data-f="2.8,48.4,58.7,84.3" data-i="2" aria-label="Hover a bar for its priority and regular counts, instead of reading them off the axis.">3</button><button type="button" class="hot" style="--x:70%;--y:58%;--mx:70%;--my:66%" data-f="59.9,48.4,97.2,84.3" data-i="3" aria-label="Status reads as one stacked bar with counts, so the backlog shows at a glance.">4</button></div></div><figcaption>The new dashboard</figcaption><ol class="annot-list"><li data-i="0">Totals and the high-priority list share a card, so the most urgent case is one click from home.</li><li data-i="1">My tasks keeps each person's follow-ups on the home screen.</li><li data-i="2">Hover a bar for its priority and regular counts, instead of reading them off the axis.</li><li data-i="3">Status reads as one stacked bar with counts, so the backlog shows at a glance.</li></ol></figure></div>
+              </section>
+
+              <section id="cases" data-toc="Cases" class="project-subsection project-content-grid">
+                <div class="project-content-text"><p class="project-subsection-label">Cases</p><h2>Goal: find and filter key cases quickly.</h2></div>
+                <div class="project-content-text"><p>Filter by any column, sort from any header, and choose which columns to show. The clip below plays on its own; click into it to try it.</p></div>
+                <div class="project-content-media" style="display:flex;flex-direction:column;gap:10px">
+                  <div class="proto" style="aspect-ratio:1456 / 720"><iframe src="../media/denials/app.html?v=cases-demo" title="Cases list: filtering to High priority, then sorting by weekly dollar change" loading="lazy"></iframe></div>
+                  <p class="try">Click in to try it</p>
+                </div>
+              </section>
+
+              <section id="case-page" data-toc="Case page" class="project-subsection project-content-grid">
+                <div class="project-content-text"><p class="project-subsection-label">Case page</p><h2>Goal: see the spike and the reason together.</h2></div>
+                <div class="project-content-text"><p>The header went from a row of equal numbers to five score cards, with the dollar change outlined. Comments moved out of their tab and next to the chart: each one links to the month it explains, and the root cause sits right under them. Drag the slider at the top of the page to compare.</p></div>
+                <div class="project-content-text"><p class="mission"><span>Before → after</span>11 numbers → 5 score cards. 8 tabs → 1 page.</p></div>
+                <div class="project-content-media"><div class="figure-grid cols-2">
+                  <figure><div class="figure-media" style="aspect-ratio:1456 / 538"><img src="../media/denials/zoom-before-case.webp" alt="Old case page, outlined: eleven same-size numbers in the header, and Team comments as one of eight tabs" loading="lazy"></div><figcaption><b>Before.</b> 11 same-size numbers, and comments on their own tab.</figcaption></figure>
+                  <figure><div class="figure-media" style="aspect-ratio:1456 / 538"><img src="../media/denials/zoom-after-case.webp" alt="New case page, outlined: five score cards with the dollar change highlighted, and comments beside the chart" loading="lazy"></div><figcaption><b>After.</b> 5 score cards, and comments beside the chart.</figcaption></figure>
+                </div></div>
+              </section>
+
+              <section id="interventions" data-toc="Interventions" class="project-subsection project-content-grid">
+                <div class="project-content-text"><p class="project-subsection-label">Interventions</p><h2>Goal: reduce repetition and guide people through it.</h2></div>
+                <div class="project-content-text"><p>“Documenting things twice” came from the hand-off between a case and its intervention. Starting one is now four short steps with a progress bar, each saying what it's for. Carrying the case's notes forward is our top recommendation for the next version.</p></div>
+                <div class="project-content-media">
+                  <div class="strip" data-strip>
+                    <div class="strip-track">
+                      <figure><img src="../media/denials/step-1.webp" alt="Step 1 of 4: name the intervention" loading="lazy"><figcaption><b>1. Name it.</b> The progress bar shows where you are.</figcaption></figure>
+                      <figure><img src="../media/denials/step-2.webp" alt="Step 2 of 4: set the region" loading="lazy"><figcaption><b>2. Set the region.</b> Cases are chosen after region and billing type.</figcaption></figure>
+                      <figure><img src="../media/denials/step-3.webp" alt="Step 3 of 4: set the billing type" loading="lazy"><figcaption><b>3. Set the billing type.</b> So the right team picks it up.</figcaption></figure>
+                      <figure><img src="../media/denials/step-4.webp" alt="Step 4 of 4: confirm the root cause" loading="lazy"><figcaption><b>4. Confirm the root cause.</b> Required once a case moves to intervention.</figcaption></figure>
+                      <figure><img src="../media/denials/step-5.webp" alt="Intervention created, with its name, region, billing type and root cause" loading="lazy"><figcaption><b>Done.</b> One summary line instead of a second write-up.</figcaption></figure>
+                    </div>
+                    <div class="strip-nav"><button type="button" class="strip-prev" aria-label="Previous step">←</button><button type="button" class="strip-next" aria-label="Next step">→</button><span class="strip-count"></span></div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="try" data-toc="Try it yourself" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Try it yourself</p>
+                <div class="project-content-text"><h2>From alert to fix, in four screens.</h2></div>
+                <div class="project-content-media" style="display:flex;flex-direction:column;gap:14px">
+                  <div class="proto-tabs" data-proto-tabs role="tablist" aria-label="Step in the workflow">
+                    <button type="button" role="tab" aria-selected="true" data-v="dashboard" data-cap="Spot it: hover the bars to see priority and regular cases for each day.">1. Spot</button>
+                    <button type="button" role="tab" aria-selected="false" data-v="cases" data-cap="Find it: open Filters or Columns, sort any column, or search.">2. Find</button>
+                    <button type="button" role="tab" aria-selected="false" data-v="case" data-cap="Understand it: hover a comment to see the month it explains.">3. Understand</button>
+                    <button type="button" role="tab" aria-selected="false" data-v="start" data-cap="Fix it: name the intervention and step through the four screens.">4. Fix</button>
+                  </div>
+                  <div class="proto" style="aspect-ratio:1456 / 860"><iframe src="../media/denials/app.html?v=dashboard" title="Interactive recreation of the redesigned denials platform" loading="lazy"></iframe></div>
+                  <p class="proto-cap" aria-live="polite">Spot it: hover the bars to see priority and regular cases for each day.</p>
+                </div>
+              </section>
+
+              <section data-tldr id="impact" data-toc="Impact &amp; reflection" class="project-content-grid section-fill">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Impact &amp; reflection</p>
+                <div class="project-content-text"><h2>A shorter path from “what spiked?” to “who's fixing it?”</h2></div>
+                <div class="project-content-text"><p>We handed the client a clickable prototype, marked-up designs with the reasons behind each change, and a final report. For users, the redesign means fewer clicks and a clear next step. For the client and its customers, it means more accurate prioritization and faster work on high-dollar denials.</p></div>
+                <!-- From the team's final deliverables (design proposal and presentation). Nothing shipped, so no outcome numbers. -->
+                <div class="project-content-text">
+                  <div class="stats accent">
+                    <div><p class="stat">4</p><p>Workflows redesigned: dashboard, cases, case page and intervention</p></div>
+                    <div><p class="stat">4</p><p>Usability tests: two on the old product, two on our first designs</p></div>
+                    <div><p class="stat">18 mo</p><p>Implementation plan handed to the client</p></div>
+                  </div>
+                </div>
+                <!-- Placeholder reflection: rewrite in her own words. -->
+                <div data-tldr-hide class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>Start with the story, not the screen</p><p>Asking about the last denial someone worked told us more than watching them click.</p></div>
+                    <div><p>What's next</p><p>Measure time to find a high-priority case, time to filter and start an intervention, and how often analysts still export to Excel.</p></div>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+          </article>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="../site.js"></script>
+  <script src="../chat.js"></script>
+</body>
+</html>

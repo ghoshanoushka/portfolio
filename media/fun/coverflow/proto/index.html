@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coverflow prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Coverflow for visionOS, playable. Three scenes in one stage, drawn at 1280 × 800 and scaled to fit:
+       1. the library window in the room, 2. Coverflow (real 3D covers you can flip), 3. an immersive race in three.js
+       when the Formula 1 theme plays. The living room photo and the F1 art come from Anoushka's Figma file; the other environments are free Unsplash photos. */
+    html, body { margin: 0; height: 100%; overflow: clip; background: #111; font-family: -apple-system, "SF Pro Text", Inter, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; user-select: none; }
+    * { box-sizing: border-box; }
+    button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 800px; transform-origin: 0 0; overflow: hidden; }
+    .room { position: absolute; inset: -20px; transition: filter .8s ease, transform 1.2s cubic-bezier(.3, 0, .2, 1); }
+    /* Environments, as in visionOS: each is a photo layer that crossfades in */
+    .room i { position: absolute; inset: 0; background: var(--img) center 55% / cover; opacity: 0; transition: opacity .9s ease; }
+    .room i.on { opacity: 1; }
+    .envs { position: absolute; left: 40px; bottom: 40px; z-index: 5; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 26px; transition: opacity .3s; }
+    .envs button { width: 36px; height: 36px; border-radius: 50%; background: var(--img) center / cover; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); transition: box-shadow .2s, scale .2s; }
+    .envs button:hover { scale: 1.08; }
+    .envs button.on { box-shadow: 0 0 0 2px #fff; }
+    .envs span { padding: 0 10px 0 6px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, .85); white-space: nowrap; }
+    .stage.race .envs { opacity: 0; pointer-events: none; }
+    .stage.cf .room { filter: brightness(.82); }
+    .glass { background: rgba(98, 98, 104, .42); backdrop-filter: blur(36px) saturate(160%); -webkit-backdrop-filter: blur(36px) saturate(160%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 30px 60px -30px rgba(0, 0, 0, .5); }
+
+    /* ---------- 1. Library window ---------- */
+    .win { position: absolute; left: 230px; top: 96px; width: 820px; height: 520px; border-radius: 44px; display: flex; overflow: hidden;
+      transition: opacity .5s ease, transform .7s cubic-bezier(.3, 0, .2, 1), filter .5s ease; }
+    .stage.cf .win, .stage.race .win { opacity: 0; transform: scale(.92) translateY(-12px); filter: blur(8px); pointer-events: none; }
+    .side { width: 220px; padding: 26px 14px; background: rgba(255, 255, 255, .06); display: flex; flex-direction: column; gap: 4px; }
+    .side h1 { margin: 0 10px 2px; font-size: 26px; font-weight: 700; letter-spacing: -.01em; }
+    .side .sub { margin: 0 10px 18px; font-size: 13px; color: rgba(255, 255, 255, .6); }
+    .side a { display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-radius: 20px; font-size: 15px; color: rgba(255, 255, 255, .92); }
+    .side a.on { background: rgba(255, 255, 255, .18); }
+    .side svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+    .main { flex: 1; padding: 26px 28px; display: flex; flex-direction: column; min-width: 0; }
+    .head { display: flex; align-items: flex-start; justify-content: space-between; }
+    .head h2 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.01em; }
+    .head p { margin: 2px 0 0; font-size: 13px; color: rgba(255, 255, 255, .6); }
+    .views { display: flex; gap: 2px; padding: 3px; border-radius: 22px; background: rgba(0, 0, 0, .18); }
+    .views button { display: grid; place-items: center; width: 44px; height: 34px; border-radius: 18px; color: rgba(255, 255, 255, .75); transition: background .2s, color .2s; }
+    .views button.on { background: rgba(255, 255, 255, .22); color: #fff; }
+    .views button:hover { color: #fff; }
+    .views svg { width: 22px; height: 18px; }
+    .search { display: flex; align-items: center; gap: 8px; height: 38px; margin: 18px 0 20px; padding: 0 14px; border-radius: 19px; background: rgba(0, 0, 0, .16); font-size: 14px; color: rgba(255, 255, 255, .55); }
+    .search svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 16px; }
+    .grid figure { margin: 0; }
+    .grid img { display: block; width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; }
+    .grid figcaption { margin-top: 7px; font-size: 13px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .grid figcaption span { display: block; color: rgba(255, 255, 255, .58); }
+    .nudge { position: absolute; right: 232px; top: 66px; padding: 9px 16px; border-radius: 18px; background: #fff; color: #1d1d22; font-size: 15px; font-weight: 600;
+      box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .45); animation: bob 1.6s ease-in-out infinite; transition: opacity .3s; pointer-events: none; }
+    /* Until Coverflow is tried, its button glows and pulses */
+    .stage:not(.used) #toCf { background: rgba(255, 255, 255, .28); color: #fff; animation: ping 1.8s ease-out infinite; }
+    @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .55); } 80%, 100% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); } }
+    .nudge::after { content: ""; position: absolute; right: 26px; bottom: -5px; width: 10px; height: 10px; background: inherit; rotate: 45deg; }
+    .stage.cf .nudge, .stage.used .nudge { opacity: 0; }
+    @keyframes bob { 50% { translate: 0 -4px; } }
+
+    /* ---------- 2. Coverflow ---------- */
+    .flow { position: absolute; left: 0; right: 0; top: 150px; height: 440px; perspective: 1300px; pointer-events: none; }
+    .stage.cf .flow { pointer-events: auto; }
+    /* Each cover is a glass card with its title and artist inside, as in Anoushka's design */
+    .cover { position: absolute; left: 50%; top: 0; width: 290px; margin-left: -145px; text-align: center; transform-style: preserve-3d;
+      transition: transform .55s cubic-bezier(.25, .8, .25, 1), opacity .5s ease, filter .55s ease; opacity: 0; cursor: pointer; }
+    /* The glass card has two faces; Formula 1 turns over once its theme plays, to offer the race */
+    /* A symmetric ease, so the card is edge-on exactly halfway, when the faces swap; it lifts a little as it turns */
+    .turn { position: relative; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.45, 0, .55, 1); }
+    .cover.over .turn { transform: rotateY(180deg); }
+    .cover.over .turn { animation: lift .7s cubic-bezier(.45, 0, .55, 1); }
+    @keyframes lift { 50% { translate: 0 0 60px; } }
+    .front, .rear { filter: brightness(var(--dim, 1)); transition: filter .55s ease; padding: 12px 12px 16px; border-radius: 30px;
+      background: linear-gradient(180deg, #8E8E95, #727279); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(255, 255, 255, .14), 0 30px 50px -24px rgba(0, 0, 0, .55); }
+    .rear { position: absolute; inset: 0; transform: rotateY(180deg); display: flex; flex-direction: column; opacity: 0; }
+    /* Faces swap halfway through the turn (Chrome drops backface-visibility on the side covers, so this is done by hand) */
+    .front, .rear { transition: filter .55s ease, opacity 0s linear .35s; }
+    .cover.over .front { opacity: 0; }
+    .cover.over .rear { opacity: 1; }
+    /* The back, styled like an Apple Music feature card: the art, a dark fade, and a white pill */
+    .rear .art { position: relative; aspect-ratio: 1; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 18px; text-align: left; }
+    .rear .art { background: #000; }
+    .rear .logo { position: absolute; left: 0; right: 0; top: 26px; height: 74px; overflow: hidden; }   /* just the F1 mark, cropped from the cover and clear of the text */
+    .rear .logo img { position: absolute; left: 12%; top: -62px; width: 76%; }
+    .rear .art::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, #000 72%); }
+    .rear .art small { position: relative; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .65); }
+    .rear .art p { position: relative; margin: 3px 0 14px; font-size: 21px; font-weight: 600; line-height: 1.2; letter-spacing: -.015em; }
+    .rear .go { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 18px 0 15px; border-radius: 999px; background: #fff; color: #000;
+      font-size: 15px; font-weight: 600; transition: scale .2s cubic-bezier(.3, .7, .3, 1.4), background .2s; }
+    .rear .go svg { width: 13px; height: 13px; fill: currentColor; }
+    .cover.over:hover .go { scale: 1.04; background: #f2f2f5; }
+    .stage.cf .cover { opacity: 1; }
+    .cover img { display: block; width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; }
+    .cover b { display: block; margin-top: 12px; font-size: 21px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cover span { display: block; margin-top: 2px; font-size: 18px; color: rgba(255, 255, 255, .58); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .label { display: none; }
+    .stage.cf .label { opacity: 1; }
+    .label b { display: block; font-size: 22px; font-weight: 600; }
+    .label span { font-size: 16px; color: rgba(255, 255, 255, .7); }
+    .hint { position: absolute; left: 50%; top: 100px; translate: -50% 0; padding: 7px 14px; border-radius: 16px; background: rgba(20, 20, 24, .38); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); white-space: nowrap; font-size: 14px; color: #fff; opacity: 0; transition: opacity .4s; }
+    .stage.cf .hint { opacity: 1; }
+    .back { position: absolute; z-index: 6; left: 40px; top: 40px; height: 40px; padding: 0 16px 0 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .back svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .stage.cf .back, .stage.race .back { opacity: 1; pointer-events: auto; }
+
+    /* ---------- Play bar (an ornament under everything) ---------- */
+    .bar { position: absolute; left: 50%; top: 640px; translate: -50% 0; height: 60px; padding: 0 10px 0 18px; border-radius: 30px; display: flex; align-items: center; gap: 16px; z-index: 5; transition: top .7s cubic-bezier(.3, 0, .2, 1); }
+    .stage.race .bar { top: 700px; }
+    .bar > button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; }
+    .bar > button:hover { background: rgba(255, 255, 255, .14); }
+    .bar svg { width: 20px; height: 20px; fill: #fff; }
+    .now { display: flex; align-items: center; gap: 10px; width: 250px; height: 44px; padding: 0 12px 0 6px; border-radius: 14px; background: rgba(0, 0, 0, .16); }
+    .now img { width: 34px; height: 34px; border-radius: 7px; object-fit: cover; }
+    .now div { min-width: 0; font-size: 12px; line-height: 1.3; }
+    .now b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now span { color: rgba(255, 255, 255, .6); }
+    .prog { position: absolute; left: 164px; bottom: 6px; width: 228px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .18); overflow: hidden; }
+    .prog i { display: block; height: 100%; width: 0; background: rgba(255, 255, 255, .85); }
+
+    /* ---------- 3. The race ---------- */
+    #race { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease; z-index: 2; pointer-events: none; }
+    .stage.race #race { opacity: 1; pointer-events: auto; }
+    .stage.race .room { transform: scale(1.15); filter: brightness(.3) blur(6px); }
+    .stage.race .cover, .stage.race .label, .stage.race .hint { opacity: 0 !important; pointer-events: none; }
+    .card { position: absolute; left: 44px; top: 96px; width: 170px; padding: 10px 10px 12px; border-radius: 26px; text-align: center; z-index: 4;
+      opacity: 0; transform: translateY(30px) scale(.9); transition: opacity .6s ease .5s, transform .8s cubic-bezier(.2, .8, .2, 1) .5s; pointer-events: none; }
+    .stage.race .card { opacity: 1; transform: none; }
+    .card img { width: 100%; border-radius: 18px; display: block; }
+    .card b { display: block; margin-top: 9px; font-size: 15px; font-weight: 600; }
+    .card span { font-size: 13px; color: rgba(255, 255, 255, .7); }
+    .stage.race .bar { top: 24px; }
+    /* Max's onboard: the halo and his steering wheel fade in once the camera is in the cockpit */
+    .onboard { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; transition: opacity .5s ease; }
+    .stage.race.inside .onboard { opacity: 1; }
+    .halo { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .wheel { position: absolute; left: 50%; bottom: -34px; width: 420px; margin-left: -210px; transform-origin: 50% 70%; }
+    .wheel svg { display: block; width: 100%; }
+    .wheel .dash { position: absolute; left: 50%; top: 62px; width: 132px; margin-left: -66px; text-align: center; font-variant-numeric: tabular-nums; }
+    .wheel .dash b { display: block; font-size: 46px; font-weight: 700; line-height: 1; color: #fff; }
+    .wheel .dash span { display: block; margin-top: 4px; font-size: 13px; font-weight: 600; letter-spacing: .06em; color: #FFC800; }
+    /* Timing tower, F1 broadcast style */
+    .tower { position: absolute; right: 40px; top: 40px; z-index: 4; width: 150px; padding: 8px 0; border-radius: 14px; background: rgba(10, 10, 14, .72); font-size: 13px; font-weight: 600;
+      opacity: 0; transition: opacity .5s ease 1s; font-variant-numeric: tabular-nums; }
+    .stage.race .tower { opacity: 1; }
+    .tower p { margin: 0 0 4px; padding: 0 12px; font-size: 10px; letter-spacing: .14em; color: rgba(255, 255, 255, .55); }
+    .tower li { display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 12px; transition: background .3s; }
+    .tower li i { width: 3px; height: 13px; border-radius: 2px; }
+    .tower li em { width: 16px; font-style: normal; color: rgba(255, 255, 255, .55); text-align: right; }
+    .tower li.me { background: rgba(255, 200, 0, .16); }
+    .tower ol { margin: 0; padding: 0; list-style: none; }
+    .steer { position: absolute; left: 44px; bottom: 44px; z-index: 4; font-size: 13px; color: rgba(255, 255, 255, .8); opacity: 0; transition: opacity .5s ease 1.2s; text-shadow: 0 1px 8px rgba(0, 0, 0, .6); }
+    .stage.race .steer { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) { .cover, .win, .room, .card { transition-duration: .01s !important; } .nudge, #toCf { animation: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="room" id="room"></div>
+    <div class="envs glass" id="envs"></div>
+
+    <!-- 1. Library -->
+    <section class="win glass" aria-label="Apple Music library">
+      <nav class="side">
+        <h1>Library</h1><p class="sub">All Music</p>
+        <a><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="M10 6v4l2.5 2"/></svg>Recently Added</a>
+        <a><svg viewBox="0 0 20 20"><path d="M12.5 3.5a3 3 0 1 1 4 4l-7 6-3-3z"/><path d="M6.5 10.5 3 17l6.5-3.5"/></svg>Artists</a>
+        <a><svg viewBox="0 0 20 20"><rect x="4" y="5" width="12" height="12" rx="2"/><path d="M6 3h8"/></svg>Albums</a>
+        <a class="on"><svg viewBox="0 0 20 20"><path d="M8 15V4l8-1.5v11"/><circle cx="6" cy="15" r="2"/><circle cx="14" cy="13.5" r="2"/></svg>Songs</a>
+        <a><svg viewBox="0 0 20 20"><path d="M10 16.5s-6.5-3.8-6.5-8.2A3.5 3.5 0 0 1 10 6.5a3.5 3.5 0 0 1 6.5 1.8c0 4.4-6.5 8.2-6.5 8.2z"/></svg>Made For You</a>
+      </nav>
+      <div class="main">
+        <div class="head">
+          <div><h2>Songs</h2><p>6 Songs</p></div>
+          <div class="views" role="group" aria-label="View">
+            <button class="on" aria-label="Grid" aria-pressed="true"><svg viewBox="0 0 22 18" fill="currentColor"><rect x="2" y="1" width="7.5" height="7" rx="2"/><rect x="12.5" y="1" width="7.5" height="7" rx="2"/><rect x="2" y="10" width="7.5" height="7" rx="2"/><rect x="12.5" y="10" width="7.5" height="7" rx="2"/></svg></button>
+            <!-- Her Coverflow icon (active state) -->
+            <button id="toCf" aria-label="Coverflow" aria-pressed="false"><svg viewBox="0 0 741 359" fill="currentColor"><rect x="191" width="358" height="358" rx="49"/><path d="M645 26c0-10-12-16-20-9l-47 39c-3 2-5 6-5 9v228c0 3 2 7 5 9l47 39c8 7 20 1 20-9z"/><path d="M740 54c0-11-13-17-21-9l-47 47c-2 2-3 5-3 9v157c0 3 1 7 3 9l47 47c8 8 21 2 21-9z"/><path d="M96 26c0-10 12-16 20-9l47 39c3 2 5 6 5 9v228c0 3-2 7-5 9l-47 39c-8 7-20 1-20-9z"/><path d="M1 54c0-11 13-17 21-9l47 47c2 2 3 5 3 9v157c0 3-1 7-3 9l-47 47c-8 8-21 2-21-9z"/></svg></button>
+          </div>
+        </div>
+        <div class="search"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>Search in Songs</div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+    <div class="nudge">Try Coverflow</div>
+
+    <!-- 2. Coverflow -->
+    <button class="back glass" id="back"><svg viewBox="0 0 20 20"><path d="M12 4 6 10l6 6"/></svg><span>Library</span></button>
+    <p class="hint" id="hint">Swipe, drag or use the arrow keys. Click the middle cover to play it.</p>
+    <div class="flow" id="flow"></div>
+    <div class="label" id="label"><b></b><span></span></div>
+
+    <!-- 3. Race -->
+    <canvas id="race"></canvas>
+    <div class="card glass" id="card"><img src="f1.webp" alt=""><b>Formula 1 Theme</b><span>Brian Tyler</span></div>
+    <div class="onboard" aria-hidden="true">
+      <svg class="halo" viewBox="0 0 1280 800" preserveAspectRatio="none"><defs><linearGradient id="hg" x1="0" x2="1"><stop offset="0" stop-color="#050507"/><stop offset=".45" stop-color="#1c1d22"/><stop offset=".55" stop-color="#1c1d22"/><stop offset="1" stop-color="#050507"/></linearGradient></defs>
+        <path d="M150 0 Q640 210 1130 0 L1180 0 Q640 270 100 0 Z" fill="#08080b"/><path d="M626 0 L654 0 L668 330 L612 330 Z" fill="url(#hg)"/></svg>
+      <div class="wheel" id="wheel">
+        <svg viewBox="0 0 420 230"><path d="M40 70 Q40 40 70 38 L350 38 Q380 40 380 70 L392 150 Q396 196 352 206 L300 206 Q280 206 272 190 L262 170 L158 170 L148 190 Q140 206 120 206 L68 206 Q24 196 28 150 Z" fill="#17181c"/>
+          <path d="M40 70 Q40 40 70 38 L110 38 L92 206 L68 206 Q24 196 28 150 Z M380 70 Q380 40 350 38 L310 38 L328 206 L352 206 Q396 196 392 150 Z" fill="#0b0b0d"/>
+          <rect x="138" y="54" width="144" height="94" rx="10" fill="#050507" stroke="#2a2b31"/>
+          <g id="leds"></g>
+          <circle cx="118" cy="120" r="9" fill="#D5133A"/><circle cx="302" cy="120" r="9" fill="#FFC800"/><circle cx="118" cy="152" r="7" fill="#2a2b31"/><circle cx="302" cy="152" r="7" fill="#2a2b31"/></svg>
+        <div class="dash"><b id="gear">N</b><span><span id="kmh" style="display:inline;color:#fff">0</span> KM/H</span></div>
+      </div>
+    </div>
+    <div class="tower"><p>POSITION</p><ol id="tower"></ol></div>
+    <p class="steer">Move your pointer, or use ← → to steer</p>
+
+    <div class="bar glass">
+      <button aria-label="Previous" id="prev"><svg viewBox="0 0 20 20"><path d="M9 5v10L2 10zM17 5v10l-7-5z"/></svg></button>
+      <button aria-label="Play" id="play"><svg viewBox="0 0 20 20" id="playIcon"><path d="M5 3.5v13l11-6.5z"/></svg></button>
+      <button aria-label="Next" id="next"><svg viewBox="0 0 20 20"><path d="M11 5v10l7-5zM3 5v10l7-5z"/></svg></button>
+      <div class="now"><img id="nowImg" src="" alt=""><div><b id="nowT"></b><span id="nowA"></span></div></div>
+      <span class="prog"><i id="progBar"></i></span>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Songs play Apple Music's official 30-second previews (from the iTunes Search API); the art is Apple's too,
+    // except the Formula 1 cover, which comes from Anoushka's Figma file.
+    const ART = (path) => `https://is1-ssl.mzstatic.com/image/thumb/${path}/600x600bb.jpg`;
+    const PREVIEW = (path) => `https://audio-ssl.itunes.apple.com/itunes-assets/${path}.plus.aac.p.m4a`;
+    const ALBUMS = [
+      { t: "As It Was", a: "Harry Styles", img: ART("Music126/v4/2a/19/fb/2a19fb85-2f70-9e44-f2a9-82abe679b88e/886449990061.jpg"), src: PREVIEW("AudioPreview221/v4/67/10/16/67101606-3869-ca44-6c03-e13d6322cb51/mzaf_1135399237022217274") },
+      { t: "Heat Waves", a: "Glass Animals", img: ART("Music115/v4/da/8b/77/da8b7731-6f4f-eacf-5e74-8b23389eefa1/20UMGIM03371.rgb.jpg"), src: PREVIEW("AudioPreview221/v4/a3/4c/b9/a34cb911-40fc-5f0c-e862-14bd171a77aa/mzaf_384792072030970151") },
+      { t: "Blinding Lights", a: "The Weeknd", img: ART("Music125/v4/6f/bc/e6/6fbce6c4-c38c-72d8-4fd0-66cfff32f679/20UMGIM12176.rgb.jpg"), src: PREVIEW("AudioPreview211/v4/19/d6/60/19d660ff-e3a9-8377-15a3-ce4b28e89cac/mzaf_18422426156481158187") },
+      { t: "Formula 1 Theme", a: "Brian Tyler", img: "f1.webp", src: PREVIEW("AudioPreview211/v4/db/f5/89/dbf58904-83f7-64bc-e1cb-bf47ad0c0420/mzaf_13254042293301799631"), race: true },
+      { t: "Espresso", a: "Sabrina Carpenter", img: ART("Music221/v4/a1/1c/ca/a11ccab6-7d4c-e041-d028-998bcebeb709/24UMGIM61704.rgb.jpg"), src: PREVIEW("AudioPreview211/v4/99/da/ff/99daffce-cdde-59c6-5ae0-7f922ce411a8/mzaf_5621292401829922816") },
+      { t: "Levitating", a: "Dua Lipa", img: ART("Music116/v4/6c/11/d6/6c11d681-aa3a-d59e-4c2e-f77e181026ab/190295092665.jpg"), src: PREVIEW("AudioPreview211/v4/59/dc/4d/59dc4dda-93ff-8f1c-c536-f005f6ea6af5/mzaf_3066686759813252385") },
+    ];
+    const $ = (s) => document.querySelector(s);
+    const stage = $("#stage");
+
+    // Fit the 1280 × 800 stage into the frame
+    const fit = () => { const s = Math.min(innerWidth / 1280, innerHeight / 800); stage.style.transform = `translate(-50%, -50%) scale(${s})`; stage.style.transformOrigin = "center"; };
+    addEventListener("resize", fit); fit();
+
+    // Library grid
+    $("#grid").innerHTML = [2, 4, 0, 3, 1, 5].map((i) => `<figure><img src="${ALBUMS[i].img}" alt=""><figcaption>${ALBUMS[i].t}<span>${ALBUMS[i].a}</span></figcaption></figure>`).join("");
+
+    // ---------- Coverflow ----------
+    let cur = 2, playing = 2, isPlaying = false, mode = "lib";
+    const ENVS = [
+      { name: "Mount Hood", img: "env-hood.webp" }, { name: "Yosemite", img: "env-yosemite.webp" }, { name: "Joshua Tree", img: "env-joshua.webp" },
+      { name: "Moon", img: "env-moon.webp" }, { name: "Living Room", img: "room.webp" },
+    ];
+    $("#room").innerHTML = ENVS.map((e) => `<i style="--img:url(${e.img})"></i>`).join("");
+    $("#envs").innerHTML = ENVS.map((e) => `<button style="--img:url(${e.img})" aria-label="${e.name}" title="${e.name}"></button>`).join("") + "<span></span>";
+    function env(n) {
+      document.querySelectorAll("#room i, #envs button").forEach((el) => el.classList.remove("on"));
+      $("#room").children[n].classList.add("on"); $("#envs").children[n].classList.add("on"); $("#envs span").textContent = ENVS[n].name;
+    }
+    [...$("#envs").querySelectorAll("button")].forEach((b, n) => b.addEventListener("click", () => env(n)));
+    env(0);
+    $("#flow").innerHTML = ALBUMS.map((al, i) => `<div class="cover" data-i="${i}"><div class="turn"><div class="front"><img src="${al.img}" alt="" draggable="false"><b>${al.t}</b><span>${al.a}</span></div>${al.race ? `<div class="rear"><div class="art"><span class="logo"><img src="${al.img}" alt="" draggable="false"></span><small>Immersive</small><p>The room becomes<br>the track</p><span class="go"><svg viewBox="0 0 14 14"><path d="M3.5 1.8v10.4a.8.8 0 0 0 1.2.7l8.3-5.2a.8.8 0 0 0 0-1.4L4.7 1.1a.8.8 0 0 0-1.2.7z"/></svg>Enter Race</span></div><b>${al.t}</b><span>${al.a}</span></div>` : ""}</div></div>`).join("");
+    const covers = [...document.querySelectorAll(".cover")];
+    function layout() {
+      covers.forEach((el, i) => {
+        const d = i - cur, s = Math.sign(d), ad = Math.abs(d);
+        const x = d === 0 ? 0 : s * (215 + (ad - 1) * 88), z = d === 0 ? 40 : -140 - ad * 20, ry = d === 0 ? 0 : -s * 58;
+        el.style.transform = mode === "lib" ? `translate3d(${d * 60}px, 60px, -400px) rotateY(0) scale(.6)` : `translate3d(${x}px, 0, ${z}px) rotateY(${ry}deg)`;
+        el.style.zIndex = 100 - ad;
+        el.style.setProperty("--dim", d === 0 ? 1 : 1 - ad * .12);  // dimmed on the faces: a filter on the cover would flatten its 3D turn
+        el.classList.toggle("over", turned(i));
+      });
+      $("#label b").textContent = ALBUMS[cur].t; $("#label span").textContent = ALBUMS[cur].a;
+    }
+    // The play bar follows the cover you stop on, and plays it if music is on; the race itself still needs a click on Formula 1
+    let settle = 0;
+    const go = (i) => {
+      cur = Math.max(0, Math.min(ALBUMS.length - 1, i)); layout();
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        if (mode !== "cf" || cur === playing) return;
+        if (isPlaying) playSong(cur); else { audio.pause(); audio.removeAttribute("src"); show(cur); }   // paused: the play bar still moves to this cover, ready to play
+      }, 450);
+    };
+    layout();
+
+    function setMode(m) {
+      mode = m;
+      stage.classList.toggle("cf", m === "cf");
+      stage.classList.toggle("race", m === "race");
+      $("#toCf").classList.toggle("on", m !== "lib"); $("#toCf").previousElementSibling.classList.toggle("on", m === "lib");
+      $("#back span").textContent = m === "race" ? "Leave the race" : "Library";
+      layout();
+      if (m === "race") race.start(); else race.stop();
+    }
+    $("#toCf").addEventListener("click", () => { stage.classList.add("used"); setMode("cf"); });
+    $("#back").addEventListener("click", () => setMode(mode === "race" ? "cf" : "lib"));
+    covers.forEach((el) => el.addEventListener("click", () => { if (moved) return; const i = +el.dataset.i; i === cur ? activate(i) : go(i); }));
+    addEventListener("keydown", (e) => {
+      if (mode === "cf") { if (e.key === "ArrowLeft") go(cur - 1); if (e.key === "ArrowRight") go(cur + 1); if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(cur); } }
+      if (e.key === "Escape" && mode !== "lib") setMode(mode === "race" ? "cf" : "lib");
+    });
+    // Drag or swipe to flip
+    let downX = null, startCur = 0, moved = false;
+    $("#flow").addEventListener("pointerdown", (e) => { downX = e.clientX; startCur = cur; moved = false; });
+    addEventListener("pointermove", (e) => { if (downX === null || mode !== "cf") return; const dx = (e.clientX - downX) / (stage.getBoundingClientRect().width / 1280); if (Math.abs(dx) > 8) moved = true; go(startCur - Math.round(dx / 110)); });
+    addEventListener("pointerup", () => { downX = null; setTimeout(() => (moved = false), 0); });
+    let wheelT = 0;
+    $("#flow").addEventListener("wheel", (e) => { e.preventDefault(); const now = performance.now(); if (now - wheelT < 160) return; const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (Math.abs(d) < 4) return; wheelT = now; go(cur + Math.sign(d)); }, { passive: false });
+
+    // ---------- Play bar ----------
+    const PLAY = '<path d="M5 3.5v13l11-6.5z"/>', PAUSE = '<path d="M5 3.5h3.5v13H5zM11.5 3.5H15v13h-3.5z"/>';
+    function show(i) { playing = i; $("#nowImg").src = ALBUMS[i].img; $("#nowT").textContent = ALBUMS[i].t; $("#nowA").textContent = ALBUMS[i].a; }
+    // The preview audio; the race loops the Formula 1 theme
+    const audio = new Audio(); audio.preload = "none";
+    audio.addEventListener("ended", () => { if (ALBUMS[playing].race && mode === "race") { audio.currentTime = 0; audio.play(); } else setPlaying(false); });
+    function setPlaying(p) {
+      isPlaying = p; covers.forEach((el, i) => el.classList.toggle("over", turned(i))); $("#playIcon").innerHTML = p ? PAUSE : PLAY; $("#play").setAttribute("aria-label", p ? "Pause" : "Play");
+      if (p) { if (audio.src !== ALBUMS[playing].src) audio.src = ALBUMS[playing].src; audio.play().catch(() => {}); } else audio.pause();
+    }
+    show(2);
+    function playSong(i) {
+      if (i !== playing) { audio.pause(); audio.removeAttribute("src"); }
+      show(i); setPlaying(true);
+    }
+    // Formula 1's card is turned over while its theme plays in Coverflow; clicking it then starts the race
+    function turned(i) { return !!ALBUMS[i].race && i === cur && i === playing && isPlaying && mode === "cf"; }
+    function playAlbum(i) { playSong(i); layout(); }
+    function activate(i) { if (turned(i)) setMode("race"); else playAlbum(i); }
+    $("#play").addEventListener("click", () => {
+      if (isPlaying) { setPlaying(false); if (mode === "race") setMode("cf"); return; }
+      playAlbum(mode === "cf" ? cur : playing);
+    });
+    $("#next").addEventListener("click", () => { const i = (playing + 1) % ALBUMS.length; if (mode === "cf") go(i); playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
+    $("#prev").addEventListener("click", () => { const i = (playing + ALBUMS.length - 1) % ALBUMS.length; if (mode === "cf") go(i); playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
+    (function tickBar() { $("#progBar").style.width = `${audio.duration ? (audio.currentTime / audio.duration) * 100 : 0}%`; requestAnimationFrame(tickBar); })();
+
+    // ---------- 3. The race: a first-person run down a red-and-black circuit ----------
+    const race = (() => {
+      const lerp = (p, q, k) => p + (q - p) * k, inOutK = (k) => (k < .5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
+      const canvas = $("#race");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(1280, 800, false);
+      const scene = new THREE.Scene();
+      const SKY = 0x3a0b0d;
+      scene.background = new THREE.Color(SKY); scene.fog = new THREE.Fog(SKY, 50, 320);
+      const cam = new THREE.PerspectiveCamera(70, 1280 / 800, .1, 600); window.__cam = cam;
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x441010, 1.25));
+      const sun = new THREE.DirectionalLight(0xffffff, .8); sun.position.set(5, 20, 10); scene.add(sun);
+
+      // Canvas textures: asphalt with lane lines, and red/white kerbs
+      const tex = (w, h, draw, rx, ry) => { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = 8; return t; };
+      const road = tex(512, 512, (g, w, h) => {
+        g.fillStyle = "#34343a"; g.fillRect(0, 0, w, h);
+        for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(255,255,255,${Math.random() * .05})`; g.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+        g.fillStyle = "#e8e8e8"; g.fillRect(8, 0, 10, h); g.fillRect(w - 18, 0, 10, h);
+        g.fillStyle = "rgba(232,232,232,.85)"; g.fillRect(w / 2 - 4, 0, 8, h * .55);
+        g.fillStyle = "#E10600"; g.fillRect(w * .3 - 2, 0, 4, h); g.fillRect(w * .7 - 2, 0, 4, h);
+      }, 1, 40);
+      const kerb = tex(64, 128, (g, w, h) => { g.fillStyle = "#E10600"; g.fillRect(0, 0, w, h / 2); g.fillStyle = "#f4f4f4"; g.fillRect(0, h / 2, w, h / 2); }, 1, 120);
+      const wall = tex(256, 64, (g, w, h) => { g.fillStyle = "#0d0d10"; g.fillRect(0, 0, w, h); g.fillStyle = "#E10600"; for (let x = 0; x < w; x += 64) g.fillRect(x, 0, 32, h); g.fillStyle = "rgba(255,255,255,.9)"; g.fillRect(0, h - 6, w, 3); }, 60, 1);
+
+      const LEN = 600, W = 22;
+      const roadM = new THREE.Mesh(new THREE.PlaneGeometry(W, LEN), new THREE.MeshLambertMaterial({ map: road }));
+      roadM.rotation.x = -Math.PI / 2; roadM.position.z = -LEN / 2 + 20; scene.add(roadM);
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, LEN), new THREE.MeshLambertMaterial({ color: 0x5a0c0e }));
+      ground.rotation.x = -Math.PI / 2; ground.position.set(0, -.02, -LEN / 2 + 20); scene.add(ground);
+      const kerbs = [-1, 1].map((s) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, LEN), new THREE.MeshLambertMaterial({ map: kerb })); m.rotation.x = -Math.PI / 2; m.position.set(s * (W / 2 + .8), .01, -LEN / 2 + 20); scene.add(m); return m; });
+      const walls = [-1, 1].map((s) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(LEN, 2.2), new THREE.MeshBasicMaterial({ map: wall })); m.rotation.y = s * Math.PI / 2 * -1; m.position.set(s * (W / 2 + 4), 1.1, -LEN / 2 + 20); scene.add(m); return m; });
+
+      // Things that pass by: light gantries, grandstands, and the cars ahead
+      const group = new THREE.Group(); scene.add(group);
+      const gantries = [];
+      const red = new THREE.MeshLambertMaterial({ color: 0xE10600 }), black = new THREE.MeshLambertMaterial({ color: 0x0b0b0d }), white = new THREE.MeshLambertMaterial({ color: 0xf2f2f2 });
+      const glow = new THREE.MeshBasicMaterial({ color: 0xff2a1a });
+      for (let i = 0; i < 8; i++) {
+        const g = new THREE.Group();
+        [-1, 1].forEach((s) => { const p = new THREE.Mesh(new THREE.BoxGeometry(.6, 9, .6), black); p.position.set(s * (W / 2 + 3), 4.5, 0); g.add(p); });
+        const beam = new THREE.Mesh(new THREE.BoxGeometry(W + 7, 1.4, .8), black); beam.position.y = 9; g.add(beam);
+        for (let k = -4; k <= 4; k++) { const l = new THREE.Mesh(new THREE.BoxGeometry(1.6, .5, .1), glow); l.position.set(k * 2.6, 9, .45); g.add(l); }
+        g.position.z = -i * 75; group.add(g); gantries.push(g);
+      }
+      const stands = [];
+      for (let i = 0; i < 24; i++) {
+        const s = i % 2 ? 1 : -1, h = 6 + Math.random() * 10;
+        const m = new THREE.Mesh(new THREE.BoxGeometry(14, h, 26), i % 3 ? black : new THREE.MeshLambertMaterial({ color: 0x3a0a0c }));
+        m.position.set(s * (W / 2 + 34 + Math.random() * 10), h / 2, -i * 26); group.add(m); stands.push(m);
+      }
+      // A low-poly F1 car in a team's colours: tub, nose, sidepods, wings, airbox, four wheels
+      const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
+      function car(liv, cockpit = false) {
+        const c = new THREE.Group(), body = mat(liv.body), acc = mat(liv.accent), tip = mat(liv.tip || liv.accent);
+        const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); c.add(o); return o; };
+        add(new THREE.BoxGeometry(1.1, .55, 3.6), body, 0, .55, 0);
+        add(new THREE.BoxGeometry(.5, .32, 1.8), body, 0, .42, -2.5);
+        add(new THREE.BoxGeometry(.52, .05, 1.5), acc, 0, .6, -2.4);          // stripe along the nose
+        add(new THREE.BoxGeometry(.46, .28, .3), tip, 0, .4, -3.35);           // nose tip
+        add(new THREE.BoxGeometry(2.4, .08, .55), acc, 0, .2, -3.35);          // front wing
+        [-1.2, 1.2].forEach((x) => add(new THREE.BoxGeometry(.06, .3, .6), body, x, .3, -3.35));
+        add(new THREE.BoxGeometry(1.9, .45, 1.6), body, 0, .48, .6);           // sidepods
+        [-.96, .96].forEach((x) => add(new THREE.BoxGeometry(.02, .12, 1.4), acc, x, .55, .6));
+        if (!cockpit) {
+          add(new THREE.BoxGeometry(2.0, .1, .5), body, 0, 1.25, 1.9);         // rear wing
+          add(new THREE.BoxGeometry(2.0, .04, .5), acc, 0, 1.31, 1.9);
+          [-.95, .95].forEach((x) => add(new THREE.BoxGeometry(.08, .6, .55), black, x, 1.0, 1.9));
+          add(new THREE.BoxGeometry(.7, .12, .9), black, 0, 1.0, -.4);         // halo
+          add(new THREE.BoxGeometry(.6, .5, .6), body, 0, .95, .1);            // airbox
+          add(new THREE.SphereGeometry(.2, 12, 10), tip, 0, .95, -.55);        // helmet
+        }
+        const wg = new THREE.CylinderGeometry(.42, .42, .42, 18); wg.rotateZ(Math.PI / 2);
+        [[-1.15, -1.75], [1.15, -1.75], [-1.2, 1.25], [1.2, 1.25]].forEach(([x, z]) => add(wg, black, x, .42, z));
+        return c;
+      }
+      // Driver tags float over the cars ahead
+      function tag(code, color) {
+        const cv = document.createElement("canvas"); cv.width = 128; cv.height = 48; const g = cv.getContext("2d");
+        g.fillStyle = "rgba(10,10,14,.8)"; g.beginPath(); g.roundRect(4, 4, 120, 40, 12); g.fill();
+        g.fillStyle = color; g.fillRect(14, 14, 5, 20);
+        g.fillStyle = "#fff"; g.font = "600 24px Inter, sans-serif"; g.textBaseline = "middle"; g.fillText(code, 30, 25);
+        const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false })); sp.scale.set(2.4, .9, 1); sp.position.y = 2.4; return sp;
+      }
+      // Max's Red Bull, and the grid around him (colours only, no team logos)
+      const RBR = { body: 0x14214D, accent: 0xD5133A, tip: 0xFFC800 };
+      const GRID = [
+        { code: "NOR", hex: "#FF8000", liv: { body: 0xFF8000, accent: 0x101014, tip: 0x47C7FC } },
+        { code: "LEC", hex: "#E8002D", liv: { body: 0xDC0000, accent: 0xf4f4f4, tip: 0xFFE500 } },
+        { code: "PIA", hex: "#FF8000", liv: { body: 0xFF8000, accent: 0x101014, tip: 0x47C7FC } },
+        { code: "RUS", hex: "#27F4D2", liv: { body: 0x2B2D33, accent: 0x27F4D2, tip: 0xC8CCD2 } },
+        { code: "HAM", hex: "#E8002D", liv: { body: 0xDC0000, accent: 0xf4f4f4, tip: 0xFFE500 } },
+        { code: "ALO", hex: "#229971", liv: { body: 0x00594F, accent: 0xCEDC00, tip: 0xCEDC00 } },
+      ];
+      const LANES = [-5, 4.5, -1.5, 6, -7, 1.5];
+      const rivals = GRID.map((d, i) => { const c = car(d.liv); c.add(tag(d.code, d.hex)); c.position.set(LANES[i], 0, -40 - i * 40); c.userData = { v: .55 + Math.random() * .2, d }; scene.add(c); return c; });
+      // Your car: the full Red Bull for the opening chase shot, then just its nose and front wing from the cockpit
+      const mine = car(RBR, true); scene.add(mine);
+      const chase = car(RBR); chase.add(tag("VER", "#FFC800")); scene.add(chase);
+      // Steering wheel lights: green, red, then blue at the limit
+      $("#leds").innerHTML = Array.from({ length: 15 }, (_, i) => `<circle cx="${154 + i * 8}" cy="46" r="3" data-c="${i < 5 ? "#1ED760" : i < 10 ? "#FF2A2A" : "#3D7BFF"}" fill="#26272c"/>`).join("");
+      const leds = [...document.querySelectorAll("#leds circle")];
+      // Speed streaks
+      const N = 260, pos = new Float32Array(N * 6);
+      const streakGeo = new THREE.BufferGeometry(); streakGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      const streaks = new THREE.LineSegments(streakGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: .45 }));
+      scene.add(streaks);
+      const P = Array.from({ length: N }, () => ({ x: (Math.random() - .5) * 60, y: Math.random() * 14, z: -Math.random() * 200 }));
+
+      let on = false, last = 0, speed = 0, dist = 0, x = 0, steer = 0, raf = 0, keys = {}, intro = 0, tick = 0;
+      addEventListener("keydown", (e) => (keys[e.key] = true)); addEventListener("keyup", (e) => (keys[e.key] = false));
+      canvas.addEventListener("pointermove", (e) => { const r = canvas.getBoundingClientRect(); steer = ((e.clientX - r.left) / r.width - .5) * 2; });
+      function frame(now) {
+        const dt = Math.min(.05, (now - last) / 1000 || 0); last = now;
+        speed += ((on ? 1 : 0) - speed) * dt * (on ? .6 : 2.5);
+        const v = 95 * speed; dist += v * dt;
+        if (keys.ArrowLeft) steer = Math.max(-1, steer - dt * 2.5); if (keys.ArrowRight) steer = Math.min(1, steer + dt * 2.5);
+        x += ((steer * (W / 2 - 2.5)) - x) * dt * 3;
+        const bend = Math.sin(dist * .004) * .35;   // the track sweeps gently left and right
+        // Opening shot: behind and above Max's car, then the camera drops into his cockpit
+        if (on) intro = Math.min(1, intro + dt / 2.6);
+        const k = inOutK(Math.max(0, (intro - .25) / .75)), inside = intro >= .96;
+        $(".stage").classList.toggle("inside", inside && on);
+        cam.position.set(x + Math.sin(now * .013) * .03 * speed, lerp(4.6, 1.75 + Math.sin(now * .02) * .02 * speed, k), lerp(10.5, 2.6, k));
+        cam.rotation.set(lerp(-.28, -.1, k), -bend * .25 * k - (steer * .06), -steer * .05 - bend * .08 * k);
+        cam.fov = 64 + 10 * speed; cam.updateProjectionMatrix();
+        mine.position.set(x, -.42, .05); mine.rotation.set(0, -steer * .06, 0); mine.visible = inside;
+        chase.position.set(x, 0, -.6); chase.rotation.set(0, -steer * .06, 0); chase.visible = !inside;
+        $("#wheel").style.transform = `rotate(${steer * 32}deg)`;
+        road.offset.y = (road.offset.y + v * dt / (LEN / 40)) % 1; kerb.offset.y = (kerb.offset.y + v * dt / (LEN / 120)) % 1; wall.offset.x = (wall.offset.x - v * dt / (LEN / 60)) % 1;
+        const wrap = (o, span) => { o.position.z += v * dt; if (o.position.z > 20) o.position.z -= span; };
+        gantries.forEach((g) => wrap(g, 600)); stands.forEach((s) => wrap(s, 624));
+        rivals.forEach((c, i) => { c.position.z += v * dt * (1 - c.userData.v); if (c.position.z > 14) { c.position.z = -220 - Math.random() * 60; c.position.x = (Math.random() - .5) * (W - 6); } c.position.x += Math.sin(now * .001 + i) * .01;
+          // Rivals keep out of your lane as they come past
+          if (c.position.z > -14 && Math.abs(c.position.x - x) < 3.4) c.position.x += Math.sign(c.position.x - x || 1) * dt * 9;
+          c.position.x = Math.max(-W / 2 + 2, Math.min(W / 2 - 2, c.position.x)); });
+        P.forEach((p, i) => { p.z += v * dt * 2.2; if (p.z > 3) { p.z = -200; p.x = (Math.random() - .5) * 60; if (Math.abs(p.x) < 4) p.x += 8 * Math.sign(p.x || 1); p.y = Math.random() * 14; }
+          const len = 1 + speed * 6; pos.set([p.x + x * .2, p.y, p.z, p.x + x * .2, p.y, p.z - len], i * 6); });
+        streakGeo.attributes.position.needsUpdate = true;
+        streaks.material.opacity = .45 * speed;
+        renderer.render(scene, cam);
+        // Wheel display: gear and revs from the speed; the tower orders the grid by who's furthest up the road
+        const kmh = Math.round(312 * speed), gear = kmh < 8 ? 0 : Math.min(8, 1 + Math.floor(kmh / 40)), rev = gear === 8 ? (kmh - 280) / 32 : gear ? (kmh % 40) / 40 : 0;
+        $("#kmh").textContent = kmh; $("#gear").textContent = gear ? gear : "N";
+        leds.forEach((l, i) => l.setAttribute("fill", i < Math.round(rev * 15) ? l.dataset.c : "#26272c"));
+        if ((tick += dt) > .25) { tick = 0;
+          const order = [...rivals.map((c) => ({ code: c.userData.d.code, hex: c.userData.d.hex, z: c.position.z })), { code: "VER", hex: "#3671C6", z: -.6, me: true }].sort((a, b) => a.z - b.z);
+          $("#tower").innerHTML = order.map((o, i) => `<li${o.me ? ' class="me"' : ""}><em>${i + 1}</em><i style="background:${o.hex}"></i>${o.code}</li>`).join(""); }
+        if (on || speed > .01) raf = requestAnimationFrame(frame); else raf = 0;
+      }
+      // A soft engine hum under the theme: two detuned saws through a low-pass, pitched by speed
+      let ac, eng, engGain;
+      function hum(level) {
+        try {
+          if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); const lp = ac.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 520; engGain = ac.createGain(); engGain.gain.value = 0;
+            eng = [0, 7].map((d) => { const o = ac.createOscillator(); o.type = "sawtooth"; o.detune.value = d; o.connect(lp); o.start(); return o; }); lp.connect(engGain); engGain.connect(ac.destination); }
+          ac.resume(); engGain.gain.setTargetAtTime(level, ac.currentTime, .4);
+        } catch {}
+      }
+      setInterval(() => { if (eng) eng.forEach((o) => o.frequency.setTargetAtTime(48 + 70 * speed, ac.currentTime, .2)); }, 100);
+      return {
+        start() { on = true; intro = 0; hum(.035); if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } },
+        stop() { on = false; hum(0); $(".stage").classList.remove("inside"); },
+      };
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coverflow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1;1,9..144,400,0..100,0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../media/fun/ctrlz/ctrlz.css">
+  <link rel="stylesheet" href="../media/fun/coverflow/coverflow.css">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+</head>
+<body data-root="../" data-page="project" data-parent="fun" data-title="Coverflow">
+  <div class="shell">
+    <div class="page-margin" style="flex:1;display:flex;flex-direction:column">
+      <div class="grid-12" style="flex:1">
+        <main class="content">
+          <article class="cz cf fade-in d1">
+
+            <section id="intro" data-toc="Coverflow" class="cz-intro">
+              <h1 class="cz-title">Coverflow: browse Apple Music on Vision Pro one album at a time</h1>
+              <p class="cz-lede">A concept that brings Coverflow back to Apple Music on visionOS. Your albums stand in a row in your room, you flip through them, and playing a song can turn the room into its world.</p>
+            </section>
+
+            <!-- A playable prototype: library, Coverflow, then the race when the Formula 1 theme plays -->
+            <figure class="cz-video cf-proto">
+              <div class="cz-frame"><iframe src="../media/fun/coverflow/proto/index.html" title="Coverflow prototype: open Coverflow, flip to Formula 1 Theme and press play" loading="lazy" allow="autoplay; fullscreen"></iframe></div>
+              <figcaption>Click the Coverflow button, flip through the songs and click one to play its preview. Formula 1 Theme takes you into the race; steer with your pointer or the arrow keys. Song previews come from Apple Music.</figcaption>
+            </figure>
+
+            <dl class="cz-meta">
+              <div><dt>Course</dt><dd>Intro to Product Management, UMSI</dd></div>
+              <div><dt>Time</dt><dd>2025</dd></div>
+              <div><dt>Team</dt><dd>Solo, built on a visionOS kit</dd></div>
+            </dl>
+
+            <section id="part" data-toc="My part" class="cz-split">
+              <p class="cz-label">My part</p>
+              <div>
+                <ul class="cz-points">
+                  <li><b>The idea.</b> This class was the first time I tried the Vision Pro. I wanted to bring back Coverflow, the old way of flipping through album covers, in a space where covers can really stand in front of you.</li>
+                  <li><b>Coverflow in 3D.</b> I designed the row of floating covers and how the library window clears to make room for them.</li>
+                  <li><b>The Coverflow icon.</b> An inactive and an active state for switching views.</li>
+                  <li><b>Immersive mode.</b> When the Formula 1 theme plays, the room turns into the track.</li>
+                  <li><b>The prototype.</b> Every screen and transition in the flow, built on a visionOS UI kit.</li>
+                </ul>
+              </div>
+            </section>
+
+          </article>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="../site.js"></script>
+  <script src="../chat.js"></script>
+</body>
+</html>

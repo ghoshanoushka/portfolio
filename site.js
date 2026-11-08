@@ -18,17 +18,43 @@ const SITE = {
   // Without media, a gradient placeholder is drawn from `colors`.
   // `cursor` is the label that follows the mouse: "View project", "Visit site", "Coming soon".
   // `ratio` is the thumbnail aspect ratio (width / height).
-  projects: [
-    { title: "Mensio", sub: "Shipped 2026", href: "projects/mensio.html", cursor: "View project", ratio: 16 / 9, media: "media/mensio/hero.html", colors: ["#2b3a67", "#7aaee9"] },
-    { title: "Deploy Design System", sub: "Shipped 2026", href: "projects/deploy-design-system.html", cursor: "View project", ratio: 16 / 9, media: "media/deploy/hero.html", colors: ["#050a1f", "#2f6bff"] },
-    { title: "Deploy Chat", sub: "Shipping 2026", cursor: "Coming soon", ratio: 16 / 9, colors: ["#0b1430", "#4a7dff"] },
+  // `tint` and `blurb` are used by the row layout (<div class="projects" data-layout="rows">);
+  // `tagline` and `card` (two gradient colours) by the card carousel (data-layout="cards").
+  // Fun page tiles in a bento grid. `group` is the small label on the card (Hackathon, Concept); `size` is wide (2 columns) or small. `logo` is the app's own logo, shown in the middle; `stickers` (three) peek in from the tile's edges on hover. Without `href` a tile reads "Coming soon".
+  fun: [
+    // Lounge is paused; its page and media stay in the repo. To bring it back:
+    // { title: "Lounge", tagline: "A calmer TV home screen", year: "2026", href: "projects/tv.html", card: ["#2A2350", "#8F7CD6"], media: "media/fun/tv/tv.html" },
+    { title: "ctrl z", tagline: "1st place at Converge '25", year: "2025", group: "Hackathon", size: "tall", href: "projects/ctrlz.html", card: ["#E3DAFB", "#F7F3FF"], logo: "media/fun/ctrlz/logo.png", stickers: ["media/fun/ctrlz/stk-run.webp", "media/fun/ctrlz/stk-picnic.webp", "media/fun/ctrlz/stk-fish.webp"] },
+    { title: "Bumpy AI", tagline: "An AI helper for a pregnancy app", year: "2025", group: "Hackathon", href: "projects/bumpy.html", card: ["#F3DFEC", "#E6EDFC"], logo: "media/fun/bumpy/mark-round.png", logoClass: "round", stickers: ["media/fun/bumpy/stk-water.webp", "media/fun/bumpy/stk-yoga.webp", "media/fun/bumpy/stk-couple.webp"], stickerClass: "card" },
+    { title: "Coverflow", tagline: "Apple Music on Vision Pro", year: "2025", group: "Concept", size: "tall", href: "projects/coverflow.html", card: ["#F6DEDC", "#EEF0F5"], logo: "media/fun/coverflow/logo.png", logoClass: "wide", stickers: ["media/fun/coverflow/stk-car.webp", "media/fun/coverflow/stk-top.webp", "media/fun/coverflow/stk-track.webp"], stickerClass: "card" },
+    { title: "Somnia", tagline: "A sleep app that grows a garden", year: "2025", group: "Concept", href: "projects/somnia.html", card: ["#D6DCF5", "#EEF1FC"], logo: "media/fun/somnia/logo-moon.png", logoClass: "moon", stickers: ["media/fun/somnia/stk-seed.webp", "media/fun/somnia/stk-daisy.webp", "media/fun/somnia/stk-spark.webp"] },
   ],
+  projects: [
+    { title: "Mensio", sub: "Shipped 2026", href: "projects/mensio.html", cursor: "View project", ratio: 16 / 9, media: "media/mensio/hero.html", colors: ["#2b3a67", "#7aaee9"], tint: "#E9F0FC", tagline: "Data you can pull yourself", card: ["#24407A", "#6FA6EC"], blurb: "Redesigned the Data Explorer so customers build their own charts instead of emailing analysts." },
+    { title: "Deploy Design System", sub: "Shipped 2026", href: "projects/deploy-design-system.html", cursor: "View project", ratio: 16 / 9, media: "media/deploy/hero.html", colors: ["#050a1f", "#2f6bff"], tint: "#ECE8FA", tagline: "One system for product and marketing", card: ["#4B3699", "#A493E3"], blurb: "Rebuilt the design system for the Deploy rebrand. One system for the Portal and the marketing site." },
+    { title: "Claim Denials", sub: "Capstone 2025", href: "projects/denials.html", cursor: "View project", ratio: 16 / 9, media: "media/denials/hero.html", colors: ["#0f5c59", "#4fc1a6"], tint: "#E6F5F1", tagline: "From denial alert to fix, faster", card: ["#0F5C59", "#4FC1A6"], blurb: "Redesigned a denials platform so revenue cycle teams find and fix high-dollar denials with fewer clicks." },
+    { title: "Deploy Chat", sub: "Shipping 2026", cursor: "Coming soon", ratio: 16 / 9, colors: ["#0b1430", "#4a7dff"], tint: "#F8EAF3", tagline: "Coming soon", card: ["#8E3A7E", "#E79BCB"], blurb: "Coming soon." },
+  ],
+
 };
 
 // Pages in subfolders (e.g. projects/) set <body data-root="../"> so shared links resolve.
 const ROOT = document.body.dataset.root || "";
 const currentPage = location.pathname.split("/").pop() || "index.html";
 const isProject = document.body.dataset.page === "project";
+// Heading font preview: add ?font=<key> to any page to try a sans instead of Libre Baskerville; [family, axes, weight].
+const HEAD_FONTS = {
+  geist: ["Geist", ":wght@400..700", 500], bricolage: ["Bricolage Grotesque", ":wght@400..700", 500], jakarta: ["Plus Jakarta Sans", ":wght@400..700", 500], manrope: ["Manrope", ":wght@400..700", 500],
+};
+const headFont = HEAD_FONTS[new URLSearchParams(location.search).get("font")];
+if (headFont) {
+  const [family, axes, weight] = headFont;
+  document.head.insertAdjacentHTML("beforeend", `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}${axes}&display=swap">`);
+  document.documentElement.style.setProperty("--font-head", `"${family}", var(--font-sans)`);
+  document.documentElement.style.setProperty("--head-weight", weight);
+}
+// Preview of the cleaner project page: add ?look to a project URL.
+if (isProject && new URLSearchParams(location.search).has("look")) document.body.classList.add("look-new");
 
 function navLinks() {
   return SITE.nav
@@ -68,58 +94,115 @@ function tocLinks() {
     .join("");
 }
 
+// "Built with Claude Code", with a tiny original pixel cat drawn from a character map.
+// 1 body, 4 ear and paw pink-lilac, 2 eye, 5 eye shine, 3 blush, 6 nose. The tail is its own group so it can flick.
+function madeWith() {
+  const BODY = [
+    "..1......1..",
+    ".141....141.",
+    ".1111111111.",
+    "111111111111",
+    "115211115211",
+    "112211112211",
+    "131116611131",
+    ".1111111111.",
+    ".1411111141.",
+    "..11....11..",
+  ];
+  const TAIL = [[12, 7], [13, 6], [13, 5], [12, 4]];
+  const fill = { 1: "var(--primary)", 2: "#2B2342", 3: "#F3A6C0", 4: "#D9CCF7", 5: "#fff", 6: "#F3A6C0" };
+  const rect = (x, y, c) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${fill[c]}"/>`;
+  const cells = (pick) => BODY.flatMap((row, y) => [...row].map((c, x) => (pick(c) ? rect(x, y, c) : ""))).join("");
+  const svg = `<svg class="pix" viewBox="0 -1 14 11" aria-hidden="true">
+    <g class="pix-tail">${TAIL.map(([x, y]) => rect(x, y, 1)).join("")}</g>
+    <g class="pix-body">${cells((c) => c !== "." && c !== "2" && c !== "5")}<g class="pix-eyes">${cells((c) => c === "2" || c === "5")}</g></g>
+  </svg>`;
+  return `<p class="made"><button type="button" class="pix-btn" aria-label="Pet the cat">${svg}</button><span>Built with <a href="https://claude.com/claude-code" target="_blank" rel="noopener noreferrer">Claude Code</a></span></p>`;
+}
+
+// Click the pixel cat: it hops and sends up a few pixel hearts.
+const PIX_HEART = '<svg viewBox="0 0 7 6" aria-hidden="true"><path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" fill="#E5484D"/></svg>';
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".pix-btn");
+  if (!btn) return;
+  btn.classList.remove("pet");
+  void btn.offsetWidth;
+  btn.classList.add("pet");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = btn.getBoundingClientRect();
+  const h = document.createElement("span");
+  h.className = "pix-heart";
+  h.innerHTML = PIX_HEART;
+  h.style.left = `${r.left + r.width / 2}px`;
+  h.style.top = `${r.top}px`;
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 1600);
+});
+
 function renderChrome() {
   document.querySelectorAll("[data-name]").forEach((el) => (el.textContent = SITE.name));
 
-  const top = isProject
-    ? `<div class="breadcrumb fade-in"><a href="${ROOT}index.html">← Work</a><span class="sep">/</span><span>${document.body.dataset.title}</span></div>`
-    : `<a class="logo fade-in" href="${ROOT}index.html">${SITE.name}</a>`;
+  // One header on every page, homepage included: the name and one line on the left, links on the right.
+  const isHome = document.body.classList.contains("home-cards");
+  // Project pages light up the section they belong to.
+  const section = isHome ? "index.html" : isProject ? (document.body.dataset.parent === "fun" ? "fun.html" : "index.html") : currentPage;
+  const resume = SITE.socials.find((x) => x.label === "Resume");
+  const links = ["Work", "Fun", "About"].map((l) => SITE.nav.find((n) => n.label === l)).filter(Boolean).map(({ label, href }) =>
+    `<a href="${ROOT}${href}"${href === section ? ' aria-current="page"' : ""}>${label}</a>`).join("") +
+    (resume ? `<a href="${resume.href}" target="_blank" rel="noopener noreferrer">Resume</a>` : "");
+  const head = `<header class="cards-head site-head fade-in">
+      <div class="cards-id">
+        <div class="cards-name"><a class="cards-logo" href="${ROOT}index.html">anoushka</a><span class="head-clock" title="San Francisco"><svg class="ggb" viewBox="0 0 40 20" aria-hidden="true"><g class="ggb-sky"></g><path class="ggb-hang" d="M4 13.5v-1.6M7 13.5v-3M16 13.5v-4.2M20 13.5v-5M24 13.5v-4.2M33 13.5v-3M36 13.5v-1.6"/><path class="ggb-cable" d="M0 13 Q6 9 11 2 Q20 13.5 29 2 Q34 9 40 13"/><path class="ggb-deck" d="M0 14h40"/><path class="ggb-tower" d="M10 1.5v18M12 1.5v18M28 1.5v18M30 1.5v18M10 4h2M10 7.5h2M10 11h2M28 4h2M28 7.5h2M28 11h2"/></svg><span class="clock"></span></span></div>
+        <p class="cards-bio">Product designer at <a href="https://deploy.com" target="_blank" rel="noopener noreferrer">Deploy</a>, making complex tools feel simple.</p>
+      </div>
+      <nav class="cards-nav" aria-label="Site">${links}</nav>
+    </header>`;
+  if (isHome) document.querySelector("main.content").insertAdjacentHTML("afterbegin", head);
+  else document.querySelector(".shell .page-margin").insertAdjacentHTML("afterbegin", `<div class="grid-12">${head}</div>`);
 
-  document.body.insertAdjacentHTML(
-    "afterbegin",
-    `<div class="sidebar"><div class="page-margin" style="height:100%"><div class="grid-12">
-      <aside>
-        ${top}
-        <nav class="fade-in${isProject ? " toc" : " side-pill"}" aria-label="${isProject ? "Sections" : "Site"}">${isProject ? tocLinks() : pillLinks()}</nav>
-      </aside>
-    </div></div></div>`
-  );
+  // Inner pages: the links stay pinned top right, and a back-to-top button shows once you scroll.
+  const pinNav = () => document.body.classList.toggle("scrolled", scrollY > 40);
+  addEventListener("scroll", pinNav, { passive: true });
+  pinNav();
+  if (!isHome) {
+    document.body.insertAdjacentHTML("beforeend", `<button type="button" class="to-top" aria-label="Back to top"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 15V5M5 10l5-5 5 5"/></svg></button>`);
+    // Project pages also get the next project in their list (work or fun), wrapping round.
+    if (isProject) {
+      const list = (document.body.dataset.parent === "fun" ? SITE.fun : SITE.projects).filter((x) => x.href);
+      const here = list.findIndex((x) => x.href.endsWith(currentPage));
+      const next = list.length > 1 && here >= 0 ? list[(here + 1) % list.length] : null;
+      if (next) document.body.insertAdjacentHTML("beforeend", `<a class="next-project" href="${ROOT}${next.href}" aria-label="Next project: ${next.title}">Next project<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5l5 5-5 5"/></svg></a>`);
+    }
+    const top = document.querySelector(".to-top");
+    const nextLink = document.querySelector(".next-project");
+    top.addEventListener("click", () => scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+    const onScroll = () => {
+      top.classList.toggle("show", scrollY > 600);
+      nextLink?.classList.toggle("show", scrollY > 600);
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
 
-  document.querySelector(".content").insertAdjacentHTML(
-    "afterbegin",
-    `<nav class="mobile-nav fade-in">${navLinks()}</nav>`
-  );
-
-  // Phones get a bottom bar instead of the top nav; chat.js puts Valentino in the last slot.
-  const social = (label) => SITE.socials.find((x) => x.label === label);
-  const dockLink = (href, label, svg, ext) =>
-    `<a class="dock-link" href="${href}" aria-label="${label}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ""}>${svg}</a>`;
-  const chat = social("Let's Chat"), linkedin = social("LinkedIn");
-  document.body.insertAdjacentHTML(
-    "beforeend",
-    `<nav class="dock" aria-label="Site">
-      ${SITE.nav.map(({ label, href }) => {
-        const active = href === currentPage || (isProject && href === "index.html") ? ' aria-current="page"' : "";
-        return dockLink(`${ROOT}${href}`, label, navIcon(label)).replace("<a ", `<a${active} `);
-      }).join("")}
-      <span class="dock-sep"></span>
-      ${chat ? dockLink(chat.href, "Book a chat", navIcon("Mail"), true) : ""}
-      ${linkedin ? dockLink(linkedin.href, "LinkedIn", '<span class="dock-in" aria-hidden="true">in</span>', true) : ""}
-      <span class="dock-sep"></span>
-      <span class="dock-cat-slot"></span>
-    </nav>`
-  );
+  // Project pages keep their section list on the left, with the way back above the title.
+  if (isProject) {
+    const fun = document.body.dataset.parent === "fun";
+    document.body.insertAdjacentHTML(
+      "afterbegin",
+      `<div class="sidebar"><div class="page-margin" style="height:100%"><div class="grid-12">
+        <aside><nav class="fade-in toc" aria-label="Sections">${tocLinks()}</nav></aside>
+      </div></div></div>`
+    );
+    document.querySelector(".content").insertAdjacentHTML(
+      "afterbegin",
+      `<div class="breadcrumb fade-in"><a href="${ROOT}${fun ? "fun.html" : "index.html"}">← ${fun ? "Fun" : "Work"}</a><span class="sep">/</span><span>${document.body.dataset.title}</span></div>`
+    );
+  }
 
   document.querySelector(".shell .page-margin").insertAdjacentHTML(
     "beforeend",
     `<footer>
-      <div class="status"><div class="dot"></div><p class="clock" aria-live="polite"></p></div>
-      <div class="links">${SITE.socials
-        .map(({ label, href }) => {
-          const ext = href.startsWith("http") ? ' target="_blank" rel="noopener noreferrer"' : "";
-          return `<a href="${href}"${ext}>${label}</a>`;
-        })
-        .join("")}</div>
+      <div class="status">${madeWith()}</div>
     </footer>`
   );
 
@@ -128,6 +211,9 @@ function renderChrome() {
   const MOON = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
   document.body.insertAdjacentHTML("beforeend", `<button type="button" class="theme-toggle">${SUN}${MOON}</button>`);
   const toggle = document.querySelector(".theme-toggle");
+  // The theme switch sits at the end of the header nav.
+  const headNav = document.querySelector(".cards-nav");
+  if (headNav) headNav.appendChild(toggle);
   const isDark = () => (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
   const label = () => toggle.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
   label();
@@ -140,23 +226,46 @@ function renderChrome() {
 
   const clock = document.querySelector(".clock");
   const fmt = new Intl.DateTimeFormat("en-US", { timeZone: SITE.timezone, hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "short" });
-  const tick = () => (clock.textContent = fmt.format(new Date()));
+  // A small sun or moon between the bridge towers, from rough San Francisco sunrise and sunset for each month (local time, in hours)
+  const sky = document.querySelector(".ggb-sky");
+  const DAYLIGHT = [[7.4, 17.3], [7.0, 17.8], [7.2, 19.2], [6.7, 19.7], [6.1, 20.1], [5.8, 20.5], [6.1, 20.5], [6.5, 20.0], [7.0, 19.2], [7.3, 18.5], [6.8, 17.0], [7.3, 16.9]];
+  const local = new Intl.DateTimeFormat("en-US", { timeZone: SITE.timezone, month: "numeric", hour: "numeric", minute: "numeric", hourCycle: "h23" });
+  // Drawn first, so the left side-span cable crosses in front of it
+  const SUN_SVG = '<circle cx="5.5" cy="6.6" r="3"/>';
+  const MOON_SVG = '<mask id="ggb-moon"><rect width="40" height="20" fill="#fff"/><circle cx="7.7" cy="5.2" r="3" fill="#000"/></mask><circle cx="5.5" cy="6.6" r="3.4" mask="url(#ggb-moon)"/>';
+  let day = null;
+  const tick = () => {
+    const now = new Date();
+    clock.textContent = fmt.format(now);
+    const p = Object.fromEntries(local.formatToParts(now).map((x) => [x.type, x.value]));
+    const h = Number(p.hour) + Number(p.minute) / 60, [rise, set] = DAYLIGHT[Number(p.month) - 1];
+    const isDay = h >= rise && h < set;
+    if (isDay !== day) {
+      day = isDay;
+      sky.setAttribute("class", `ggb-sky ${isDay ? "is-sun" : "is-moon"}`);
+      sky.innerHTML = isDay ? SUN_SVG : MOON_SVG;
+      sky.closest(".head-clock").title = `San Francisco, ${isDay ? "daytime" : "night"}`;
+    }
+  };
   tick();
   setInterval(tick, 1000);
 }
 
-function projectCard(p) {
-  const media = p.media
+function projectMedia(p) {
+  return p.media
     ? p.media.endsWith(".mp4")
       ? `<video src="${p.media}" autoplay muted loop playsinline></video>`
-      : p.media.endsWith(".html")
+      : /\.html(\?|$)/.test(p.media)
         ? `<iframe src="${p.media}" title="" tabindex="-1" aria-hidden="true" loading="lazy"></iframe>`
         : `<img src="${p.media}" alt="" loading="lazy">`
     : `<div class="placeholder" style="background:linear-gradient(135deg, ${p.colors[0]}, ${p.colors[1]})">${p.title}</div>`;
+}
 
+function projectCard(p) {
+  const media = projectMedia(p);
   const inner = `
     <div class="thumb" style="aspect-ratio:${p.ratio}" role="img" aria-label="Project thumbnail for ${p.title}">
-      ${media}<div class="overlay"></div>
+      ${media}<div class="overlay"></div><div class="sheen"></div>
     </div>
     <div class="caption"><p class="title">${p.title}</p><p class="sep">/</p><p class="sub">${p.sub}</p></div>`;
 
@@ -165,12 +274,178 @@ function projectCard(p) {
   return `<a class="project" href="${p.href}"${ext} data-label="${p.cursor}">${inner}</a>`;
 }
 
+// Full-width tinted card: text on the left, the thumbnail on the right.
+function projectRow(p) {
+  const inner = `
+    <div class="row-text">
+      <p class="row-sub">${p.sub}</p>
+      <h2 class="row-title">${p.title}</h2>
+      <p class="row-blurb">${p.blurb || ""}</p>
+      ${p.href ? `<span class="row-cta">${p.cursor} →</span>` : ""}
+    </div>
+    <div class="thumb" style="aspect-ratio:${p.ratio}" role="img" aria-label="Project thumbnail for ${p.title}">${projectMedia(p)}</div>`;
+  const tint = p.tint ? ` style="--tint:${p.tint}"` : "";
+  if (!p.href) return `<div class="project-row" data-cursor="coming-soon"${tint}>${inner}</div>`;
+  const ext = p.external ? ' target="_blank" rel="noopener noreferrer"' : "";
+  return `<a class="project-row" href="${p.href}"${ext}${tint}>${inner}</a>`;
+}
+
+const STAGE_MODES = ["bend", "bulge", "stack", "flat", "drum"];
+
+// Card carousel: one project card in the middle, its neighbours bent away at the screen edges.
+// Projects are repeated twice so the card that wraps round always jumps while it is off screen.
+function renderCardStage(root) {
+  // Only projects you can open go on the home page; "coming soon" entries stay in SITE for later
+  const list = SITE.projects.filter((p) => p.href);
+  const n = list.length * 2;
+  const card = (p, i) => {
+    const [status, year] = [p.sub.replace(/\s*\d{4}$/, ""), (p.sub.match(/\d{4}$/) || [""])[0]];
+    const tag = p.href ? "a" : "div";
+    const attrs = p.href ? ` href="${p.href}"${p.external ? ' target="_blank" rel="noopener noreferrer"' : ""}` : ' data-cursor="coming-soon"';
+    return `<${tag} class="stage-card" data-i="${i}"${attrs} style="--c1:${p.card[0]};--c2:${p.card[1]}" aria-label="${p.title}">
+      <div class="stage-top"><p class="stage-title">${p.title}</p><p class="stage-tag">${p.tagline || ""}</p></div>
+      ${p.media ? `<div class="thumb" style="aspect-ratio:${p.ratio}">${projectMedia(p)}</div>` : '<div class="stage-soon">Coming soon</div>'}
+      <div class="stage-bottom"><span>${status}</span><span>${year}</span></div>
+    </${tag}>`;
+  };
+  document.querySelector(".content").insertAdjacentHTML("beforeend", `<div class="home-made">${madeWith()}</div>`);
+  root.innerHTML = `<div class="stage">${[...list, ...list].map((p, i) => card(p, i)).join("")}</div>
+    <div class="stage-tabs">
+      <div class="view-toggle" role="group" aria-label="Layout">
+        <button type="button" data-view="carousel" aria-pressed="true" aria-label="Carousel" title="Carousel"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6" y="4" width="8" height="12" rx="1.5"/><path d="M3 6.5v7M17 6.5v7"/></svg></button>
+        <button type="button" data-view="grid" aria-pressed="false" aria-label="Grid, no motion" title="Grid, no motion"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3.5" y="3.5" width="5.5" height="5.5" rx="1.2"/><rect x="11" y="3.5" width="5.5" height="5.5" rx="1.2"/><rect x="3.5" y="11" width="5.5" height="5.5" rx="1.2"/><rect x="11" y="11" width="5.5" height="5.5" rx="1.2"/></svg></button>
+      </div>
+      <span class="stage-sep" aria-hidden="true"></span>
+      <div class="stage-modes" role="group" aria-label="How the cards move">${STAGE_MODES.map((m) => `<button type="button" data-mode="${m}" aria-pressed="false">${m[0].toUpperCase() + m.slice(1)}</button>`).join("")}</div>
+    </div>`;
+  const cards = [...root.querySelectorAll(".stage-card")];
+  const modes = [...root.querySelectorAll("[data-mode]")];
+  // Every visit opens in Bend; the other layouts are there to play with.
+  const setMode = (m) => {
+    root.dataset.mode = m;
+    modes.forEach((b) => b.setAttribute("aria-pressed", b.dataset.mode === m));
+  };
+  setMode("bend");
+  cards.forEach((el, i) => el.classList.toggle("dup", i >= list.length));
+  let cur = 0;
+  // Carousel or grid, from the header toggle. The grid is the no-motion option. The choice is remembered.
+  const isGrid = () => root.classList.contains("is-grid");
+  const stage = root.querySelector(".stage");
+  const noMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const EASE = "cubic-bezier(.2, .7, .2, 1)";
+  const setView = (view) => {
+    const toGrid = view === "grid";
+    const animate = !noMotion && toGrid !== isGrid() && stage.getAnimations;
+    // Note where each visible card is now, switch layouts, then glide every card from there to its new place
+    const from = animate ? new Map(cards.filter((el) => getComputedStyle(el).display !== "none" && getComputedStyle(el).opacity > 0.05).map((el) => [el, el.getBoundingClientRect()])) : null;
+    root.classList.toggle("is-grid", toGrid);
+    document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === view));
+    try { localStorage.setItem("homeView", view); } catch {}
+    paint();
+    if (!animate) return;
+    // paint() sets "jump" per card, so switch the cards' own transitions off after it
+    cards.forEach((el) => el.classList.add("jump"));
+    cards.forEach((el, i) => {
+      const style = getComputedStyle(el);
+      if (style.display === "none" || style.opacity < 0.05) return;
+      const a = from.get(el), b = el.getBoundingClientRect();
+      if (!a) return void el.animate([{ opacity: 0 }, { opacity: style.opacity }], { duration: 500, delay: 150 + i * 40, easing: EASE, fill: "backwards" });
+      const dx = a.left + a.width / 2 - (b.left + b.width / 2), dy = a.top + a.height / 2 - (b.top + b.height / 2);
+      // The grid has no transforms of its own, so it can scale too; carousel cards only travel
+      const frames = toGrid
+        ? [{ translate: `${dx}px ${dy}px`, scale: `${a.width / b.width} ${a.height / b.height}` }, { translate: "0 0", scale: "1" }]
+        : [{ translate: `${dx}px ${dy}px` }, { translate: "0 0" }];
+      el.animate(frames, { duration: 650, easing: EASE });
+    });
+    // The cards' own position transitions stay off until the glide is done
+    setTimeout(() => cards.forEach((el) => el.classList.remove("jump")), 700);
+  };
+  document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+  const offset = (i) => ((((i - cur) % n) + n + Math.floor(n / 2)) % n) - Math.floor(n / 2);
+  const last = new Map();
+  const paint = () => {
+    cards.forEach((el, i) => {
+      const d = offset(i);
+      // A card moving further than one step is wrapping round off screen: no transition.
+      el.classList.toggle("jump", Math.abs(d - (last.get(el) ?? d)) > 1);
+      last.set(el, d);
+      el.dataset.d = d;
+      el.style.setProperty("--d", d);
+      el.dataset.pos = d < -1 ? "far-left" : d > 1 ? "far-right" : ["left", "center", "right"][d + 1];
+      const shown = isGrid() ? i < list.length : d === 0;
+      el.tabIndex = shown ? 0 : -1;
+      el.setAttribute("aria-hidden", shown ? "false" : "true");
+    });
+  };
+  const go = (to) => { cur = ((to % n) + n) % n; paint(); };
+  let saved = null;
+  try { saved = localStorage.getItem("homeView"); } catch {}
+  // People who ask their system for reduced motion start on the still grid too.
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches || matchMedia("(max-width: 640px)").matches;
+  setView(saved || (calm ? "grid" : "carousel"));
+  root.addEventListener("click", (e) => {
+    const mode = e.target.closest("[data-mode]");
+    if (mode) { setMode(mode.dataset.mode); return paint(); }
+    const el = e.target.closest(".stage-card");
+    if (!el || isGrid() || el.getAttribute("aria-hidden") === "false") return;
+    e.preventDefault();
+    go(cur + (el.dataset.pos === "left" ? -1 : 1));
+  });
+  // Wheel and trackpad: one card per gesture.
+  let acc = 0, lock = 0;
+  addEventListener("wheel", (e) => {
+    if (isGrid() || e.target.closest(".vc-panel")) return;
+    e.preventDefault();
+    if (Date.now() < lock) return;
+    acc += Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (Math.abs(acc) > 40) { go(cur + Math.sign(acc)); acc = 0; lock = Date.now() + 750; }
+  }, { passive: false });
+  addEventListener("keydown", (e) => {
+    if (isGrid() || e.target.closest("input, textarea")) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") go(cur + 1);
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") go(cur - 1);
+  });
+  let x0 = null;
+  root.addEventListener("touchstart", (e) => (x0 = e.touches[0].clientX), { passive: true });
+  root.addEventListener("touchend", (e) => {
+    if (x0 === null || isGrid()) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    x0 = null;
+  });
+}
+
+// Fun page: tiles of different sizes in a bento grid, in the same card style as the homepage.
+function renderFun() {
+  const root = document.querySelector(".fun-bento");
+  if (!root) return;
+  root.innerHTML = funTiles(SITE.fun);
+}
+
+function funTiles(list) {
+  return list.map((p) => {
+    const tag = p.href ? "a" : "div";
+    const attrs = p.href ? ` href="${p.href}"` : ' data-cursor="coming-soon"';
+    return `<${tag} class="fun-tile fun-${p.size || "small"}"${attrs} style="--c1:${p.card[0]};--c2:${p.card[1]}">
+      <div class="stage-top">${p.group ? `<span class="fun-label">${p.group}</span>` : ""}<p class="stage-title">${p.title}</p><p class="stage-tag">${p.tagline || ""}</p></div>
+      ${p.logo ? `<img class="fun-logo ${p.logoClass || ""}" src="${p.logo}" alt="">` : p.media ? `<div class="thumb" style="aspect-ratio:16 / 9">${projectMedia(p)}</div>` : ""}
+      <div class="stage-bottom"><span>${p.href ? "View" : ""}</span><span>${p.year}</span></div>
+      ${(p.stickers || []).map((src, i) => `<img class="fun-stk fun-stk-${i} ${p.stickerClass || ""}" src="${src}" alt="" loading="lazy">`).join("")}
+    </${tag}>`;
+  }).join("");
+}
+
 function renderProjects() {
   const root = document.querySelector(".projects");
   if (!root) return;
+  if (root.dataset.layout === "cards") return renderCardStage(root);
+  if (root.dataset.layout === "rows") {
+    root.innerHTML = SITE.projects.filter((p) => p.href).map(projectRow).join("");
+    return;
+  }
   // Two independent columns give the staggered masonry look.
   const cols = [[], []];
-  SITE.projects.forEach((p, i) => cols[i % 2].push(projectCard(p)));
+  SITE.projects.filter((p) => p.href).forEach((p, i) => cols[i % 2].push(projectCard(p)));
   root.innerHTML = cols.map((c) => `<div class="column">${c.join("")}</div>`).join("");
 }
 
@@ -178,7 +453,7 @@ function renderProjects() {
 // That way thin lines shrink with everything else instead of staying 1px at small sizes.
 function initScaledFrames() {
   const BASE = 1456;
-  document.querySelectorAll(".thumb iframe, .project-hero iframe").forEach((frame) => {
+  document.querySelectorAll(".thumb iframe, .project-hero iframe, .proto iframe").forEach((frame) => {
     frame.classList.add("scaled-frame");
     const box = frame.parentElement;
     new ResizeObserver(() => {
@@ -186,6 +461,64 @@ function initScaledFrames() {
       frame.style.height = `${box.clientHeight / scale}px`;
       frame.style.transform = `scale(${scale})`;
     }).observe(box);
+  });
+}
+
+// Tabs above a live prototype frame: each tab tells the frame which view to show.
+function initProtoTabs() {
+  document.querySelectorAll("[data-proto-tabs]").forEach((tabs) => {
+    const frame = tabs.parentElement.querySelector(".proto iframe");
+    const cap = tabs.parentElement.querySelector(".proto-cap");
+    // A lazy frame may still be loading when a tab is clicked: resend the chosen view once it's ready.
+    let want = null;
+    frame?.addEventListener("load", () => want && frame.contentWindow.postMessage({ v: want }, "*"));
+    tabs.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-v]");
+      if (!b || !frame) return;
+      tabs.querySelectorAll("[data-v]").forEach((x) => x.setAttribute("aria-selected", x === b));
+      want = b.dataset.v;
+      frame.contentWindow.postMessage({ v: want }, "*");
+      if (cap) cap.textContent = b.dataset.cap || "";
+    });
+  });
+}
+
+// Pick a quote; the part of the redesign that answers it is spotlit on the screen beside it.
+function initSpotlight() {
+  document.querySelectorAll("[data-spot]").forEach((root) => {
+    const img = root.querySelector(".spot-stage img");
+    const box = root.querySelector(".spot-box");
+    const note = root.querySelector(".spot-note");
+    const btns = [...root.querySelectorAll("[data-box]")];
+    const pick = (b) => {
+      btns.forEach((x) => x.setAttribute("aria-selected", x === b));
+      const [x, y, w, h] = b.dataset.box.split(",").map(Number);
+      Object.assign(box.style, { left: `${x}%`, top: `${y}%`, width: `${w}%`, height: `${h}%` });
+      if (!img.src.endsWith(b.dataset.img)) {
+        img.classList.add("swap");
+        setTimeout(() => { img.src = `${ROOT}${b.dataset.img}`; img.alt = b.dataset.alt || ""; img.classList.remove("swap"); }, 180);
+      }
+      note.textContent = b.dataset.note;
+    };
+    btns.forEach((b) => b.addEventListener("click", () => pick(b)));
+    pick(btns[0]);
+  });
+}
+
+// A row of frames that snap into place, with previous/next buttons.
+function initStrip() {
+  document.querySelectorAll("[data-strip]").forEach((root) => {
+    const track = root.querySelector(".strip-track");
+    const frames = [...track.children];
+    const count = root.querySelector(".strip-count");
+    const at = () => Math.round(track.scrollLeft / (frames[1].offsetLeft - frames[0].offsetLeft));
+    const paint = () => { const i = at(); count.textContent = `${i + 1} / ${frames.length}`; frames.forEach((f, k) => f.classList.toggle("on", k === i)); };
+    const go = (d) => { const i = Math.max(0, Math.min(frames.length - 1, at() + d)); track.scrollTo({ left: frames[i].offsetLeft - frames[0].offsetLeft, behavior: "smooth" }); };
+    root.querySelector(".strip-prev").addEventListener("click", () => go(-1));
+    root.querySelector(".strip-next").addEventListener("click", () => go(1));
+    frames.forEach((f, k) => f.addEventListener("click", () => go(k - at())));
+    track.addEventListener("scroll", () => requestAnimationFrame(paint), { passive: true });
+    paint();
   });
 }
 
@@ -1137,6 +1470,81 @@ function initCollapseOnLeave() {
 
 renderChrome();
 renderProjects();
+renderFun();
+
+// First-visit (or reload) intro: the name's letters grow to fill the screen, then the panel fades away.
+function initIntro() {
+  const root = document.querySelector(".intro");
+  const html = document.documentElement;
+  if (!root) return;
+  if (!("intro" in html.dataset)) { root.remove(); return; }
+  try { localStorage.setItem("intro", "1"); } catch {}
+  const word = root.querySelector(".intro-word");
+  const letters = [...word.textContent].map((c) => {
+    const el = document.createElement("span");
+    el.textContent = c;
+    return el;
+  });
+  word.replaceChildren(...letters);
+  word.classList.add("split");
+  // ?intro=fade swaps the grow for a plain fade; any ?intro forces it to play.
+  const fade = html.dataset.intro === "fade";
+  let ended = false;
+  const finish = () => {
+    if (ended) return;
+    ended = true;
+    root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 800, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" })
+      .finished.then(() => { delete html.dataset.intro; root.remove(); });
+  };
+  root.addEventListener("click", finish);
+  addEventListener("keydown", finish, { once: true });
+  setTimeout(finish, 2500);
+  const play = () => {
+    if (fade) {
+      const runs = letters.map((el, i) => el.animate(
+        [{ opacity: 0, transform: "translateY(12%)" }, { opacity: 1, transform: "none" }],
+        { duration: 500, delay: i * 30, easing: "cubic-bezier(.2,.7,.3,1)", fill: "forwards" }).finished);
+      Promise.all(runs).then(() => setTimeout(finish, 350));
+      return;
+    }
+    const vw = innerWidth, vh = innerHeight, cols = Math.ceil(letters.length / 2);
+    const runs = letters.map((el, i) => {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2 - vw / 2, cy = r.top + r.height / 2 - vh / 2;
+      const tilt = (i % 2 ? 1 : -1) * (1 + (i % 3));
+      const col = i % cols, row = i < cols ? -1 : 1;
+      const tx = (col + 0.5) * (vw / cols) - vw / 2 - cx, ty = row * vh * 0.27 - cy;
+      const k = Math.max((vw / cols) * 1.1 / r.width, (vh * 0.55) / r.height);
+      return el.animate([
+        { offset: 0, opacity: 0, transform: "translateY(20%)", easing: "cubic-bezier(.2,.7,.3,1)" },
+        { offset: 0.3, opacity: 1, transform: "none" },
+        { offset: 0.45, opacity: 1, transform: "none", easing: "cubic-bezier(.65,0,.35,1)" },
+        { offset: 1, opacity: 1, transform: `translate(${tx}px, ${ty}px) rotate(${tilt}deg) scale(${k})` },
+      ], { duration: 1100, delay: i * 25, fill: "forwards" }).finished;
+    });
+    Promise.all(runs).then(finish);
+  };
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(play, play);
+}
+initIntro();
+
+// Home cards tilt a little toward the pointer, with a soft light where it is
+function initCardTilt() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(".projects .project").forEach((card) => {
+    const thumb = card.querySelector(".thumb");
+    card.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      const r = thumb.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      thumb.style.setProperty("--ry", `${(x - 0.5) * 6}deg`);
+      thumb.style.setProperty("--rx", `${(0.5 - y) * 6}deg`);
+      thumb.style.setProperty("--mx", `${x * 100}%`);
+      thumb.style.setProperty("--my", `${y * 100}%`);
+    });
+    card.addEventListener("pointerleave", () => ["--rx", "--ry"].forEach((v) => thumb.style.removeProperty(v)));
+  });
+}
+initCardTilt();
 // Mensio request flow: draws each person's rail and the route through the numbered stops.
 function initRequestFlow() {
   const LANE_Y = [56, 150, 244];
@@ -1240,30 +1648,41 @@ function initPivots() {
   });
 }
 
-// Annotated screenshots: a marker or its list item zooms the image to that spot.
+// Annotated screenshots: a marker or its list item zooms the image to frame its part of the screen.
+// A marker's data-f="x0,y0,x1,y1" (percent) is the part to frame; without it the zoom centres on the marker's spot.
 function initAnnotations() {
-  const ZOOM = 2.2;
+  const ZOOM = 2.2, PAD = 6;
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   document.querySelectorAll(".annot").forEach((fig) => {
     const stage = fig.querySelector(".annot-stage");
     const hots = [...fig.querySelectorAll(".hot")];
     const items = [...fig.querySelectorAll(".annot-list li")];
+    const pct = (h, v) => parseFloat(h.style.getPropertyValue(v));
     const show = (i) => {
       const on = i != null;
       fig.classList.toggle("on", on);
       hots.forEach((h, k) => h.classList.toggle("on", k === i));
       items.forEach((li, k) => li.classList.toggle("on", k === i));
-      const pct = (h, v) => parseFloat(h.style.getPropertyValue(v));
-      // Markers sit beside their target; while zoomed, pull the active one back inside the frame
+      fig.querySelectorAll(".annot-state").forEach((el) => el.classList.toggle("on", +el.dataset.i === i));
       hots.forEach((h) => { h.style.removeProperty("left"); h.style.removeProperty("top"); });
+      let z = 1, tx = 0, ty = 0;
       if (on) {
         const h = hots[i], ox = pct(h, "--x"), oy = pct(h, "--y");
-        stage.style.setProperty("--zx", `${ox}%`);
-        stage.style.setProperty("--zy", `${oy}%`);
-        const fit = (o, m) => o + (Math.min(92, Math.max(8, o + (m - o) * ZOOM)) - o) / ZOOM;
-        h.style.left = `${fit(ox, pct(h, "--mx"))}%`;
-        h.style.top = `${fit(oy, pct(h, "--my"))}%`;
+        const [x0, y0, x1, y1] = h.dataset.f ? h.dataset.f.split(",").map(Number) : [ox - 14, oy - 12, ox + 14, oy + 12];
+        z = Math.min(ZOOM, (100 - PAD * 2) / Math.max(x1 - x0, 1), (100 - PAD * 2) / Math.max(y1 - y0, 1));
+        // Centre the part, but never pull an edge of the screenshot into the frame
+        tx = clamp(50 - ((x0 + x1) / 2) * z, 100 - 100 * z, 0);
+        ty = clamp(50 - ((y0 + y1) / 2) * z, 100 - 100 * z, 0);
+        // Everything outside the part is dimmed
+        [["--bx", x0], ["--by", y0], ["--bw", x1 - x0], ["--bh", y1 - y0]].forEach(([k, v]) => stage.style.setProperty(k, `${v}%`));
+        // Framed parts get the marker on their top-left corner; either way it stays inside the frame
+        const [mx, my] = h.dataset.f ? [x0, y0] : [pct(h, "--mx"), pct(h, "--my")];
+        h.style.left = `${(clamp(mx * z + tx, 5, 95) - tx) / z}%`;
+        h.style.top = `${(clamp(my * z + ty, 7, 93) - ty) / z}%`;
       }
-      stage.style.setProperty("--z", on ? ZOOM : 1);
+      stage.style.setProperty("--z", z);
+      stage.style.setProperty("--tx", `${tx}%`);
+      stage.style.setProperty("--ty", `${ty}%`);
     };
     [...hots, ...items].forEach((el) => {
       const i = +el.dataset.i;
@@ -1523,6 +1942,81 @@ function initTracker() {
 }
 
 initScaledFrames();
+
+// Live prototypes can open large over the page, so the UI is big enough to use. The overlay loads its own copy of
+// the prototype on the view that's showing (the autoplaying cases clip opens as the plain, clickable table).
+// Esc, Close or a click on the backdrop shuts it.
+function initProtoExpand() {
+  const ICON_OPEN = '<svg viewBox="0 0 12 12"><path d="M7 1h4v4M5 11H1V7M11 1 7 5M1 11l4-4"/></svg>';
+  const ICON_CLOSE = '<svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+  document.querySelectorAll(".proto").forEach((box) => {
+    const frame = box.querySelector("iframe");
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "proto-expand";
+    btn.innerHTML = `${ICON_OPEN}Expand`; btn.setAttribute("aria-label", "Open the prototype larger");
+    box.append(btn);
+    btn.addEventListener("click", () => {
+      const url = new URL(frame.src, location.href);
+      if (url.searchParams.get("v") === "cases-demo") url.searchParams.set("v", "cases");
+      const tab = box.parentElement.querySelector('[data-proto-tabs] [aria-selected="true"]');
+      if (tab) url.searchParams.set("v", tab.dataset.v);
+      url.searchParams.set("scroll", "1");
+      const ratio = box.clientWidth / box.clientHeight;
+      // Only some of the recreation is wired up; say what is, so nobody clicks a dead button
+      const WORKS = {
+        dashboard: "Works here: hover the weekly bars for each day's counts.",
+        cases: "Works here: search, Show closed, Filters, Columns, and sorting from any column header. Tabs and rows don't open anything.",
+        case: "Works here: hover a comment to see the month it explains.",
+        start: "Works here: fill in each step, then Next and Back.",
+      };
+      // ← / → step through the four screens in the same open prototype (the app switches view on a message)
+      const STEPS = [["dashboard", "Spot"], ["cases", "Find"], ["case", "Understand"], ["start", "Fix"]];
+      let at = Math.max(0, STEPS.findIndex(([v]) => v === url.searchParams.get("v")));
+      const hint = document.createElement("p");
+      hint.className = "proto-hint";
+      const ARROW = (d) => `<svg viewBox="0 0 16 16"><path d="${d}"/></svg>`;
+      const prev = document.createElement("button"), next = document.createElement("button");
+      prev.type = next.type = "button"; prev.className = next.className = "proto-step";
+      prev.innerHTML = ARROW("M10 3 5 8l5 5"); next.innerHTML = ARROW("M6 3l5 5-5 5");
+      const label = () => {
+        const [v, name] = STEPS[at];
+        hint.textContent = `${at + 1} of ${STEPS.length} · ${name}. ${WORKS[v]}`;
+        prev.setAttribute("aria-label", `Previous screen: ${STEPS[(at + STEPS.length - 1) % STEPS.length][1]}`);
+        next.setAttribute("aria-label", `Next screen: ${STEPS[(at + 1) % STEPS.length][1]}`);
+      };
+      const go = (d) => { at = (at + d + STEPS.length) % STEPS.length; inner.contentWindow.postMessage({ v: STEPS[at][0] }, "*"); label(); };
+      prev.addEventListener("click", () => go(-1)); next.addEventListener("click", () => go(1));
+      const backdrop = document.createElement("div");
+      backdrop.className = "proto-backdrop";
+      const big = document.createElement("div");
+      big.className = "proto is-open"; big.style.aspectRatio = getComputedStyle(box).aspectRatio;
+      big.setAttribute("role", "dialog"); big.setAttribute("aria-modal", "true"); big.setAttribute("aria-label", frame.title);
+      big.innerHTML = `<iframe class="scaled-frame" src="${url}" title="${frame.title}"></iframe>`;
+      const inner = big.querySelector("iframe"), shut = document.createElement("button");
+      shut.type = "button"; shut.className = "proto-expand proto-close"; shut.innerHTML = `${ICON_CLOSE}Close`;
+      const fit = () => {
+        big.style.width = `${Math.min(innerWidth - 160, innerHeight * .86 * ratio)}px`;   // room either side for the arrows
+        const scale = big.clientWidth / 1456;
+        inner.style.height = `${big.clientHeight / scale}px`; inner.style.transform = `scale(${scale})`;
+        // Close sits just above the frame's top-right corner, clear of the app's own header
+        const r = big.getBoundingClientRect(); shut.style.left = `${r.right - shut.offsetWidth}px`; shut.style.top = `${r.top - 40}px`;
+        hint.style.left = `${r.left}px`; hint.style.top = `${r.top - 34}px`; hint.style.maxWidth = `${r.width - shut.offsetWidth - 24}px`;
+        const mid = r.top + r.height / 2 - 22;
+        prev.style.left = `${r.left - 56}px`; next.style.left = `${r.right + 12}px`; prev.style.top = next.style.top = `${mid}px`;
+      };
+      const onKey = (e) => { if (e.key === "Escape") close(); if (e.key === "ArrowLeft") go(-1); if (e.key === "ArrowRight") go(1); };
+      const close = () => { backdrop.remove(); big.remove(); shut.remove(); hint.remove(); prev.remove(); next.remove(); document.documentElement.style.overflow = ""; removeEventListener("keydown", onKey); removeEventListener("resize", fit); btn.focus(); };
+      shut.addEventListener("click", close); backdrop.addEventListener("click", close);
+      addEventListener("keydown", onKey); addEventListener("resize", fit);
+      label(); document.body.append(backdrop, big, shut, hint, prev, next); fit(); shut.focus();
+      document.documentElement.style.overflow = "hidden";   // the page behind stays put while the prototype scrolls
+    });
+  });
+}
+initProtoExpand();
+initProtoTabs();
+initSpotlight();
+initStrip();
 initCursorLabel();
 initScrollSpy();
 initCompare();

@@ -1,0 +1,11 @@
+/* Bumpy AI: reuses the ctrl z page layout (ctrlz.css) with Bumpy's own lavender and rose. */
+.bj { --cream: #F4F0FA; --purple: #8379BC; --purple-deep: #3C3468; --orange: #F7467B; --green: #439DE1; }
+.bj .cz-try { background: linear-gradient(160deg, #EEF0FB, #F8E9F1); }
+.bj .steps button { color: #7A7491; }
+.bj .steps button:hover, .bj .steps button[aria-current="step"] { color: #23203A; }
+.bj .steps .n { color: #ABA5C4; }
+.bj .steps small { color: #5E5878; }
+.bj .proto-nav { color: #7A7491; }
+.bj .proto-nav button { background: #3C3468; color: #fff; }
+.bj .cz-frame { background: #EEF0FB; }
+.bj .cz-more summary { color: #23203A; }
