@@ -2515,6 +2515,8 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .cb .fb-board:not([data-bv]) :is(.cc-crumbs, .cc-nav-row) { flex-wrap: wrap; row-gap: 0.25em; }
   .cb .fb-board:not([data-bv]) .cc-nav-btn { white-space: nowrap; }
   .cb .fb-board:not([data-bv]) :is(.cc-alerts, .cc-combo-row) { grid-template-columns: minmax(0, 1fr); }
+  .cb .fb-board:not([data-bv]) .cc-dialog { max-width: calc(100% - 2em); }
+  .cb .fb-board:not([data-bv]) .cc-range { flex-direction: column; }
   .panel-card.fb.cb:has([data-bv]) { overflow-x: auto; }
   .cb .fb-board[data-bv] { font-size: 11px; width: 42.5em; justify-self: start; }
 }
@@ -2545,4 +2547,9 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .project-measure > .tldr-toggle { position: static; margin-top: 24px; }
   .project-measure > .tldr-toggle .tldr-say { display: none; }
   .next-project { bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
+/* Phones: the boards that scroll sideways start at their left edge in every browser (Safari ignores justify-self in a
+   block box, so the card is a grid aligned to the start) */
+@media (max-width: 640px) {
+  .panel-card.fb.cb:has([data-bv]), .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty) { display: grid; place-items: start; place-content: start; }
 }

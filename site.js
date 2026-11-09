@@ -884,7 +884,15 @@ function initOverlays() {
     const anchor = stage.querySelector(".cc-pop-trigger").parentElement;
     const trigger = anchor.querySelector(".cc-pop-trigger");
     const pop = anchor.querySelector(".cc-popover");
-    const setPop = (open) => { pop.hidden = !open; trigger.setAttribute("aria-expanded", String(open)); };
+    // Narrow screens: the popover may not fit beside its trigger, so it's capped to its card and nudged back inside it
+    const keepInside = () => {
+      const card = anchor.closest(".cb-card"), em = parseFloat(getComputedStyle(pop).fontSize);
+      pop.style.translate = ""; pop.style.maxWidth = `${card.clientWidth - 2 * em}px`;
+      const c = card.getBoundingClientRect(), r = pop.getBoundingClientRect();
+      const dx = Math.min(0, c.right - em - r.right) || Math.max(0, c.left + em - r.left);
+      if (dx) pop.style.translate = `${dx}px 0`;
+    };
+    const setPop = (open) => { pop.hidden = !open; trigger.setAttribute("aria-expanded", String(open)); if (open) keepInside(); };
     trigger.addEventListener("click", () => setPop(pop.hidden));
     dismissable(anchor, () => !pop.hidden, (refocus) => { setPop(false); if (refocus) trigger.focus(); });
   });
@@ -928,7 +936,8 @@ function initNavMenu() {
     const open = (i) => btns.forEach((b, j) => {
       pops[j].hidden = j !== i;
       b.setAttribute("aria-expanded", String(j === i));
-      if (j === i) pops[j].style.left = `${pops[j].classList.contains("cc-nav-single") ? b.offsetLeft : 0}px`;
+      // A single-column panel sits under its trigger, but never past the menu's right edge
+      if (j === i) pops[j].style.left = `${pops[j].classList.contains("cc-nav-single") ? Math.max(0, Math.min(b.offsetLeft, nav.clientWidth - pops[j].offsetWidth)) : 0}px`;
     });
     const openIndex = () => pops.findIndex((p) => !p.hidden);
     btns.forEach((b, i) => b.addEventListener("click", () => open(openIndex() === i ? -1 : i)));
