@@ -449,8 +449,9 @@
     try { localStorage.setItem("vc-ask-off", "1"); } catch {}
     showAsk();
   });
+  // Mouse only: on a phone, Safari treats a tap that changes the page on hover as just a hover, and never opens the chat
   [launch, askText].forEach((el) => {
-    el.addEventListener("pointerenter", () => val.classList.add("is-hover"));
+    el.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") val.classList.add("is-hover"); });
     el.addEventListener("pointerleave", () => val.classList.remove("is-hover"));
   });
 

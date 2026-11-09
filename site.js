@@ -1890,7 +1890,7 @@ function initTldr() {
     timer = setTimeout(() => (bubble.hidden = true), ms);
   };
   const sayOnLoad = () => setTimeout(() => say(5000), 900);
-  toggle.addEventListener("pointerenter", () => say(60000));
+  toggle.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") say(60000); });
   toggle.addEventListener("pointerleave", () => { clearTimeout(timer); timer = setTimeout(() => (bubble.hidden = true), 250); });
   const set = (mode, scroll) => {
     document.body.classList.toggle("tldr", mode === "short");
