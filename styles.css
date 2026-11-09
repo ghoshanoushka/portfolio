@@ -627,7 +627,7 @@ footer .links a:hover { color: var(--primary-ink); }
 
 /* Exploration rows: option panel with a caption beside it */
 .explore-row { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .explore-row { grid-template-columns: 60% auto; gap: 32px; align-items: end; }
 }
 .explore-panel { background: color-mix(in srgb, var(--foreground) 6%, transparent); }
@@ -2479,8 +2479,8 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 
 /* Phones: Mensio widgets. Tabs share the card's width, and the tracker shows only numbers (the stage name is written below it) */
 @media (max-width: 640px) {
-  .panel-card .seg { display: flex; width: 100%; }
-  .panel-card .seg button { flex: 1 1 auto; padding: 5px 8px; font-size: 12.5px; }
+  .seg:not(.tldr-toggle) { display: flex; width: 100%; scrollbar-width: none; }
+  .seg:not(.tldr-toggle) button { flex: 1 1 auto; padding: 5px 7px; font-size: 12px; }
   .pt-bar span { font-size: 0; }
   .pt-bar span::before { font-size: 12px; }
 }
@@ -2491,4 +2491,29 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .cx-tabs::-webkit-scrollbar { display: none; }
   .cx-tabs button { flex: none; white-space: nowrap; font-size: 12.5px; padding: 3px 7px; }
   .gs-panel .gs-hint { padding-right: 48px; }
+}
+
+/* Tablets (no sidebar yet): project sections use the full width, up to 720px, instead of the desktop's 6-of-8 measure */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .project-measure, .project-content-grid { width: 100%; max-width: 720px; }
+  .project-content-grid.section-fill { box-sizing: border-box; padding: 32px 28px; }
+}
+@media (min-width: 641px) and (max-width: 1023px) {
+  /* The content runs the full width here, so the TL;DR switch moves from the top right to the bottom left */
+  .tldr-toggle { top: auto; right: auto; left: var(--grid-margin); bottom: 40px; }
+  .tldr-say { top: auto; bottom: calc(100% + 10px); right: auto; left: 0; }
+  .tldr-say::before { top: auto; bottom: -5px; right: auto; left: 28px; transform: rotate(225deg); }
+}
+
+/* Phones: Deploy component boards. Scaled to the screen they shrink to ~6px type, so the simple boards switch to
+   a readable size in one column, and the every-variant table keeps its layout at a readable size and scrolls sideways. */
+@media (max-width: 640px) {
+  .cb .fb-board:not([data-bv]) { font-size: 12px; grid-template-columns: minmax(0, 1fr); }
+  .cb .fb-board:not([data-bv]) .cb-row { flex-wrap: wrap; }
+  .panel-card.fb.cb:has([data-bv]) { overflow-x: auto; }
+  .cb .fb-board[data-bv] { font-size: 11px; width: 42.5em; justify-self: start; }
+}
+@media (max-width: 640px) {
+  .explore-panel .panel-card.fb { aspect-ratio: auto; }
+  .explore-panel .fb-board { font-size: 10px; }
 }
