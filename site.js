@@ -1662,7 +1662,7 @@ function initPivots() {
 // Annotated screenshots: a marker or its list item zooms the image to frame its part of the screen.
 // A marker's data-f="x0,y0,x1,y1" (percent) is the part to frame; without it the zoom centres on the marker's spot.
 function initAnnotations() {
-  const ZOOM = 2.2, PAD = 6;
+  const ZOOM = 2.2, ZOOM_FRAMED = 2.8, PAD = 6;   // framed parts are measured tightly, so they can zoom further
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   document.querySelectorAll(".annot").forEach((fig) => {
     const stage = fig.querySelector(".annot-stage");
@@ -1680,7 +1680,7 @@ function initAnnotations() {
       if (on) {
         const h = hots[i], ox = pct(h, "--x"), oy = pct(h, "--y");
         const [x0, y0, x1, y1] = h.dataset.f ? h.dataset.f.split(",").map(Number) : [ox - 14, oy - 12, ox + 14, oy + 12];
-        z = Math.min(ZOOM, (100 - PAD * 2) / Math.max(x1 - x0, 1), (100 - PAD * 2) / Math.max(y1 - y0, 1));
+        z = Math.min(h.dataset.f ? ZOOM_FRAMED : ZOOM, (100 - PAD * 2) / Math.max(x1 - x0, 1), (100 - PAD * 2) / Math.max(y1 - y0, 1));
         // Centre the part, but never pull an edge of the screenshot into the frame
         tx = clamp(50 - ((x0 + x1) / 2) * z, 100 - 100 * z, 0);
         ty = clamp(50 - ((y0 + y1) / 2) * z, 100 - 100 * z, 0);
