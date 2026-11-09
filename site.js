@@ -1505,8 +1505,9 @@ function initIntro() {
   });
   word.replaceChildren(...letters);
   word.classList.add("split");
-  // ?intro=fade swaps the grow for a plain fade; any ?intro forces it to play.
-  const fade = html.dataset.intro === "fade";
+  // ?intro=fade swaps the grow for a plain fade; any ?intro forces it to play. Phones always fade: on a tall,
+  // narrow screen the grown letters stretch out of shape.
+  const fade = html.dataset.intro === "fade" || matchMedia("(max-width: 640px)").matches;
   let ended = false;
   const finish = () => {
     if (ended) return;

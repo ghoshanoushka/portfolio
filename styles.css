@@ -2484,3 +2484,11 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .pt-bar span { font-size: 0; }
   .pt-bar span::before { font-size: 12px; }
 }
+
+/* Phones: Guided Setup. The step tabs stay on one line and scroll sideways, and the hint clears the expand button */
+@media (max-width: 640px) {
+  .cx-tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .cx-tabs::-webkit-scrollbar { display: none; }
+  .cx-tabs button { flex: none; white-space: nowrap; font-size: 12.5px; padding: 3px 7px; }
+  .gs-panel .gs-hint { padding-right: 48px; }
+}
