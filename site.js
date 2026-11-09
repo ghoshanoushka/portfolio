@@ -1943,14 +1943,16 @@ function initTracker() {
 
 initScaledFrames();
 
-// Safari doesn't pass the wheel from an embedded prototype to the page, so scrolling stops over it.
-// Hand on any wheel the prototype didn't use itself (and that isn't over something scrollable inside it).
+// Safari sends the wheel to whatever embedded page is under the pointer, even a thumbnail that ignores the mouse,
+// so the homepage carousel and the page scroll stop there. Hand any wheel the embed didn't use back to the page:
+// re-sent from the frame element (so the carousel hears it), and scrolled here if nothing on the page took it.
+// Embeds inside embeds (the Claim Denials app) pass it up one level at a time.
 function initWheelPassThrough() {
   const safari = /^((?!chrome|chromium|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent);
   if (!safari) return;
   const scrollsInside = (el, dy) => {
     for (; el && el.nodeType === 1; el = el.parentElement) {
-      const cs = getComputedStyle(el);
+      const cs = el.ownerDocument.defaultView.getComputedStyle(el);
       if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight && (dy < 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight)) return true;
     }
     return false;
@@ -1958,8 +1960,17 @@ function initWheelPassThrough() {
   const hook = (frame) => {
     try {
       const w = frame.contentWindow;
-      if (!w || w.__wheelHooked) return; w.__wheelHooked = true;
-      w.addEventListener("wheel", (e) => { if (!e.defaultPrevented && !scrollsInside(e.target, e.deltaY)) window.scrollBy(e.deltaX, e.deltaY); }, { passive: true });
+      if (!w || w.__wheelHooked) return;
+      w.__wheelHooked = true;
+      w.addEventListener("wheel", (e) => {
+        if (e.defaultPrevented || scrollsInside(e.target, e.deltaY)) return;
+        const r = frame.getBoundingClientRect();
+        const up = new WheelEvent("wheel", { deltaX: e.deltaX, deltaY: e.deltaY, deltaMode: e.deltaMode, clientX: r.left + e.clientX, clientY: r.top + e.clientY, bubbles: true, cancelable: true });
+        const unused = frame.dispatchEvent(up);
+        if (unused && frame.ownerDocument === document) window.scrollBy(e.deltaX, e.deltaY);
+      }, { passive: true });
+      const scan = () => w.document.querySelectorAll("iframe").forEach((f) => { hook(f); f.addEventListener("load", () => hook(f)); });
+      scan(); w.addEventListener("load", scan);
     } catch {}   // a frame from another site can't be reached; leave it be
   };
   document.querySelectorAll("iframe").forEach((frame) => { hook(frame); frame.addEventListener("load", () => hook(frame)); });
