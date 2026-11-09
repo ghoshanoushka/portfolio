@@ -2533,3 +2533,6 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .project-measure, .project-content-grid { width: 100%; }
   .project-content-grid.section-fill { box-sizing: border-box; padding: 36px 32px; }
 }
+/* Segmented tabs too long for one line: one option per row, the selected one still a white pill */
+.seg.stacked { flex-direction: column; align-items: stretch; width: 100%; border-radius: 14px; overflow: visible; }
+.seg.stacked button { text-align: left; border-radius: 11px; padding: 7px 12px; }

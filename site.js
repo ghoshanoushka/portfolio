@@ -2106,3 +2106,20 @@ initExpand();
 initVariablesPanel();
 initCollapseOnLeave();
 initFitToOpen();
+
+// Segmented tabs that don't fit comfortably on one line (long labels on phones) stack, one option per row.
+// Fonts render a little wider on some phones, so they stack once they need 80% of the room, not only on overflow.
+function initSegStack() {
+  document.querySelectorAll(".seg:not(.tldr-toggle)").forEach((seg) => {
+    const fit = () => {
+      seg.classList.remove("stacked");
+      seg.style.width = "max-content";
+      const need = seg.scrollWidth, room = seg.parentElement.clientWidth;
+      seg.style.width = "";
+      if (need > room * 0.8) seg.classList.add("stacked");
+    };
+    new ResizeObserver(fit).observe(seg.parentElement);
+    fit();
+  });
+}
+initSegStack();
