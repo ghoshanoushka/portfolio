@@ -440,7 +440,7 @@ function funTiles(list) {
     return `<${tag} class="fun-tile fun-${p.size || "small"}"${attrs} style="--c1:${p.card[0]};--c2:${p.card[1]}">
       <div class="stage-top">${p.group ? `<span class="fun-label">${p.group}</span>` : ""}<p class="stage-title">${p.title}</p><p class="stage-tag">${p.tagline || ""}</p></div>
       ${p.logo ? `<img class="fun-logo ${p.logoClass || ""}" src="${p.logo}" alt="">` : p.media ? `<div class="thumb" style="aspect-ratio:16 / 9">${projectMedia(p)}</div>` : ""}
-      <div class="stage-bottom"><span>${p.href ? "View" : ""}</span><span>${p.year}</span></div>
+      <div class="stage-bottom"><span></span><span>${p.year}</span></div>
       ${(p.stickers || []).map((src, i) => `<img class="fun-stk fun-stk-${i} ${p.stickerClass || ""}" src="${src}" alt="" loading="lazy">`).join("")}
     </${tag}>`;
   }).join("");
