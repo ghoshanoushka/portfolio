@@ -2440,3 +2440,38 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 
 /* Hero animations are pictures, like thumbnails: no clicks, and scrolling over them scrolls the page (Safari otherwise keeps the wheel) */
 .project-hero iframe { pointer-events: none; }
+
+/* ---------- Phones: one tidy bottom edge ----------
+   Valentino sits in the bottom-right corner (tap him to chat; his label and greeting stay hidden so they never
+   cover the page). The TL;DR switch moves to the bottom-left, Next project and Back to top sit just above it,
+   the homepage keeps only the carousel/grid switch, and Fun cards are all one size. */
+@media (max-width: 640px) {
+  .vc-tree { right: 8px; bottom: calc(10px + env(safe-area-inset-bottom)); }
+  .vc-ask, .vc-say.vc-say-val { display: none !important; }
+  .vc-panel { right: 12px; left: 12px; width: auto; bottom: calc(92px + env(safe-area-inset-bottom)); height: min(560px, calc(100dvh - 140px)); }
+
+  .tldr-toggle { right: auto; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .tldr-say { right: auto; left: 0; }
+  .tldr-say::before { right: auto; left: 28px; }
+  .next-project { right: auto; left: 16px; bottom: calc(68px + env(safe-area-inset-bottom)); }
+  .to-top { right: 22px; bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+  .stage-tabs .stage-sep, .stage-tabs .stage-modes { display: none; }
+
+  .fun-page .fun-bento { grid-auto-rows: 236px; }
+  .fun-page .fun-tall { grid-row: auto; }
+  .fun-page .fun-tile .fun-logo { flex: 1 1 0; min-height: 0; height: 100%; max-height: 104px; width: auto; max-width: 60%; }
+}
+
+/* The Coverflow prototype is drawn for a big screen: on phones, offer it full screen (turn the phone sideways) */
+.cf-full { display: none; }
+@media (max-width: 640px) { .cf-full { display: inline; color: var(--primary-ink); text-decoration: underline; text-underline-offset: 2px; } }
+
+/* Step strip: the count on the left, the arrows on the right, beside the next frame */
+.strip-nav { justify-content: flex-end; }
+.strip-nav .strip-count { order: -1; margin-right: auto; }
+
+/* Phones: while the chat is open, the floating page buttons step aside so they don't cover it */
+@media (max-width: 640px) {
+  body:has(.vc-panel:not([hidden])) :is(.next-project, .to-top, .tldr-toggle) { opacity: 0 !important; pointer-events: none !important; }
+}

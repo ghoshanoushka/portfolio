@@ -112,7 +112,7 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 
 /* ---------- Grid view: every project at once, page scrolls ---------- */
 
-.projects.is-grid .stage { position: static; inset: auto; perspective: none; overflow: visible; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 32px 0 64px; }
+.projects.is-grid .stage { position: static; inset: auto; perspective: none; overflow: visible; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 32px 0 64px; }
 @media (min-width: 760px) { .projects.is-grid .stage { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
 /* The motion modes set transform, opacity and filter per position; on the grid none of them apply. */
 .projects.is-grid .stage-card[data-pos] { position: relative; left: auto; top: auto; width: auto; height: auto; aspect-ratio: 540 / 420; transform: none !important; opacity: 1 !important; filter: none !important; pointer-events: auto !important; cursor: pointer; transition: none; }

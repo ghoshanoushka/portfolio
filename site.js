@@ -1686,8 +1686,12 @@ function initAnnotations() {
         ty = clamp(50 - ((y0 + y1) / 2) * z, 100 - 100 * z, 0);
         // Everything outside the part is dimmed
         [["--bx", x0], ["--by", y0], ["--bw", x1 - x0], ["--bh", y1 - y0]].forEach(([k, v]) => stage.style.setProperty(k, `${v}%`));
-        // Framed parts get the marker on their top-left corner; either way it stays inside the frame
-        const [mx, my] = h.dataset.f ? [x0, y0] : [pct(h, "--mx"), pct(h, "--my")];
+        // Framed parts get the marker beside the frame, so it never covers what's framed: above it if there's room
+        // in view, else below, left or right. Either way it stays inside the picture.
+        const fits = ([x, y]) => x * z + tx >= 5 && x * z + tx <= 95 && y * z + ty >= 7 && y * z + ty <= 93;
+        const g = 7 / z, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        const spots = [[cx, y0 - g], [cx, y1 + g], [x0 - g, cy], [x1 + g, cy]];
+        const [mx, my] = h.dataset.f ? spots.find(fits) || spots[0] : [pct(h, "--mx"), pct(h, "--my")];
         h.style.left = `${(clamp(mx * z + tx, 5, 95) - tx) / z}%`;
         h.style.top = `${(clamp(my * z + ty, 7, 93) - ty) / z}%`;
       }
