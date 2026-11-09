@@ -2553,3 +2553,9 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 @media (max-width: 640px) {
   .panel-card.fb.cb:has([data-bv]), .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty) { display: grid; place-items: start; place-content: start; }
 }
+/* The card outline is an overlay inside the card, so in a card that scrolls sideways it slid along with the board and
+   showed as a line across it. Those cards get a real border instead, which stays put. */
+@media (max-width: 640px) {
+  :is(.panel-card.fb.cb:has([data-bv]), .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty))::after { content: none; }
+  .panel-card.fb.cb:has([data-bv]), .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty) { border: 1px solid var(--border-default); }
+}
