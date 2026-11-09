@@ -2474,7 +2474,7 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 
 /* Phones: while the chat is open, the floating page buttons step aside so they don't cover it */
 @media (max-width: 640px) {
-  body:has(.vc-panel:not([hidden])) :is(.next-project, .to-top, .tldr-toggle) { opacity: 0 !important; pointer-events: none !important; }
+  body:has(.vc-panel:not([hidden])) :is(.next-project, .to-top) { opacity: 0 !important; pointer-events: none !important; }
 }
 
 /* Phones: Mensio widgets. Tabs share the card's width, and the tracker shows only numbers (the stage name is written below it) */
@@ -2539,5 +2539,10 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 /* Segmented tabs too long for one line: one option per row, the selected one still a white pill */
 .seg.stacked { flex-direction: column; align-items: stretch; width: 100%; border-radius: 14px; overflow: visible; }
 .seg.stacked button { text-align: left; border-radius: 11px; padding: 7px 12px; }
-/* Phones: the page itself never scrolls sideways, even if something is a pixel too wide */
-@media (max-width: 640px) { html, body { overflow-x: clip; } }
+
+/* Tablets and phones: the TL;DR switch sits under the project details instead of floating over the content */
+@media (max-width: 1023px) {
+  .project-measure > .tldr-toggle { position: static; margin-top: 24px; }
+  .project-measure > .tldr-toggle .tldr-say { display: none; }
+  .next-project { bottom: calc(16px + env(safe-area-inset-bottom)); }
+}

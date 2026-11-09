@@ -1865,8 +1865,12 @@ function initChartTabs() {
 function initTldr() {
   const tabs = [...document.querySelectorAll(".tldr-toggle [data-tldr-mode]")];
   if (!tabs.length) return;
-  document.body.append(document.querySelector(".tldr-toggle"));
   const toggle = document.querySelector(".tldr-toggle");
+  // On desktop it floats in the corner; on tablets and phones it stays in place under the project details
+  const home = toggle.parentElement, wide = matchMedia("(min-width: 1024px)");
+  const place = () => (wide.matches ? document.body.append(toggle) : home.append(toggle));
+  wide.addEventListener("change", place);
+  place();
   const bubble = toggle.querySelector(".tldr-say");
   let timer;
   const say = (ms = 2600) => {
