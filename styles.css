@@ -2512,6 +2512,9 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 @media (max-width: 640px) {
   .cb .fb-board:not([data-bv]) { font-size: 12px; grid-template-columns: minmax(0, 1fr); }
   .cb .fb-board:not([data-bv]) .cb-row { flex-wrap: wrap; }
+  .cb .fb-board:not([data-bv]) :is(.cc-crumbs, .cc-nav-row) { flex-wrap: wrap; row-gap: 0.25em; }
+  .cb .fb-board:not([data-bv]) .cc-nav-btn { white-space: nowrap; }
+  .cb .fb-board:not([data-bv]) :is(.cc-alerts, .cc-combo-row) { grid-template-columns: minmax(0, 1fr); }
   .panel-card.fb.cb:has([data-bv]) { overflow-x: auto; }
   .cb .fb-board[data-bv] { font-size: 11px; width: 42.5em; justify-self: start; }
 }
@@ -2536,3 +2539,5 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 /* Segmented tabs too long for one line: one option per row, the selected one still a white pill */
 .seg.stacked { flex-direction: column; align-items: stretch; width: 100%; border-radius: 14px; overflow: visible; }
 .seg.stacked button { text-align: left; border-radius: 11px; padding: 7px 12px; }
+/* Phones: the page itself never scrolls sideways, even if something is a pixel too wide */
+@media (max-width: 640px) { html, body { overflow-x: clip; } }
