@@ -2517,3 +2517,10 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .explore-panel .panel-card.fb { aspect-ratio: auto; }
   .explore-panel .fb-board { font-size: 10px; }
 }
+/* Phones: the other scaled boards (Hive audit, tokens, spacing, effects, Deploy's type ramp) keep their layout at
+   a readable 10px and scroll sideways, instead of shrinking to ~6px type */
+@media (max-width: 640px) {
+  .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty) { overflow-x: auto; }
+  .hs-board { font-size: 10px; width: 45em; justify-self: start; }
+  .sc-board, .panel-card.fb:not(.cb, .pl, .ty) > .fb-board { font-size: 10px; width: 42.5em; justify-self: start; }
+}
