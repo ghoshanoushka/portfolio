@@ -309,6 +309,8 @@ function renderCardStage(root) {
     </${tag}>`;
   };
   document.querySelector(".content").insertAdjacentHTML("beforeend", `<div class="home-made">${madeWith()}</div>`);
+  // Phones only: the case studies hold live prototypes made for a bigger screen
+  root.insertAdjacentHTML("beforebegin", `<p class="best-web">Best viewed on a laptop. The prototypes are made for a bigger screen.</p>`);
   root.innerHTML = `<div class="stage">${[...list, ...list].map((p, i) => card(p, i)).join("")}</div>
     <div class="stage-tabs">
       <div class="view-toggle" role="group" aria-label="Layout">

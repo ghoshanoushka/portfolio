@@ -155,3 +155,7 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
   .projects.is-grid .stage-card:nth-child(3) { animation-delay: .45s; }
   @keyframes card-rise { from { translate: 0 22px; } to { translate: 0 0; } }
 }
+
+/* Phones: a note above the grid that the site is best on a laptop */
+.best-web { display: none; }
+@media (max-width: 640px) { .best-web { display: block; margin: 16px 0 0; font-size: 13px; line-height: 1.4; color: var(--ink-55); } }
