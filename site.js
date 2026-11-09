@@ -1943,6 +1943,29 @@ function initTracker() {
 
 initScaledFrames();
 
+// Safari doesn't pass the wheel from an embedded prototype to the page, so scrolling stops over it.
+// Hand on any wheel the prototype didn't use itself (and that isn't over something scrollable inside it).
+function initWheelPassThrough() {
+  const safari = /^((?!chrome|chromium|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent);
+  if (!safari) return;
+  const scrollsInside = (el, dy) => {
+    for (; el && el.nodeType === 1; el = el.parentElement) {
+      const cs = getComputedStyle(el);
+      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight && (dy < 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight)) return true;
+    }
+    return false;
+  };
+  const hook = (frame) => {
+    try {
+      const w = frame.contentWindow;
+      if (!w || w.__wheelHooked) return; w.__wheelHooked = true;
+      w.addEventListener("wheel", (e) => { if (!e.defaultPrevented && !scrollsInside(e.target, e.deltaY)) window.scrollBy(e.deltaX, e.deltaY); }, { passive: true });
+    } catch {}   // a frame from another site can't be reached; leave it be
+  };
+  document.querySelectorAll("iframe").forEach((frame) => { hook(frame); frame.addEventListener("load", () => hook(frame)); });
+}
+initWheelPassThrough();
+
 // Live prototypes can open large over the page, so the UI is big enough to use. The overlay loads its own copy of
 // the prototype on the view that's showing (the autoplaying cases clip opens as the plain, clickable table).
 // Esc, Close or a click on the backdrop shuts it.

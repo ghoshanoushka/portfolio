@@ -100,7 +100,7 @@
 .cz-frame video { display: block; width: 100%; height: 100%; object-fit: cover; scale: 1.02; cursor: pointer; }
 /* After one run the video stops on its end card; Replay sits low in the frame, clear of the title */
 .cz-frame { position: relative; }
-.cz-replay { position: absolute; left: 50%; bottom: 7%; translate: -50% 0; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: rgba(28, 26, 24, .72); color: #fff; font: 500 15px var(--font-sans); cursor: pointer; backdrop-filter: blur(8px); animation: cz-replay-in .3s ease-out; }
+.cz-replay { position: absolute; left: 50%; bottom: 7%; translate: -50% 0; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: rgba(28, 26, 24, .72); color: #fff; font: 500 15px var(--font-sans); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: cz-replay-in .3s ease-out; }
 .cz-replay[hidden] { display: none; }
 .cz-replay:hover { background: rgba(28, 26, 24, .85); }
 .cz-replay:focus-visible { outline: 3px solid var(--purple-deep); outline-offset: 3px; }
