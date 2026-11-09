@@ -333,14 +333,15 @@ function renderCardStage(root) {
   const stage = root.querySelector(".stage");
   const noMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const EASE = "cubic-bezier(.2, .7, .2, 1)";
-  const setView = (view) => {
+  const setView = (view, glide = true) => {
     const toGrid = view === "grid";
-    const animate = !noMotion && toGrid !== isGrid() && stage.getAnimations;
+    const animate = glide && !noMotion && toGrid !== isGrid() && stage.getAnimations;
     // Note where each visible card is now, switch layouts, then glide every card from there to its new place
     const from = animate ? new Map(cards.filter((el) => getComputedStyle(el).display !== "none" && getComputedStyle(el).opacity > 0.05).map((el) => [el, el.getBoundingClientRect()])) : null;
     root.classList.toggle("is-grid", toGrid);
     document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === view));
-    try { localStorage.setItem("homeView", view); } catch {}
+    // A phone forcing the grid shouldn't overwrite the choice someone made on a bigger screen
+    if (!matchMedia("(max-width: 640px)").matches) try { localStorage.setItem("homeView", view); } catch {}
     paint();
     if (!animate) return;
     // paint() sets "jump" per card, so switch the cards' own transitions off after it
@@ -386,8 +387,12 @@ function renderCardStage(root) {
   let saved = null;
   try { saved = localStorage.getItem("homeView"); } catch {}
   // People who ask their system for reduced motion start on the still grid too.
-  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches || matchMedia("(max-width: 640px)").matches;
-  setView(saved || (calm ? "grid" : "carousel"));
+  // Phones always get the grid (there's no switch there); people who ask for reduced motion start on it too.
+  const phone = matchMedia("(max-width: 640px)");
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // The first layout appears in place; only switching layouts glides the cards
+  setView(phone.matches ? "grid" : saved || (calm ? "grid" : "carousel"), false);
+  phone.addEventListener("change", (e) => { if (e.matches) setView("grid", false); });
   root.addEventListener("click", (e) => {
     const mode = e.target.closest("[data-mode]");
     if (mode) { setMode(mode.dataset.mode); return paint(); }
