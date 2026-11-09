@@ -363,15 +363,20 @@ function renderCardStage(root) {
   document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
   const offset = (i) => ((((i - cur) % n) + n + Math.floor(n / 2)) % n) - Math.floor(n / 2);
   const last = new Map();
+  const place = (el, d) => {
+    el.dataset.d = d;
+    el.style.setProperty("--d", d);
+    el.dataset.pos = d < -1 ? "far-left" : d > 1 ? "far-right" : ["left", "center", "right"][d + 1];
+  };
   const paint = () => {
     cards.forEach((el, i) => {
-      const d = offset(i);
-      // A card moving further than one step is wrapping round off screen: no transition.
-      el.classList.toggle("jump", Math.abs(d - (last.get(el) ?? d)) > 1);
+      const d = offset(i), was = last.get(el) ?? d;
       last.set(el, d);
-      el.dataset.d = d;
-      el.style.setProperty("--d", d);
-      el.dataset.pos = d < -1 ? "far-left" : d > 1 ? "far-right" : ["left", "center", "right"][d + 1];
+      // A card moving further than one step is wrapping round: drop it in one step beyond its new place, out of
+      // sight, then let it glide and fade in from there (otherwise it would pop into the outermost slot).
+      el.classList.remove("jump");
+      if (Math.abs(d - was) > 1) { el.classList.add("jump"); place(el, d + Math.sign(d || 1)); void el.offsetWidth; el.classList.remove("jump"); }
+      place(el, d);
       const shown = isGrid() ? i < list.length : d === 0;
       el.tabIndex = shown ? 0 : -1;
       el.setAttribute("aria-hidden", shown ? "false" : "true");
@@ -391,17 +396,23 @@ function renderCardStage(root) {
     e.preventDefault();
     go(cur + (el.dataset.pos === "left" ? -1 : 1));
   });
-  // Wheel and trackpad: one card per gesture.
-  let acc = 0, lock = 0;
+  // Wheel and trackpad: one card per gesture. A trackpad swipe keeps sending fading "momentum" events for a second
+  // or more after the fingers lift, so a gesture only ends after a short quiet gap, or when a fresh swipe starts
+  // (the deltas jump back up instead of fading).
+  let acc = 0, used = false, lastT = 0, lastMag = 0, movedT = 0;
   addEventListener("wheel", (e) => {
-    if (isGrid() || e.target.closest(".vc-panel")) return;
+    if (isGrid() || e.target.closest?.(".vc-panel")) return;
     e.preventDefault();
-    if (Date.now() < lock) return;
-    acc += Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    if (Math.abs(acc) > 40) { go(cur + Math.sign(acc)); acc = 0; lock = Date.now() + 750; }
+    const now = performance.now(), delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX, mag = Math.abs(delta);
+    const fresh = now - lastT > 220 || (now - movedT > 350 && mag > 24 && mag > lastMag * 1.8);
+    if (fresh) { used = false; acc = 0; }
+    lastT = now; lastMag = mag;
+    if (used) return;
+    acc += delta;
+    if (Math.abs(acc) > 30) { go(cur + Math.sign(acc)); used = true; movedT = now; }
   }, { passive: false });
   addEventListener("keydown", (e) => {
-    if (isGrid() || e.target.closest("input, textarea")) return;
+    if (isGrid() || e.target.closest?.("input, textarea")) return;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") go(cur + 1);
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") go(cur - 1);
   });
