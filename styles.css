@@ -2448,7 +2448,7 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 @media (max-width: 640px) {
   .vc-tree { right: 8px; bottom: calc(10px + env(safe-area-inset-bottom)); }
   .vc-ask, .vc-say.vc-say-val { display: none !important; }
-  .vc-panel { right: 12px; left: 12px; width: auto; bottom: calc(92px + env(safe-area-inset-bottom)); height: min(560px, calc(100dvh - 140px)); }
+  body .vc-panel, body.home-cards .vc-panel { left: 50%; right: auto; translate: -50% 0; width: min(380px, calc(100vw - 24px)); bottom: calc(90px + env(safe-area-inset-bottom)); height: min(460px, calc(100dvh - 170px)); transform-origin: 50% 100%; }
 
   .tldr-toggle { right: auto; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); }
   .tldr-say { right: auto; left: 0; }

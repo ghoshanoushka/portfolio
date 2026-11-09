@@ -142,3 +142,6 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 .home-cards .vc-say-val { left: 74px; }
 .home-cards .vc-say::after { left: auto; right: 14px; }
 .home-cards .vc-panel { left: auto; right: 20px; transform-origin: bottom right; }
+
+/* The bottom switch is solid, and the grid ends with room under "Built with Claude Code" so the two never overlap */
+.content:has(.projects.is-grid) .home-made { padding-bottom: 112px; }
