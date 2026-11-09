@@ -1648,7 +1648,8 @@ function initRequestFlow() {
     select(null);
 
     // Draw the route in the first time the diagram scrolls into view
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); drawn = true; draw(true); } }, { threshold: 0.4 });
+    // A low threshold: on phones the map is wider than the screen and scrolls sideways, so it never shows 40% of itself
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); drawn = true; draw(true); } }, { threshold: 0.15 });
     io.observe(map);
   });
 }
@@ -1728,7 +1729,8 @@ function initAffinity() {
 
     const layout = () => {
       const W = board.clientWidth;
-      const cols = W >= 640 ? 4 : 2;
+      // One column on phones, so each note is wide enough to read its first lines
+      const cols = W >= 640 ? 4 : W >= 420 ? 2 : 1;
       const colW = (W - GAP * (cols - 1)) / cols;
       [...notes, ...heads].forEach((el) => (el.style.width = `${colW}px`));
 
@@ -1785,7 +1787,7 @@ function initAffinity() {
       if (!e.isIntersecting) return;
       io.disconnect();
       setTimeout(() => setView("grouped"), 400);
-    }, { threshold: 0.5 });
+    }, { rootMargin: "0px 0px -30% 0px" });
     io.observe(board);
   });
 }

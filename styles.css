@@ -2476,3 +2476,11 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 @media (max-width: 640px) {
   body:has(.vc-panel:not([hidden])) :is(.next-project, .to-top, .tldr-toggle) { opacity: 0 !important; pointer-events: none !important; }
 }
+
+/* Phones: Mensio widgets. Tabs share the card's width, and the tracker shows only numbers (the stage name is written below it) */
+@media (max-width: 640px) {
+  .panel-card .seg { display: flex; width: 100%; }
+  .panel-card .seg button { flex: 1 1 auto; padding: 5px 8px; font-size: 12.5px; }
+  .pt-bar span { font-size: 0; }
+  .pt-bar span::before { font-size: 12px; }
+}
