@@ -144,7 +144,9 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 .home-cards .vc-panel { left: auto; right: 20px; transform-origin: bottom right; }
 
 /* The bottom switch is solid, and the grid ends with room under "Built with Claude Code" so the two never overlap */
-.content:has(.projects.is-grid) .home-made { padding-bottom: 112px; }
+@media (min-width: 641px) { .content:has(.projects.is-grid) .home-made { padding-bottom: 112px; } }
+/* Phones have no switch at the bottom, so the grid ends close to its last line */
+@media (max-width: 640px) { .projects.is-grid .stage { padding-bottom: 28px; } .content:has(.projects.is-grid) .home-made { padding: 0 0 28px; } }
 
 /* Phones open straight on the grid: the block fades in (.fade-in) while the cards rise into place one after another */
 @media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
