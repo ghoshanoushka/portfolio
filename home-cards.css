@@ -159,3 +159,5 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 /* Phones: a note above the grid that the site is best on a laptop */
 .best-web { display: none; }
 @media (max-width: 640px) { .best-web { display: block; margin: 16px 0 0; font-size: 13px; line-height: 1.4; color: var(--ink-55); } }
+/* Tablets: as on phones, the carousel's bottom-left credit would sit behind the layout switch */
+@media (max-width: 1023px) { .content:has(.projects:not(.is-grid)) .home-made { display: none; } }

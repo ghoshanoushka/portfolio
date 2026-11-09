@@ -2499,6 +2499,8 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .project-content-grid.section-fill { box-sizing: border-box; padding: 32px 28px; }
 }
 @media (min-width: 641px) and (max-width: 1023px) {
+  /* Valentino's label would sit over the content here, as on phones: tap him to chat */
+  .vc-ask, .vc-say.vc-say-val { display: none !important; }
   /* The content runs the full width here, so the TL;DR switch moves from the top right to the bottom left */
   .tldr-toggle { top: auto; right: auto; left: var(--grid-margin); bottom: 40px; }
   .tldr-say { top: auto; bottom: calc(100% + 10px); right: auto; left: 0; }
@@ -2523,4 +2525,11 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty) { overflow-x: auto; }
   .hs-board { font-size: 10px; width: 45em; justify-self: start; }
   .sc-board, .panel-card.fb:not(.cb, .pl, .ty) > .fb-board { font-size: 10px; width: 42.5em; justify-self: start; }
+}
+/* Two columns of Fun tiles: all one size, so the tall ones don't run down the page */
+@media (min-width: 641px) and (max-width: 900px) { .fun-page .fun-tall { grid-row: auto; } }
+/* Tablet landscape and small laptops: the sidebar takes room, so sections use the content column's full width */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .project-measure, .project-content-grid { width: 100%; }
+  .project-content-grid.section-fill { box-sizing: border-box; padding: 36px 32px; }
 }
