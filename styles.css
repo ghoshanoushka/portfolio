@@ -322,8 +322,9 @@ p { margin: 0; }
 footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  flex-wrap: wrap;
+  column-gap: 24px;
+  row-gap: 6px;
   padding: 24px 0;
   margin-top: auto;
 }
@@ -1993,6 +1994,8 @@ html[data-intro] .intro {
    hover it and it hops. */
 .made { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-40); }
 .made a { color: var(--ink-55); transition: color .2s; }
+/* The copyright line matches "Built with Claude Code" and never breaks */
+.rights { font-size: 13px; color: var(--ink-40); white-space: nowrap; }
 .made a:hover { color: var(--primary-ink); }
 .pix { width: 28px; height: 22px; overflow: visible; shape-rendering: crispEdges; }
 .pix-body { animation: pix-breathe 2.4s steps(2) infinite; transform-origin: 50% 100%; transform-box: fill-box; }

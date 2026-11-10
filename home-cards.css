@@ -129,6 +129,7 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 
 /* Built with Claude Code: bottom-left corner on the carousel, after the cards on the grid */
 .home-made { position: fixed; left: var(--grid-margin); bottom: 28px; z-index: 5; }
+.home-made { display: flex; align-items: center; flex-wrap: wrap; column-gap: 24px; row-gap: 6px; }
 .content:has(.projects.is-grid) .home-made { position: static; padding: 0 0 32px; }
 @media (max-width: 640px) { .content:has(.projects:not(.is-grid)) .home-made { display: none; } }
 

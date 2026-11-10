@@ -203,6 +203,7 @@ function renderChrome() {
     "beforeend",
     `<footer>
       <div class="status">${madeWith()}</div>
+      <div class="rights">© ${new Date().getFullYear()} Anoushka Ghosh</div>
     </footer>`
   );
 
@@ -308,7 +309,7 @@ function renderCardStage(root) {
       <div class="stage-bottom"><span>${status}</span><span>${year}</span></div>
     </${tag}>`;
   };
-  document.querySelector(".content").insertAdjacentHTML("beforeend", `<div class="home-made">${madeWith()}</div>`);
+  document.querySelector(".content").insertAdjacentHTML("beforeend", `<div class="home-made">${madeWith()}<div class="rights">© ${new Date().getFullYear()} Anoushka Ghosh</div></div>`);
   // Phones only: the case studies hold live prototypes made for a bigger screen
   root.insertAdjacentHTML("beforebegin", `<p class="best-web">Best viewed on a laptop. The prototypes are made for a bigger screen.</p>`);
   root.innerHTML = `<div class="stage">${[...list, ...list].map((p, i) => card(p, i)).join("")}</div>
