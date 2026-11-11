@@ -183,6 +183,12 @@
     chips: START,
   };
 
+  // Asked about a highlighted line that no topic covers
+  const QUOTE_MISS = () => ({
+    html: `That's from ${document.body.dataset.title ? `the ${document.body.dataset.title} page` : "this page"}. I'm a cat, so I don't know the story behind every line. Anoushka can tell you more: ${link(EMAIL, "email her")} or ${link(CAL, "book a call")}.`,
+    chips: START,
+  });
+
   async function answer(q) {
     const s = ` ${q.toLowerCase()} `;
     const hit = TOPICS.find((t) => t.keys.some((k) => (k.length < 4 ? new RegExp(`\\b${k}\\b`).test(s) : s.includes(k))));
@@ -312,6 +318,7 @@
         </button>
       </header>
       <div class="vc-log" role="log" aria-live="polite"></div>
+      <div class="vc-quote" hidden><span class="vc-quote-text"></span><button type="button" class="vc-x" aria-label="Remove quote">×</button></div>
       <form class="vc-form">
         <input class="vc-input" type="text" placeholder="Ask Valentino about Anoushka…" aria-label="Your question" maxlength="200" autocomplete="off">
         <button type="submit" class="vc-send" aria-label="Send" disabled>
@@ -365,14 +372,29 @@
 
   async function ask(q) {
     q = q.trim();
-    if (!q || busy) return;
+    const said = quote;
+    if ((!q && !said) || busy) return;
+    if (!q) q = "Tell me more about this.";
     busy = true;
     chips([]);
-    bubble("user", q);
+    const mine = bubble("user", q);
+    if (said) {
+      const el = document.createElement("span");
+      el.className = "vc-said";
+      el.textContent = said;
+      mine.prepend(el);
+    }
+    setQuote("");
     input.value = "";
     send.disabled = true;
     const typing = bubble("bot", '<span class="vc-dots"><i></i><i></i><i></i></span>');
-    const [reply] = await Promise.all([answer(q), new Promise((r) => setTimeout(r, 650))]);
+    // A highlighted line answers from what it's about first, then from the question
+    const pick = async () => {
+      if (!said) return answer(q);
+      for (const text of [said, q]) { const r = await answer(text); if (r !== OFF_TOPIC) return r; }
+      return QUOTE_MISS();
+    };
+    const [reply] = await Promise.all([pick(), new Promise((r) => setTimeout(r, 650))]);
     typing.innerHTML = reply.html;
     chips(reply.chips);
     busy = false;
@@ -463,13 +485,67 @@
         setTimeout(() => val.classList.remove("play"), 1600);
       }
       play();
-    }, 9000 + Math.random() * 9000);
+    }, 4000 + Math.random() * 4000);
   })();
 
   launch.addEventListener("click", () => (panel.hidden ? open() : close()));
   dockCat?.addEventListener("click", () => (panel.hidden ? open() : close()));
   panel.querySelector(".vc-close").addEventListener("click", close);
   panel.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
-  input.addEventListener("input", () => (send.disabled = !input.value.trim()));
+  input.addEventListener("input", () => (send.disabled = !input.value.trim() && !quote));
   form.addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
+
+  // Highlight any text on the page to ask Valentino about it: a small "Ask Valentino" button appears
+  // at the selection's top right and opens the chat with the quote attached. Mouse and trackpad only; on touch
+  // screens the system's own selection menu sits in the same place.
+  const quoteBox = panel.querySelector(".vc-quote");
+  const quoteText = quoteBox.querySelector(".vc-quote-text");
+  let quote = "";
+  function setQuote(text) {
+    quote = text;
+    quoteText.textContent = text;
+    quoteBox.hidden = !text;
+    input.placeholder = text ? "Ask about this quote…" : "Ask Valentino about Anoushka…";
+    send.disabled = !input.value.trim() && !text;
+  }
+  quoteBox.querySelector(".vc-x").addEventListener("click", () => { setQuote(""); input.focus(); });
+
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+  document.body.insertAdjacentHTML("beforeend", '<button type="button" class="vc-pick" hidden>Ask Valentino</button>');
+  const pickBtn = document.querySelector(".vc-pick");
+  const selected = () => {
+    const sel = getSelection();
+    if (sel.isCollapsed || !sel.rangeCount) return null;
+    const text = sel.toString().replace(/\s+/g, " ").trim();
+    const node = sel.getRangeAt(0).commonAncestorContainer;
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    if (text.length < 2 || el?.closest(".vc-panel, .vc-tree, .vc-pick, input, textarea, [contenteditable]")) return null;
+    return { text, range: sel.getRangeAt(0) };
+  };
+  const showPick = () => {
+    const s = fine.matches && selected();
+    if (!s) { pickBtn.hidden = true; return; }
+    // Sits at the selection's top right corner
+    const box = s.range.getBoundingClientRect();
+    pickBtn.hidden = false;
+    const w = pickBtn.offsetWidth, h = pickBtn.offsetHeight;
+    const top = box.top - h - 6 < 8 ? box.bottom + 6 : box.top - h - 6;
+    pickBtn.style.left = `${Math.max(8, Math.min(box.right - w, innerWidth - w - 8))}px`;
+    pickBtn.style.top = `${top}px`;
+  };
+  document.addEventListener("mouseup", () => setTimeout(showPick));
+  document.addEventListener("keyup", (e) => { if (e.shiftKey || e.key === "Shift") showPick(); });
+  document.addEventListener("selectionchange", () => { if (getSelection().isCollapsed) pickBtn.hidden = true; });
+  addEventListener("scroll", () => (pickBtn.hidden = true), { passive: true });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") pickBtn.hidden = true; });
+  // Keep the selection while the button is pressed
+  pickBtn.addEventListener("mousedown", (e) => e.preventDefault());
+  pickBtn.addEventListener("click", () => {
+    const s = selected();
+    pickBtn.hidden = true;
+    if (!s) return;
+    setQuote(s.text.length > 300 ? `${s.text.slice(0, 300).trim()}…` : s.text);
+    getSelection().removeAllRanges();
+    open();
+  });
 })();
