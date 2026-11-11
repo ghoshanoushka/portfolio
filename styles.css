@@ -1569,19 +1569,41 @@ footer .links a:hover { color: var(--primary-ink); }
 .hero-headline .accent { color: var(--primary); }
 
 
-/* ---------- Theme toggle (site.js) ---------- */
-
-.theme-toggle { position: fixed; top: 16px; right: var(--grid-margin); z-index: 60; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--background); color: var(--ink-55); cursor: pointer; transition: color .2s, border-color .2s; }
-.theme-toggle:hover { color: var(--primary-ink); border-color: currentColor; }
-.theme-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.theme-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.theme-toggle .moon { display: none; }
-:root[data-theme="dark"] .theme-toggle .sun { display: none; }
-:root[data-theme="dark"] .theme-toggle .moon { display: block; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-toggle .sun { display: none; }
-  :root:not([data-theme="light"]) .theme-toggle .moon { display: block; }
-}
+/* ---------- Lamp (site.js) ---------- */
+/* A pendant lamp with a pull chain is the theme switch. Off = the light theme, the room's ambient light.
+   On = the dark theme, lit by the lamp: a warm pool of light around it, darker toward the far corners,
+   and lit surfaces (.lit) casting soft shadows away from it. site.js sets --lamp-top, --lamp-x, --lamp-y. */
+.lamp { position: fixed; top: 0; right: var(--grid-margin); z-index: 80; width: 44px; height: 0; }
+.lamp .cord { position: absolute; left: 21.5px; top: 0; width: 1px; height: var(--lamp-top, 26px); background: #9aa1ad; }
+.lamp svg { position: absolute; left: 0; top: var(--lamp-top, 26px); width: 44px; height: 33px; overflow: visible; cursor: pointer; }
+.lamp .shade { fill: #d9d2f3; transition: fill .3s ease; }
+.lamp .rim { fill: #8F7CD6; transition: fill .3s ease; }
+.lamp .glass { fill: #eef0f3; stroke: #b8bec8; stroke-width: .8; transition: fill .3s ease, stroke .3s ease, filter .35s ease; }
+.lamp .fil { fill: none; stroke: #b0b6c0; stroke-width: .9; stroke-linecap: round; transition: stroke .3s ease; }
+.lamp .chain { position: absolute; left: 37.5px; top: calc(var(--lamp-top, 26px) + 20px); width: 0; height: 0; }
+.lamp .chain i { position: absolute; left: -1.5px; top: 0; width: 3px; height: 16px; background: radial-gradient(circle, #9aa1ad 0 1px, transparent 1.2px) 0 0 / 3px 3px; transition: height .45s cubic-bezier(.3, 1.6, .5, 1); }
+.lamp .bead { position: absolute; left: -3px; top: 15px; width: 6px; height: 7px; padding: 0; border: 0; border-radius: 2px; background: #7058CB; cursor: pointer; transition: top .45s cubic-bezier(.3, 1.6, .5, 1); }
+.lamp .bead::after { content: ""; position: absolute; inset: -10px; }
+.lamp .bead:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.lamp .chain.pull i { height: 22px; transition-duration: .12s; }
+.lamp .chain.pull .bead { top: 21px; transition-duration: .12s; }
+.lamp-on .lamp .shade { fill: #7a6cb8; }
+.lamp-on .lamp .rim { fill: #f2c46d; }
+.lamp-on .lamp .glass { fill: #ffe38a; stroke: #ffd36a; filter: drop-shadow(0 0 5px rgba(255, 200, 90, .95)) drop-shadow(0 0 16px rgba(255, 186, 72, .55)); }
+.lamp-on .lamp .fil { stroke: #e59a1f; }
+.lamp-on .lamp .cord { background: #6b7280; }
+.lamp-on .lamp .chain i { background-image: radial-gradient(circle, #8a919d 0 1px, transparent 1.2px); }
+.lamp-on .lamp .bead { background: #A493E3; }
+.lamp-light { position: fixed; inset: 0; z-index: 70; pointer-events: none; opacity: 0; transition: opacity .5s ease; }
+.lamp-light.warm { background: radial-gradient(circle at var(--lamp-x) var(--lamp-y), rgba(255, 196, 120, .30), rgba(255, 190, 110, .13) 24%, rgba(255, 190, 110, .04) 45%, rgba(255, 190, 110, 0) 65%); mix-blend-mode: screen; }
+.lamp-light.dim { background: radial-gradient(circle at var(--lamp-x) var(--lamp-y), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, .28) 78%, rgba(0, 0, 0, .45) 100%); mix-blend-mode: multiply; }
+.lamp-on .lamp-light { opacity: 1; }
+/* No transition here: it would replace the element's own (the home cards animate transform) */
+.lamp-on .lit { box-shadow: var(--lx) var(--ly) 36px -4px rgba(0, 0, 0, .6); }
+@media (prefers-reduced-motion: reduce) { .lamp-light, .lamp .chain i, .lamp .bead { transition: none; } }
+/* On phones the nav scrolls away, so the lamp goes with it rather than hanging over the content */
+@media (max-width: 640px) { .lamp { position: absolute; } }
+@media print { .lamp, .lamp-light { display: none; } }
 
 /* ---------- Sidebar nav pill (site.js) ---------- */
 
@@ -1817,7 +1839,7 @@ footer .links a:hover { color: var(--primary-ink); }
 @media (max-width: 560px) { .pt-bar span { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .pt-skel { animation: none; } }
 /* TL;DR toggle: the short version keeps marked sections and drops marked blocks */
-/* Sticks at the top right, beside the theme toggle (moved to <body> in site.js so no ancestor transform traps it) */
+/* Sticks at the top right, under the lamp (moved to <body> in site.js so no ancestor transform traps it) */
 .tldr-toggle { position: fixed; top: 16px; right: calc(var(--grid-margin) + 44px); z-index: 60; height: 36px; align-items: center; border: 1px solid var(--border); background: var(--background); }
 .tldr-toggle { overflow: visible; box-shadow: 0 4px 14px -6px rgba(50, 64, 79, .25); }
 .tldr-toggle button { font-weight: 500; }
@@ -2022,8 +2044,8 @@ html[data-intro] .intro {
 .cards-bio { font-size: 14px; color: var(--ink-55); }
 .cards-bio a { color: var(--ink-80); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; transition: color .2s; }
 .cards-bio a:hover { color: var(--primary-ink); }
-/* Room on the right for the theme toggle, which is fixed there */
-.cards-nav { display: flex; align-items: center; gap: 24px; font-size: 14px; }
+/* Room on the right for the lamp, which hangs just past the last link */
+.cards-nav { display: flex; align-items: center; gap: 24px; margin-right: 58px; font-size: 14px; }
 .cards-nav > a { color: var(--ink-55); transition: color .2s; }
 .cards-nav > a:hover { color: var(--ink-100); }
 .cards-nav .cards-cta { padding: 8px 14px; border-radius: 999px; background: var(--foreground); color: var(--background); }
@@ -2038,16 +2060,13 @@ html[data-intro] .intro {
 
 @media (max-width: 640px) {
   .cards-head { padding-top: 20px; }
-  .cards-nav { width: 100%; gap: 16px; padding-right: 0; }
+  .cards-nav { width: calc(100% - 58px); gap: 16px; padding-right: 0; }
   .cards-nav .cards-cta { margin-left: auto; }
 }
 
 
 .site-head { grid-column: 1 / -1; }
 .cards-nav > a[aria-current="page"] { color: var(--ink-100); }
-/* In the header the theme switch is a plain icon, in line with the links */
-.cards-nav .theme-toggle { position: static; width: 28px; height: 28px; margin: 0 -4px; border: 0; border-radius: 50%; background: none; box-shadow: none; color: var(--ink-55); }
-.cards-nav .theme-toggle:hover { color: var(--ink-100); }
 
 /* No side pill, top bar or phone dock any more: the header does that job */
 .mobile-nav, .dock { display: none !important; }
@@ -2145,7 +2164,7 @@ a.fun-tile:hover::after { transform: scale(1.015); }
 
 /* Inner pages: the nav stays pinned where it sits, and picks up a pill once the page scrolls */
 @media (min-width: 641px) {
-  .site-head .cards-nav { position: fixed; top: 22px; right: var(--grid-margin); z-index: 70; padding: 6px 10px 6px 18px; border-radius: 999px; transition: background-color .25s, box-shadow .25s; }
+  .site-head .cards-nav { position: fixed; top: 22px; right: calc(var(--grid-margin) + 58px); z-index: 70; margin-right: 0; padding: 6px 18px; border-radius: 999px; transition: background-color .25s, box-shadow .25s; }
   .scrolled .site-head .cards-nav { background: color-mix(in srgb, var(--background) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 0 0 1px var(--border), 0 6px 18px -10px rgba(50, 64, 79, .3); }
 }
 .to-top { position: fixed; right: 36px; bottom: 184px; z-index: 55; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--background); color: var(--ink-80); box-shadow: 0 0 0 1px var(--border), 0 6px 18px -10px rgba(50, 64, 79, .3); cursor: pointer; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .25s, transform .25s, color .2s; }

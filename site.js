@@ -207,23 +207,103 @@ function renderChrome() {
     </footer>`
   );
 
-  // Light/dark toggle. The choice is saved; until then the system setting decides.
-  const SUN = '<svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>';
-  const MOON = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
-  document.body.insertAdjacentHTML("beforeend", `<button type="button" class="theme-toggle">${SUN}${MOON}</button>`);
-  const toggle = document.querySelector(".theme-toggle");
-  // The theme switch sits at the end of the header nav.
-  const headNav = document.querySelector(".cards-nav");
-  if (headNav) headNav.appendChild(toggle);
-  const isDark = () => (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
-  const label = () => toggle.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
-  label();
-  toggle.addEventListener("click", () => {
-    const next = isDark() ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    try { localStorage.setItem("theme", next); } catch {}
-    label();
-  });
+  // The lamp is the light/dark switch: pull the chain to turn it on (dark) or off (light).
+  // The choice is saved; until then the system setting decides.
+  const html = document.documentElement;
+  const isDark = () => (html.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+  html.classList.toggle("lamp-on", isDark());
+  document.body.insertAdjacentHTML("beforeend", `
+    <div class="lamp-light warm"></div><div class="lamp-light dim"></div>
+    <div class="lamp">
+      <span class="cord"></span>
+      <svg viewBox="0 0 40 30" aria-hidden="true">
+        <circle class="glass" cx="20" cy="19" r="6.5"/>
+        <path class="fil" d="M16.5 19c0 1.8 1.4 1.8 1.4 0s1.4-1.8 1.4 0 1.4 1.8 1.4 0 1.4-1.8 1.4 0 1.4 1.8 1.4 0"/>
+        <path class="shade" d="M17.5 0h5l1 6 11.5 5.6c2.4 1.2 3.5 3 3.5 5.4v.5H1.5V17c0-2.4 1.1-4.2 3.5-5.4L16.5 6z"/>
+        <rect class="rim" x="1.5" y="17" width="37" height="1.2" rx=".6"/>
+      </svg>
+      <span class="chain"><i></i><button type="button" class="bead" role="switch" aria-label="Lamp"></button></span>
+    </div>`);
+  const lamp = document.querySelector(".lamp"), chain = lamp.querySelector(".chain"), bead = chain.querySelector(".bead");
+  bead.setAttribute("aria-checked", isDark());
+
+  // The shade sits level with the middle of the nav. offsetTop ignores the nav's fade-in transform.
+  const hang = () => {
+    const nav = document.querySelector(".cards-nav");
+    let top = 0;
+    for (let el = nav; el; el = el.offsetParent) top += el.offsetTop;
+    const mid = nav ? top + nav.offsetHeight / 2 : 42;
+    html.style.setProperty("--lamp-top", `${Math.round(mid - 13)}px`);
+    const r = lamp.getBoundingClientRect();
+    html.style.setProperty("--lamp-x", `${r.left + 22}px`);
+    html.style.setProperty("--lamp-y", `${mid + 8}px`);
+  };
+
+  // Lit surfaces cast shadows away from the lamp. A surface is what you see (a background, border, image
+  // or clipped rounded box), not a transparent wrapper, so shadows follow its rounded corners. Cards that
+  // paint themselves on a full-size ::after lend their corners to the card.
+  const LIT = ".ab-me, .project-content-media, .panel-card, .stage-card, .polaroid, .bento-tile, .fun-tile, .project-card, figure, .vc-say, .content img";
+  const surface = (el) => {
+    const c = getComputedStyle(el);
+    return /^(IMG|VIDEO|PICTURE|CANVAS)$/.test(el.tagName) || !/rgba\(0, 0, 0, 0\)|transparent/.test(c.backgroundColor)
+      || parseFloat(c.borderTopWidth) > 0 || (parseFloat(c.borderTopLeftRadius) > 0 && c.overflow !== "visible");
+  };
+  const pseudo = (el) => ["::after", "::before"].map((w) => getComputedStyle(el, w))
+    .find((c) => c.content !== "none" && c.inset === "0px" && c.backgroundImage + c.backgroundColor !== "nonergba(0, 0, 0, 0)");
+  const find = (el, out) => {
+    if (el.offsetWidth * el.offsetHeight < 12000) return;
+    if (surface(el)) return out.push(el);
+    const ps = pseudo(el);
+    if (ps) { el.style.borderRadius = ps.borderRadius; return out.push(el); }
+    [...el.children].forEach((k) => find(k, out));
+  };
+  let lit = [];
+  const collect = () => {
+    lit.forEach((el) => el.classList.remove("lit"));
+    lit = [];
+    [...document.querySelectorAll(LIT)].filter((el, i, a) => !a.some((p) => p !== el && p.contains(el))).forEach((el) => find(el, lit));
+    lit.forEach((el) => el.classList.add("lit"));
+  };
+  const place = () => {
+    if (!html.classList.contains("lamp-on")) return;
+    const r = lamp.getBoundingClientRect(), lx = r.left + 22, ly = parseFloat(getComputedStyle(html).getPropertyValue("--lamp-y"));
+    for (const el of lit) {
+      const b = el.getBoundingClientRect();
+      if (b.bottom < -200 || b.top > innerHeight + 200) continue;
+      const dx = b.left + b.width / 2 - lx, dy = b.top + b.height / 2 - ly, d = Math.hypot(dx, dy) || 1;
+      el.style.setProperty("--lx", `${(dx / d * 14).toFixed(1)}px`);
+      el.style.setProperty("--ly", `${(dy / d * 14).toFixed(1)}px`);
+    }
+  };
+  // Re-aim shadows on scroll and while anything animates (the home cards swing without scrolling)
+  let raf = 0, until = 0;
+  const follow = (ms) => {
+    until = Math.max(until, performance.now() + ms);
+    if (raf) return;
+    const step = () => { place(); raf = performance.now() < until ? requestAnimationFrame(step) : 0; };
+    raf = requestAnimationFrame(step);
+  };
+  addEventListener("scroll", () => follow(0), { passive: true });
+  addEventListener("resize", () => { hang(); follow(0); });
+  document.addEventListener("transitionstart", () => follow(900));
+  document.addEventListener("animationstart", () => follow(900));
+  addEventListener("load", () => { hang(); collect(); follow(0); });
+  hang(); collect(); place();
+
+  const pull = () => {
+    chain.classList.add("pull");
+    setTimeout(() => {
+      chain.classList.remove("pull");
+      const next = isDark() ? "light" : "dark";
+      html.dataset.theme = next;
+      html.classList.toggle("lamp-on", next === "dark");
+      try { localStorage.setItem("theme", next); } catch {}
+      bead.setAttribute("aria-checked", next === "dark");
+      if (next === "dark") { collect(); place(); }
+    }, 120);
+  };
+  bead.addEventListener("click", pull);
+  lamp.querySelector("svg").addEventListener("click", pull);
 
   const clock = document.querySelector(".clock");
   const fmt = new Intl.DateTimeFormat("en-US", { timeZone: SITE.timezone, hour: "numeric", minute: "2-digit", second: "2-digit", timeZoneName: "short" });
