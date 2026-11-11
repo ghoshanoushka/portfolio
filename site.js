@@ -1965,7 +1965,7 @@ function initTldr() {
   let timer;
   const say = (ms = 2600) => {
     const short = document.body.classList.contains("tldr");
-    bubble.textContent = short ? "You're reading the short version. Want the details? Try Full story." : "Short on time? TL;DR has the highlights.";
+    bubble.textContent = short ? "You're reading the short version.\nWant the details? Try Full story." : "Short on time?\nTL;DR has the highlights.";
     bubble.hidden = false;
     clearTimeout(timer);
     timer = setTimeout(() => (bubble.hidden = true), ms);
