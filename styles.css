@@ -2301,6 +2301,9 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 .vc-z i:nth-child(2) { animation-delay: 1s; font-size: 11px; }
 .vc-z i:nth-child(3) { animation-delay: 2s; font-size: 9px; }
 .awake .vc-z { display: none; }
+/* Hovering sits him up, so the Zzz fades out with the sleeping pose */
+.vc-z { transition: opacity .15s ease; }
+.vc-tree:has(.is-hover) .vc-z, .chatting .vc-z { opacity: 0; }
 @keyframes vc-z { 0% { opacity: 0; transform: translate(0, 8px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -22px); } }
 
 /* Hello bubble and the "Ask Valentino" label sit over his head, toward the page */
