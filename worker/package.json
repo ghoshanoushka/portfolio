@@ -1,0 +1,16 @@
+{
+  "name": "valentino",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "knowledge": "node build-knowledge.mjs",
+    "dev": "node build-knowledge.mjs && wrangler dev",
+    "deploy": "node build-knowledge.mjs && wrangler deploy"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.161.0"
+  }
+}

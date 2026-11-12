@@ -1,6 +1,6 @@
 // Valentino, Anoushka's grey tabby, answers questions about Anoushka, her work and himself.
-// Scripted for now: `answer()` matches keywords against TOPICS. To switch to a real model later,
-// make `answer()` call a server endpoint and keep the same return shape ({ html, chips }).
+// He asks Claude Haiku through the Cloudflare Worker in worker/ when AI_URL is set. If that fails or is unset,
+// `answer()` matches keywords against TOPICS instead. Both return { html, chips }.
 (() => {
   const R = document.body.dataset.root || "";
   const link = (href, text) => {
@@ -13,6 +13,8 @@
   const GITHUB = "https://github.com/ghoshanoushka";
   const BEHANCE = "https://www.behance.net/Anoushka-Ghosh";
   const RESUME = "https://drive.google.com/file/d/1x3pUb8lTMzYpkzIJ6nRIZ6F23U4mlWyp/view";
+
+  const AI_URL = "";
 
   const START = ["What does Anoushka do?", "Which project should I see first?", "Is she open to work?", "Who are you?"];
   const CAT = ["What are you like?", "Who's Ollie?", "What does Anoushka do?"];
@@ -193,6 +195,35 @@
     const s = ` ${q.toLowerCase()} `;
     const hit = TOPICS.find((t) => t.keys.some((k) => (k.length < 4 ? new RegExp(`\\b${k}\\b`).test(s) : s.includes(k))));
     return hit || OFF_TOPIC;
+  }
+
+  // The model writes plain text with Markdown links. Escape it, then link only her pages and known contacts.
+  const KNOWN = [CAL, LINKEDIN, EMAIL, GITHUB, BEHANCE, RESUME];
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const md = (t) => esc(t).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (all, label, href) =>
+    /^[a-z0-9/-]+\.html(#[\w-]+)?$/.test(href) || KNOWN.includes(href) ? link(href, label) : label).replace(/\n+/g, "<br><br>");
+  const PAGE = location.pathname.split("/").slice(R ? -2 : -1).join("/") || "index.html";
+  const turns = [];
+
+  async function askAI(q, said) {
+    if (!AI_URL) return null;
+    const stop = new AbortController();
+    const timer = setTimeout(() => stop.abort(), 15000);
+    try {
+      const res = await fetch(AI_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q, quote: said, page: PAGE, history: turns }),
+        signal: stop.signal,
+      });
+      if (!res.ok) return null;
+      const { reply, chips } = await res.json();
+      return reply ? { html: md(reply), chips: chips?.length ? chips : START, text: reply } : null;
+    } catch {
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   // Valentino, the grey tabby, sits in the corner on his own. Ollie's drawing is kept below but isn't shown.
@@ -394,8 +425,9 @@
       for (const text of [said, q]) { const r = await answer(text); if (r !== OFF_TOPIC) return r; }
       return QUOTE_MISS();
     };
-    const [reply] = await Promise.all([pick(), new Promise((r) => setTimeout(r, 650))]);
+    const [reply] = await Promise.all([askAI(q, said).then((r) => r || pick()), new Promise((r) => setTimeout(r, 650))]);
     typing.innerHTML = reply.html;
+    turns.push({ role: "user", text: said ? `"${said}" ${q}` : q }, { role: "assistant", text: reply.text || typing.textContent });
     chips(reply.chips);
     busy = false;
   }
