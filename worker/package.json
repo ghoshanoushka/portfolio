@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "knowledge": "node build-knowledge.mjs",
-    "dev": "node build-knowledge.mjs && wrangler dev",
+    "dev": "node build-knowledge.mjs && printf 'ANTHROPIC_API_KEY=%s\\n' \"$(tr -d '[:space:]' < api-key.txt)\" > .dev.vars && wrangler dev --port 8787",
     "deploy": "node build-knowledge.mjs && wrangler deploy"
   },
   "dependencies": {

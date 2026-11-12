@@ -14,7 +14,9 @@
   const BEHANCE = "https://www.behance.net/Anoushka-Ghosh";
   const RESUME = "https://drive.google.com/file/d/1x3pUb8lTMzYpkzIJ6nRIZ6F23U4mlWyp/view";
 
-  const AI_URL = "";
+  // Local preview talks to `npm run dev` in worker/. Set the live URL once the worker is deployed.
+  const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const AI_URL = LOCAL ? "http://localhost:8787" : "";
 
   const START = ["What does Anoushka do?", "Which project should I see first?", "Is she open to work?", "Who are you?"];
   const CAT = ["What are you like?", "Who's Ollie?", "What does Anoushka do?"];

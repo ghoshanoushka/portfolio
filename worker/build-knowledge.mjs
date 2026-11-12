@@ -32,9 +32,9 @@ const text = (html) => html
 const chat = readFileSync(path.join(root, "chat.js"), "utf8");
 const topicsSrc = chat.slice(chat.indexOf("const TOPICS = ["), chat.indexOf("\n  ];", chat.indexOf("const TOPICS = [")) + 5);
 const consts = [...chat.matchAll(/^  const (CAL|LINKEDIN|EMAIL|GITHUB|BEHANCE|RESUME|START|CAT) = .*;$/gm)].map((m) => m[0]).join("\n");
-const link = (href, label) => `${label} (${href})`;
+const link = (href, label) => `[${label}](${href})`;
 const TOPICS = new Function("link", `${consts}\n${topicsSrc}\nreturn TOPICS;`)(link);
-const answers = TOPICS.map((t) => `- ${t.html.replace(/<[^>]+>/g, "")}`).join("\n");
+const answers = TOPICS.map((t) => `- On ${t.keys.slice(0, 4).join(", ")}: ${t.html.replace(/<[^>]+>/g, "")}`).join("\n");
 
 const out = [
   ...PAGES.map((p) => `<page path="${p}">\n${text(readFileSync(path.join(root, p), "utf8"))}\n</page>`),

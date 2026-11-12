@@ -14,3 +14,7 @@ media/mensio/Data Explorer Revamp Technical Specs.docx
 
 # Resume source and PDFs: has contact details, stays on this laptop
 resume/
+
+# Valentino API key for local testing only
+api-key.txt
+worker/.dev.vars
