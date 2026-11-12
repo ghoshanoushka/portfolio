@@ -101,7 +101,12 @@
       chips: ["Is she open to work?"],
     },
     {
-      keys: ["tool", "figma", "code", "coding", "github", "ai", "claude", "prototyp", "software", "stack", "develop"],
+      keys: ["use ai", "ai in", "ai for", "with ai", "ai tool", "workflow", "claude", "automat", "ai"],
+      html: `She uses AI across her whole workflow. She builds prototypes, and this site, with Claude Code. She has Claude work in Figma with her own components, like rebuilding charts or making dark-mode versions, and run design QA passes over her frames. She also uses it to turn research notes into themes. AI takes the repetitive parts, so she spends her time on the design decisions.`,
+      chips: ["What tools does she use?", "What's her design process?"],
+    },
+    {
+      keys: ["tool", "figma", "code", "coding", "github", "prototyp", "software", "stack", "develop"],
       html: `Figma for design and prototyping, and code for the rest. She builds and prototypes with AI tools like Claude Code, and this site was made that way. Her code is on ${link(GITHUB, "GitHub")}.`,
       chips: ["What kind of role is she looking for?", "What's her design process?"],
     },
