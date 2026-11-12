@@ -106,8 +106,8 @@
       chips: ["What tools does she use?", "What's her design process?"],
     },
     {
-      keys: ["tool", "figma", "code", "coding", "github", "prototyp", "software", "stack", "develop"],
-      html: `Figma for design and prototyping, and code for the rest. She builds and prototypes with AI tools like Claude Code, and this site was made that way. Her code is on ${link(GITHUB, "GitHub")}.`,
+      keys: ["tool", "figma", "figjam", "miro", "adobe", "illustrator", "photoshop", "code", "coding", "github", "prototyp", "software", "stack", "develop"],
+      html: `Figma, mostly, for design and prototyping. She uses FigJam and Miro for mapping and workshops, Adobe apps for visual and brand work, and other prototyping tools when a flow needs more than Figma. For building, she codes with Claude Code, which is how this site was made. Her code is on ${link(GITHUB, "GitHub")}.`,
       chips: ["What kind of role is she looking for?", "What's her design process?"],
     },
     {
