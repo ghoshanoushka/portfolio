@@ -328,7 +328,7 @@
     <div class="vc-scene vc-drawn" aria-hidden="true">
       <div class="vc-cat" data-cat="valentino">
         <span class="vc-pose vc-curl"><img src="${IMG}/val-curl.webp" alt=""></span>
-        <span class="vc-pose vc-loaf"><img src="${IMG}/val-loaf.webp" alt=""><img class="vc-blink" src="${IMG}/val-loaf-blink.webp" alt=""></span>
+        <span class="vc-pose vc-loaf"><span class="vc-rear"><img src="${IMG}/val-loaf.webp" alt=""></span><img class="vc-front" src="${IMG}/val-loaf.webp" alt=""><img class="vc-blink" src="${IMG}/val-loaf-blink.webp" alt=""></span>
         <span class="vc-pose vc-sit"><img class="vc-wag" src="${IMG}/val-sit-tail.webp" alt=""><img src="${IMG}/val-sit-body.webp" alt=""><img class="vc-blink" src="${IMG}/val-sit-blink.webp" alt=""></span>
         <span class="vc-ball"></span>
         <span class="vc-head"><span class="vc-pupils"></span></span>
@@ -521,7 +521,7 @@
     setTimeout(() => {
       if (tree.classList.contains("awake") && panel.hidden) {
         val.classList.add("play");
-        setTimeout(() => val.classList.remove("play"), 1600);
+        setTimeout(() => val.classList.remove("play"), 2300);
       }
       play();
     }, 4000 + Math.random() * 4000);

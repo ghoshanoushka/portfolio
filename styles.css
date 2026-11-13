@@ -2465,7 +2465,14 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 .vc-ball { position: absolute; left: -2px; bottom: 1px; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #C4B7F2, #8F7CD6 70%); box-shadow: 0 2px 4px rgba(30, 20, 60, .25); opacity: 0; transition: opacity .3s; }
 /* Awake, the ball wobbles under his paw; now and then he bats it away and it rolls back */
 .awake .vc-ball { opacity: 1; animation: vc-ballidle 2.6s ease-in-out infinite; }
-.awake .vc-cat.play .vc-ball { animation: vc-ballroll 1.6s cubic-bezier(.3, .7, .4, 1); }
+/* Before he bats it, he wiggles his bum like he's about to pounce. The loaf is split along his back haunch:
+   the back half sits under the front and rocks from the hip. Clip points are in the unflipped image. */
+.vc-rear { position: absolute; inset: 0; transform-origin: 65% 77%; }
+.vc-rear img { clip-path: polygon(0 0, 46% 0, 42% 40%, 41% 75%, 49% 82%, 49% 100%, 0 100%); }
+.vc-loaf .vc-front { clip-path: polygon(40% 0, 100% 0, 100% 100%, 43% 100%, 43% 82%, 34.5% 75%, 34.5% 55%, 36% 35%); }
+.awake .vc-cat.play .vc-rear { animation: vc-wiggle .7s ease-in-out; }
+@keyframes vc-wiggle { 15% { rotate: -3deg; } 30% { rotate: 2.5deg; } 45% { rotate: -3deg; } 60% { rotate: 2.5deg; } 78% { rotate: -1.5deg; } }
+.awake .vc-cat.play .vc-ball { animation: vc-ballroll 1.6s cubic-bezier(.3, .7, .4, 1) .7s; }
 .vc-cat.is-hover .vc-ball, .chatting .vc-ball { opacity: 0; }
 .vc-drawn .vc-head { position: absolute; left: 25%; top: 10%; width: 45%; height: 45%; }
 @keyframes vc-breathe { 50% { transform: scale(1.025, .985); } }
@@ -2477,7 +2484,7 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 /* The label and bubble sit centred just above his head, and rise with him when he sits up */
 .vc-say.vc-say-val, .vc-ask { left: 50%; right: auto; bottom: 60px; translate: calc(-50% - 8px) 0; transition: bottom .35s cubic-bezier(.34, 1.4, .64, 1); }
 .vc-tree:has(.vc-cat.is-hover) :is(.vc-ask, .vc-say-val), .vc-tree.chatting :is(.vc-ask, .vc-say-val) { bottom: 76px; }
-@media (prefers-reduced-motion: reduce) { .vc-pose, .vc-pose img, .vc-ball { animation: none !important; transition: none; } }
+@media (prefers-reduced-motion: reduce) { .vc-pose, .vc-pose img, .vc-rear, .vc-ball { animation: none !important; transition: none; } }
 
 /* Fun bento: tall | two stacked | tall, so no card gets wider than a column */
 .fun-page .fun-bento { max-width: 1040px; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 240px; }
