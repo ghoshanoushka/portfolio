@@ -391,7 +391,7 @@
     return el;
   }
 
-  function chips(list) {
+  function chips(list, keep) {
     log.querySelectorAll(".vc-chips").forEach((c) => c.remove());
     if (!list?.length) return;
     const wrap = document.createElement("div");
@@ -405,7 +405,7 @@
       wrap.append(b);
     });
     log.append(wrap);
-    scroll();
+    if (!keep) scroll();
   }
 
   async function ask(q) {
@@ -435,7 +435,10 @@
     const [reply] = await Promise.all([askAI(q, said).then((r) => r || pick()), new Promise((r) => setTimeout(r, 650))]);
     typing.innerHTML = reply.html;
     turns.push({ role: "user", text: said ? `"${said}" ${q}` : q }, { role: "assistant", text: reply.text || typing.textContent });
-    chips(reply.chips);
+    chips(reply.chips, true);
+    // Land on the start of the answer, not below its suggestions, so long replies read from the top
+    const top = log.scrollTop + typing.getBoundingClientRect().top - log.getBoundingClientRect().top - 12;
+    log.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     busy = false;
   }
 
