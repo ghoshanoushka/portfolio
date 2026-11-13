@@ -1,0 +1,1 @@
+- Mensio: the other product designer was Serena. Anoushka and Serena co-owned every design decision.
