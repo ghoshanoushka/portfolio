@@ -32,7 +32,7 @@ html:has(.home-cards .projects:not(.is-grid)), .home-cards:has(.projects:not(.is
 /* Card face */
 .stage-card::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: 22px; background: radial-gradient(120% 90% at 80% 10%, var(--c2), var(--c1) 70%); box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--c1) 70%, transparent); }
 /* Colour smear behind the side cards */
-.stage-card::before { content: ""; position: absolute; inset: 4% -70%; z-index: -2; pointer-events: none; border-radius: 50%; background: linear-gradient(90deg, var(--c1), var(--c2), var(--c1)); filter: blur(46px); opacity: 0; transition: opacity .8s; }
+.stage-card::before { content: ""; position: absolute; inset: 4% -70%; z-index: -2; pointer-events: none; border-radius: 50%; background: linear-gradient(90deg, var(--c1), var(--c2), var(--c1)); filter: blur(46px); opacity: 0; transition: opacity .3s cubic-bezier(.4, 0, 1, 1); }
 
 .stage-card[data-pos="center"] { z-index: 2; }
 .projects[data-mode="bend"] .stage-card[data-pos="left"] { --k-tx: calc(-50vw + var(--w) * .18); --k-ry: 64deg; --k-s: 1.12; filter: saturate(1.15); }
@@ -40,7 +40,8 @@ html:has(.home-cards .projects:not(.is-grid)), .home-cards:has(.projects:not(.is
 .projects[data-mode="bend"] .stage-card[data-pos="far-left"] { --k-tx: -110vw; --k-ry: 80deg; opacity: 0; }
 .projects[data-mode="bend"] .stage-card[data-pos="far-right"] { --k-tx: 110vw; --k-ry: -80deg; opacity: 0; }
 /* The side cards trail a soft glow of their colours in every carousel layout */
-.projects:not(.is-grid) .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: .55; }
+/* A glow leaves quickly, and only fades in once its card has nearly slid into place, so it never shows up ahead of the card */
+.projects:not(.is-grid) .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: .55; transition: opacity .5s cubic-bezier(.33, 0, .2, 1) .4s; }
 /* Stack hides its glow behind the front card, and Drum turns it in 3D into a halo: both get a fainter, wider blur */
 .projects:is([data-mode="stack"], [data-mode="drum"]) .stage-card::before { inset: 10% -40%; filter: blur(80px); }
 .projects[data-mode="stack"] .stage-card[data-pos="right"]::before { opacity: .22; }
