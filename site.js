@@ -478,6 +478,26 @@ function renderCardStage(root) {
     });
   };
   const go = (to) => { cur = ((to % n) + n) % n; paint(); };
+  // Layouts bend the side cards in opposite directions, so tweening them across draws them flat through the middle.
+  // Instead the side cards fade out where they are, jump while hidden, and fade in at their new places, nearest
+  // first. The middle card stays put in every layout, so it just tweens its size.
+  let switching = 0;
+  const switchMode = (m) => {
+    if (m === root.dataset.mode) return;
+    if (noMotion || isGrid()) { setMode(m); return paint(); }
+    const token = ++switching;
+    root.classList.remove("mode-in");
+    root.classList.add("mode-out");
+    setTimeout(() => {
+      if (token !== switching) return;
+      // While "mode-out" is on, the side cards only transition opacity, so they jump to the new layout unseen
+      setMode(m);
+      paint();
+      void root.offsetWidth;
+      root.classList.replace("mode-out", "mode-in");
+      setTimeout(() => token === switching && root.classList.remove("mode-in"), 900);
+    }, 220);
+  };
   let saved = null;
   try { saved = localStorage.getItem("homeView"); } catch {}
   // People who ask their system for reduced motion start on the still grid too.
@@ -489,7 +509,7 @@ function renderCardStage(root) {
   phone.addEventListener("change", (e) => { if (e.matches) setView("grid", false); });
   root.addEventListener("click", (e) => {
     const mode = e.target.closest("[data-mode]");
-    if (mode) { setMode(mode.dataset.mode); return paint(); }
+    if (mode) return switchMode(mode.dataset.mode);
     const el = e.target.closest(".stage-card");
     if (!el || isGrid() || el.getAttribute("aria-hidden") === "false") return;
     e.preventDefault();
