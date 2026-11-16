@@ -126,11 +126,11 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 .content:has(.projects.is-grid) .home-made { padding-bottom: 96px; }
 
 /* Switching layouts (site.js switchMode): side cards fade out in place, then fade in at their new places, nearest first */
-.projects.mode-out .stage-card:not([data-d="0"]) { opacity: 0 !important; transition: opacity .2s ease; }
-.projects.mode-out .stage-card:not([data-d="0"])::before { opacity: 0 !important; transition: opacity .2s ease; }
-.projects.mode-in .stage-card:not([data-d="0"]) { transition: opacity .45s ease .25s, filter .45s ease .25s; }
-.projects.mode-in .stage-card:is([data-d="2"], [data-d="-2"]) { transition-delay: .35s; }
-.projects.mode-in .stage-card:not([data-d="0"])::before { transition: opacity .6s ease .3s; }
+.projects.mode-out .stage-card:not([data-d="0"]) { opacity: 0 !important; transition: opacity .12s ease; }
+.projects.mode-out .stage-card:not([data-d="0"])::before { opacity: 0 !important; transition: opacity .12s ease; }
+.projects.mode-in .stage-card:not([data-d="0"]) { transition: opacity .3s ease .05s, filter .3s ease .05s; }
+.projects.mode-in .stage-card:is([data-d="2"], [data-d="-2"]) { transition-delay: .1s; }
+.projects.mode-in .stage-card:not([data-d="0"])::before { transition: opacity .35s ease .08s; }
 
 @media (prefers-reduced-motion: reduce) { .stage-card, .stage-card::before { transition: none; } }
 
