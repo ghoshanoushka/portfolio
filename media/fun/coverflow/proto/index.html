@@ -49,10 +49,13 @@
     .search { display: flex; align-items: center; gap: 8px; height: 38px; margin: 18px 0 20px; padding: 0 14px; border-radius: 19px; background: rgba(0, 0, 0, .16); font-size: 14px; color: rgba(255, 255, 255, .55); }
     .search svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
     .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 16px; }
-    .grid figure { margin: 0; }
-    .grid img { display: block; width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; }
-    .grid figcaption { margin-top: 7px; font-size: 13px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .grid figcaption span { display: block; color: rgba(255, 255, 255, .58); }
+    .grid .song { display: block; width: 100%; text-align: left; border-radius: 12px; }
+    .grid img { display: block; width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; transition: filter .2s, scale .2s; }
+    .grid .song:hover img, .grid .song:focus-visible img { filter: brightness(1.08); scale: 1.03; }
+    .grid .song:focus-visible { outline: 2px solid rgba(255, 255, 255, .8); outline-offset: 3px; }
+    .grid .song:active img { scale: .98; }
+    .grid .cap { display: block; margin-top: 7px; font-size: 13px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .grid .cap span { display: block; color: rgba(255, 255, 255, .58); }
     .nudge { position: absolute; right: 232px; top: 66px; padding: 9px 16px; border-radius: 18px; background: #fff; color: #1d1d22; font-size: 15px; font-weight: 600;
       box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .45); animation: bob 1.6s ease-in-out infinite; transition: opacity .3s; pointer-events: none; }
     /* Until Coverflow is tried, its button glows and pulses */
@@ -241,7 +244,7 @@
     addEventListener("resize", fit); fit();
 
     // Library grid
-    $("#grid").innerHTML = [2, 4, 0, 3, 1, 5].map((i) => `<figure><img src="${ALBUMS[i].img}" alt=""><figcaption>${ALBUMS[i].t}<span>${ALBUMS[i].a}</span></figcaption></figure>`).join("");
+    $("#grid").innerHTML = [2, 4, 0, 3, 1, 5].map((i) => `<button class="song" data-i="${i}"><img src="${ALBUMS[i].img}" alt=""><span class="cap">${ALBUMS[i].t}<span>${ALBUMS[i].a}</span></span></button>`).join("");
 
     // ---------- Coverflow ----------
     let cur = 2, playing = 2, isPlaying = false, mode = "lib";
@@ -348,6 +351,8 @@
       if (isPlaying) { setPlaying(false); if (mode === "race") setMode("cf"); return; }
       playAlbum(mode === "cf" ? cur : playing);
     });
+    // A song in the Library plays when clicked (or pauses, if it's the one playing), and Coverflow will open on it
+    $("#grid").addEventListener("click", (e) => { const b = e.target.closest(".song"); if (!b) return; const i = +b.dataset.i; cur = i; if (i === playing && isPlaying) setPlaying(false); else playAlbum(i); });
     // Skipping in the Library or the race moves the cover too, so Coverflow always opens on the song that's playing
     $("#next").addEventListener("click", () => { const i = (playing + 1) % ALBUMS.length; if (mode === "cf") go(i); else cur = i; playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
     $("#prev").addEventListener("click", () => { const i = (playing + ALBUMS.length - 1) % ALBUMS.length; if (mode === "cf") go(i); else cur = i; playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
