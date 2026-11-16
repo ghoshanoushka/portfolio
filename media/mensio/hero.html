@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mensio hero</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* Three beats on a loop: a customer's question, Guided Setup flashing past as they build the chart themselves,
        then the fetched chart as a table, scatterplot and heatmap. No analyst in the loop. Screens are exports of the Revamped Screens frames; the chart data is dummy data.
        Drawn at 1456px wide. */
     html, body { margin: 0; height: 100%; overflow: hidden; }
-    body { background: linear-gradient(135deg, #2b3a67, #7aaee9); font-family: Roboto, sans-serif; }
+    body { background: linear-gradient(135deg, #2b3a67, #7aaee9); font-family: Inter, sans-serif; }
     .scene { position: relative; width: 1456px; height: 100vh; }
     /* The app window rises from the bottom edge and spans the hero with the same side margins as the Deploy hero */
     .window {
@@ -53,7 +53,7 @@
 
     /* Beat 2: the steps flash past, slightly soft so they read as speed, not as something to study */
     .beat-squeeze .flash { filter: blur(.6px); }
-    .fetching { position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(13, 17, 27, .6); color: #fff; font: 500 18px/1 Roboto, sans-serif; opacity: 0; transition: opacity .25s ease; }
+    .fetching { position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(13, 17, 27, .6); color: #fff; font: 500 18px/1 Inter, sans-serif; opacity: 0; transition: opacity .25s ease; }
     .fetching span { width: 26px; height: 26px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .4); border-top-color: #fff; animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .beat-fetch .fetching { opacity: 1; }
