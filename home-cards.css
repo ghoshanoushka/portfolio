@@ -130,7 +130,7 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 .projects.mode-out .stage-card:not([data-d="0"])::before { opacity: 0 !important; transition: opacity .12s ease; }
 .projects.mode-in .stage-card:not([data-d="0"]) { transition: opacity .3s ease .05s, filter .3s ease .05s; }
 .projects.mode-in .stage-card:is([data-d="2"], [data-d="-2"]) { transition-delay: .1s; }
-.projects.mode-in .stage-card:not([data-d="0"])::before { transition: opacity .35s ease .08s; }
+.projects.mode-in .stage-card:not([data-d="0"])::before { transition: opacity .4s ease .3s; }
 
 @media (prefers-reduced-motion: reduce) { .stage-card, .stage-card::before { transition: none; } }
 

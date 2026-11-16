@@ -495,7 +495,7 @@ function renderCardStage(root) {
       paint();
       void root.offsetWidth;
       root.classList.replace("mode-out", "mode-in");
-      setTimeout(() => token === switching && root.classList.remove("mode-in"), 500);
+      setTimeout(() => token === switching && root.classList.remove("mode-in"), 800);
     }, 130);
   };
   let saved = null;
