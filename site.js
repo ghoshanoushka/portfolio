@@ -456,7 +456,10 @@ function renderCardStage(root) {
     setTimeout(() => cards.forEach((el) => el.classList.remove("jump")), 700);
   };
   document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
-  const offset = (i) => ((((i - cur) % n) + n + Math.floor(n / 2)) % n) - Math.floor(n / 2);
+  // The one spare card waits on the side the cards are coming from, so it can slide in from there while the card
+  // leaving the other side glides away instead of vanishing (n is always even)
+  let dir = 1;
+  const offset = (i) => { const h = dir < 0 ? n / 2 - 1 : n / 2; return ((((i - cur) % n) + n + h) % n) - h; };
   const last = new Map();
   const place = (el, d) => {
     el.dataset.d = d;
@@ -477,7 +480,7 @@ function renderCardStage(root) {
       el.setAttribute("aria-hidden", shown ? "false" : "true");
     });
   };
-  const go = (to) => { cur = ((to % n) + n) % n; paint(); };
+  const go = (to) => { if (to !== cur) dir = Math.sign(to - cur); cur = ((to % n) + n) % n; paint(); };
   // Layouts bend the side cards in opposite directions, so tweening them across draws them flat through the middle.
   // Instead the side cards fade out where they are, jump while hidden, and fade in at their new places, nearest
   // first. The middle card stays put in every layout, so it just tweens its size.

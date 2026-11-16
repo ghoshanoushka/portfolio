@@ -32,7 +32,7 @@ html:has(.home-cards .projects:not(.is-grid)), .home-cards:has(.projects:not(.is
 /* Card face */
 .stage-card::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: 22px; background: radial-gradient(120% 90% at 80% 10%, var(--c2), var(--c1) 70%); box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--c1) 70%, transparent); }
 /* Colour smear behind the side cards */
-.stage-card::before { content: ""; position: absolute; inset: 4% -70%; z-index: -2; pointer-events: none; border-radius: 50%; background: linear-gradient(90deg, var(--c1), var(--c2), var(--c1)); filter: blur(46px); opacity: 0; transition: opacity .3s cubic-bezier(.4, 0, 1, 1); }
+.stage-card::before { content: ""; position: absolute; inset: 4% -70%; z-index: -2; pointer-events: none; border-radius: 50%; background: linear-gradient(90deg, var(--c1), var(--c2), var(--c1)); filter: blur(46px); opacity: 0; transition: opacity .15s cubic-bezier(0, 0, .2, 1); }
 
 .stage-card[data-pos="center"] { z-index: 2; }
 .projects[data-mode="bend"] .stage-card[data-pos="left"] { --k-tx: calc(-50vw + var(--w) * .18); --k-ry: 64deg; --k-s: 1.12; filter: saturate(1.15); }
@@ -42,6 +42,12 @@ html:has(.home-cards .projects:not(.is-grid)), .home-cards:has(.projects:not(.is
 /* The side cards trail a soft glow of their colours in every carousel layout */
 /* A glow leaves quickly, and only fades in once its card has nearly slid into place, so it never shows up ahead of the card */
 .projects:not(.is-grid) .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: .55; transition: opacity .5s cubic-bezier(.33, 0, .2, 1) .4s; }
+/* Bend's side cards are big and close, so their haze is fainter and drifts in more slowly */
+.projects[data-mode="bend"] .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: .3; transition: opacity .8s cubic-bezier(.33, 0, .2, 1) .4s; }
+/* Bulge packs the cards edge to edge, so an inner card's glow would wash over the card beyond it. There the haze
+   comes from the outermost cards instead, which sit underneath their neighbours, so it only spreads outward */
+.projects[data-mode="bulge"] .stage-card:is([data-pos="left"], [data-pos="right"])::before { opacity: 0; transition: opacity .15s cubic-bezier(0, 0, .2, 1); }
+.projects[data-mode="bulge"] .stage-card:is([data-d="2"], [data-d="-2"])::before { opacity: .55; transition: opacity .5s cubic-bezier(.33, 0, .2, 1) .4s; }
 /* Stack hides its glow behind the front card, and Drum turns it in 3D into a halo: both get a fainter, wider blur */
 .projects:is([data-mode="stack"], [data-mode="drum"]) .stage-card::before { inset: 10% -40%; filter: blur(80px); }
 .projects[data-mode="stack"] .stage-card[data-pos="right"]::before { opacity: .22; }
@@ -83,6 +89,8 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 /* Stack: a vertical deck. The next cards wait below and behind; the current one lifts up and away. */
 .projects[data-mode="stack"] .stage-card[data-pos="right"] { --k-ty: 9%; --k-s: .92; filter: brightness(.9); z-index: 1; }
 .projects[data-mode="stack"] .stage-card[data-pos="far-right"] { --k-ty: 17%; --k-s: .84; filter: brightness(.8); opacity: .6; z-index: 0; }
+/* Only one card peeks out under the stack; the spare waits unseen behind it */
+.projects[data-mode="stack"] .stage-card[data-pos="far-right"]:not([data-d="2"]) { opacity: 0; z-index: -1; }
 .projects[data-mode="stack"] .stage-card[data-pos="left"] { --k-ty: -115%; --k-rot: -3deg; --k-s: 1.02; opacity: 0; }
 .projects[data-mode="stack"] .stage-card[data-pos="far-left"] { --k-ty: -130%; opacity: 0; }
 .projects[data-mode="stack"] .stage-card:is([data-pos="left"], [data-pos="far-left"]) { pointer-events: none; }
@@ -102,7 +110,13 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
   --k-rr: calc((var(--w) + 14px) / .3129); --k-ry: calc(var(--d) * 18deg);
 }
 .projects[data-mode="bulge"] .stage-card:not([data-d="0"]) { filter: brightness(.92); }
-.projects[data-mode="bulge"] .stage-card:not([data-d="0"]):not([data-d="1"]):not([data-d="-1"]):not([data-d="2"]):not([data-d="-2"]) { opacity: 0; pointer-events: none; }
+/* The card past each end waits solid and a little smaller right behind the outer card, so scrolling reveals it as
+   the outer card slides away, instead of fading it in as a see-through smear. Nearer cards sit on top */
+.projects[data-mode="bulge"] .stage-card:is([data-d="1"], [data-d="-1"]) { z-index: 1; }
+.projects[data-mode="bulge"] .stage-card:is([data-d="2"], [data-d="-2"]) { z-index: 0; }
+.projects[data-mode="bulge"] .stage-card:not([data-d="0"]):not([data-d="1"]):not([data-d="-1"]):not([data-d="2"]):not([data-d="-2"]) { z-index: -1; --k-s: .85 !important; pointer-events: none; }
+.projects[data-mode="bulge"] .stage-card[data-pos="far-right"]:not([data-d="2"]) { --k-ry: 36deg; }
+.projects[data-mode="bulge"] .stage-card[data-pos="far-left"]:not([data-d="-2"]) { --k-ry: -36deg; }
 .projects[data-mode="bulge"] .stage-card:is([data-d="2"], [data-d="-2"]) { cursor: pointer; }
 
 /* Drum: the cards sit round a cylinder that turns. Eight cards, 45deg apart */
