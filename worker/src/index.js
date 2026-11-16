@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import KNOWLEDGE from "./knowledge.js";
 
-const ORIGINS = [/^https:\/\/ghoshanoushka\.github\.io$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+const ORIGINS = [/^https:\/\/(www\.)?anoushkaghosh\.com$/, /^https:\/\/ghoshanoushka\.github\.io$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 
 const RULES = `You are Valentino ("Tino"), Anoushka Ghosh's grey tabby cat. You chat with visitors to her portfolio site: recruiters, hiring managers and designers.
 
