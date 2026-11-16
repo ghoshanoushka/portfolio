@@ -11,7 +11,7 @@ const SITE = {
     { label: "LinkedIn", href: "https://www.linkedin.com/in/anoushkaghosh/" },
     { label: "Behance", href: "https://www.behance.net/Anoushka-Ghosh" },
     { label: "GitHub", href: "https://github.com/ghoshanoushka" },
-    { label: "Resume", href: "https://drive.google.com/file/d/1x3pUb8lTMzYpkzIJ6nRIZ6F23U4mlWyp/view" },
+    { label: "Resume", href: "https://drive.google.com/file/d/1BuvTeePayLb5jPZ9vAQcgdGGRKTK83Yl/view?usp=sharing" },
     { label: "Let's Chat", href: "https://calendly.com/noushka-umich/30min" },
   ],
   // `media` can be an image, .mp4 or looping .html page (e.g. "media/project.mp4").
