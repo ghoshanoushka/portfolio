@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoML Evaluations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1;1,9..144,400,0..100,0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=20261127">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:image" content="https://www.anoushkaghosh.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body data-root="../" data-page="project" data-title="AutoML Evaluations">
+  <!-- Every screen is recreated in media/automl/app.html. Layouts follow the old Hive Compare Models page and the shipped Evaluations pages; the pet-photo evaluations and their numbers are made up. -->
+  <div class="shell">
+    <div class="page-margin" style="flex:1;display:flex;flex-direction:column">
+      <div class="grid-12" style="flex:1">
+        <main class="content">
+          <article class="case-study fade-in d1">
+            <div class="project-hero" style="background:linear-gradient(135deg, #1f2430, #6b7591)"><iframe src="../media/automl/hero.html" title="The old Compare Models page gives every Best badge to one row, though five rows score 100%; then the shipped Compare Evaluations page" loading="lazy" tabindex="-1"></iframe></div>
+
+            <div class="project-measure">
+              <h1 class="project-title">Which model wins? Turning AutoML's confusing leaderboard into evaluations people can trust</h1>
+              <div class="project-meta">
+                <div><p class="project-meta-label">Role</p><p class="project-meta-value">Product design intern</p><p class="project-meta-value">Sole designer</p></div>
+                <div><p class="project-meta-label">Company</p><p class="project-meta-value">Hive, now Deploy</p><p class="project-meta-value">AutoML</p></div>
+                <div><p class="project-meta-label">Timeline</p><p class="project-meta-value">June – August 2025</p><p class="project-meta-value">Shipped August 2025</p></div>
+                <div><p class="project-meta-label">Scope</p><p class="project-meta-value">Heuristic evaluation</p><p class="project-meta-value">Competitive analysis</p><p class="project-meta-value">Product design</p></div>
+              </div>
+            </div>
+
+            <div class="project-sections">
+
+              <section id="overview" data-toc="Overview" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Overview</p>
+                <div class="project-content-text"><h2>Six models. Five score 100% on everything. One gets every “Best” badge, and the page never says why.</h2></div>
+                <div class="project-content-text"><p>Hive AutoML lets teams train image and language models without code. Once you've trained a few, you need to know which one to ship. The Compare Models page was supposed to answer that, but it showed a wall of numbers and no way to decide between them.</p></div>
+                <div class="project-content-media" style="display:flex;flex-direction:column;gap:14px">
+                  <div class="proto-tabs" role="tablist" aria-label="Old screen" data-before-tabs>
+                    <button type="button" role="tab" aria-selected="true" data-show="table">The leaderboard</button>
+                    <button type="button" role="tab" aria-selected="false" data-show="matrix">The confusion matrix</button>
+                  </div>
+                  <figure class="annot" style="margin:0" data-before="table"><div class="figure-media annot-media" style="aspect-ratio:2912 / 1492"><div class="annot-stage"><img src="../media/automl/before-leaderboard.webp" alt="Recreation of the old Compare Models leaderboard: six models, five at 100% on every metric, with Best badges on the first row only"><button type="button" class="hot" style="--x:94.5%;--y:27%;--mx:94.5%;--my:27%" data-i="0" data-f="28.6,21.9,91.8,32" aria-label="Every metric on the first row says Best, but four other rows score exactly the same.">1</button><button type="button" class="hot" style="--x:37.5%;--y:16%;--mx:37.5%;--my:16%" data-i="1" data-f="28.4,12,36.5,21.1" aria-label="The star next to Balanced Accuracy doesn't say what it means.">2</button><button type="button" class="hot" style="--x:90%;--y:9%;--mx:90%;--my:9%" data-i="2" data-f="92,6,95.1,12" aria-label="The control for choosing metrics is an unlabelled icon, and for object detection it starts with no metrics at all.">3</button></div></div><figcaption>Recreated from the old Compare Models page. Hover a number to zoom in.</figcaption><ol class="annot-list"><li data-i="0">Every metric on the first row says Best, but four other rows score exactly the same.</li><li data-i="1">The star next to Balanced Accuracy doesn't say what it means.</li><li data-i="2">The control for choosing metrics is an unlabelled icon, and for object detection it starts with no metrics at all.</li></ol></figure>
+                  <figure class="annot" style="margin:0" data-before="matrix" hidden><div class="figure-media annot-media" style="aspect-ratio:2912 / 1860"><div class="annot-stage"><img src="../media/automl/before-matrix-overlay.webp" alt="Recreation of the old confusion matrix comparison: two models drawn in one grid, with one number in each corner of every cell and blended colours" loading="lazy"><button type="button" class="hot" style="--x:56.6%;--y:54%;--mx:56.6%;--my:54%" data-i="0" data-f="39.4,40.5,73.9,94.4" aria-label="Both models share one grid: one model's number sits in each cell's top-left corner, the other's in the bottom-right.">1</button><button type="button" class="hot" style="--x:76.5%;--y:81%;--mx:76.5%;--my:81%" data-i="1" data-f="39.4,40.5,73.9,94.4" aria-label="Where the two colours overlap they blend into grey, so you can't tell which model a shade belongs to.">2</button><button type="button" class="hot" style="--x:61%;--y:33%;--mx:61%;--my:33%" data-i="2" data-f="42.4,25.4,57.6,30.4" aria-label="“0 / 4” and “2 / 4” sit under the models with no label saying what they count.">3</button><button type="button" class="hot" style="--x:78%;--y:24.5%;--mx:78%;--my:24.5%" data-i="3" data-f="29.9,21.8,75.5,27.1" aria-label="The colour swatches sit on opposite sides of the names, and the tiny arrows are the only way to switch models.">4</button></div></div><figcaption>Recreated from the old Compare Models page. Hover a number to zoom in.</figcaption><ol class="annot-list"><li data-i="0">Both models share one grid: one model's number sits in each cell's top-left corner, the other's in the bottom-right.</li><li data-i="1">Where the two colours overlap they blend into grey, so you can't tell which model a shade belongs to.</li><li data-i="2">“0 / 4” and “2 / 4” sit under the models with no label saying what they count.</li><li data-i="3">The colour swatches sit on opposite sides of the names, and the tiny arrows are the only way to switch models.</li></ol></figure>
+                </div>
+                <div class="project-content-text"><p>I was the only designer on it. I redesigned it around <b>Evaluations</b>: each one is a run you can read, trace and compare side by side. It shipped in August 2025.</p></div>
+              </section>
+
+              <section id="research" data-toc="Research" class="project-content-grid section-fill">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Research</p>
+                <div class="project-content-text"><h2>Two people ask “which one wins?” for different reasons.</h2></div>
+                <div class="project-content-text"><p>I interviewed Alberto, turned what I heard into two personas, and took apart how four competitors handle comparisons.</p></div>
+                <div class="project-content-media">
+                  <div class="panel" style="background:#8F7CD61c" data-board>
+                    <div class="cx-label-row">
+                      <p class="panel-label">Research board</p>
+                      <div class="cx-tabs" role="tablist" aria-label="Research"><button type="button" role="tab" aria-selected="true" data-tab="interview">Interview</button><button type="button" role="tab" aria-selected="false" data-tab="personas">Personas</button><button type="button" role="tab" aria-selected="false" data-tab="competitors">Competitors</button></div>
+                    </div>
+                    <div class="panel-card rb" data-pane="interview">
+                      <div class="rb-interview">
+                        <img src="../media/automl/alberto.webp" alt="Anoushka and Alberto smiling at a meeting table, with whiteboard sketches behind them" loading="lazy">
+                        <div><p class="rb-k">User interview</p><p class="rb-h">With Alberto</p><p>We talked through how comparing models in AutoML really goes, from picking runs to deciding which one to ship.</p></div>
+                      </div>
+                    </div>
+                    <div class="panel-card rb rb-flat" data-pane="personas" hidden>
+                      <div class="rb-personas">
+                        <article class="pc" style="--pc:#B4477A;--pc-soft:#FBEEF3">
+                          <header><img src="../media/automl/avatar-ivy.webp" alt="" loading="lazy"><div><h3>Ivy Warren</h3><p>Marketing Analytics Manager · Toronto</p><span>Medium tech literacy</span></div></header>
+                          <blockquote>“I don't need to know how the model works. I just need to know what to do next.”</blockquote>
+                          <div class="pc-cols"><div><p class="pc-k">Needs</p><ul class="pc-yes"><li>Clear guidance on what model results mean</li><li>Business-friendly visuals and summaries</li><li>Shareable reports for decision-makers</li></ul></div><div><p class="pc-k">Frustrations</p><ul class="pc-no"><li>Confusing metrics like log loss or AUC</li><li>Hard to tell which model is active, and why</li><li>Hard to interpret or trust predictions</li></ul></div></div>
+                          <footer><em>Excel</em><em>Tableau</em><em>Google Analytics</em><em>Canva</em></footer>
+                        </article>
+                        <article class="pc" style="--pc:#2F8F88;--pc-soft:#E7F4F2">
+                          <header><img src="../media/automl/avatar-dane.webp" alt="" loading="lazy"><div><h3>Dane Williamson</h3><p>Product Manager, AI/ML · New York</p><span>High tech literacy</span></div></header>
+                          <blockquote>“I need AutoML to be fast, flexible, and explainable, not just ‘easy.’”</blockquote>
+                          <div class="pc-cols"><div><p class="pc-k">Needs</p><ul class="pc-yes"><li>Compare models on business KPIs</li><li>Track model versions and performance</li><li>Explainable outputs for stakeholders</li></ul></div><div><p class="pc-k">Frustrations</p><ul class="pc-no"><li>Unclear model comparison tools</li><li>No view of how settings change outcomes</li><li>Simple UIs that limit advanced use</li></ul></div></div>
+                          <footer><em>Vertex AI</em><em>GitHub</em><em>Notion</em><em>Jira</em></footer>
+                        </article>
+                      </div>
+                    </div>
+                    <div class="panel-card rb rb-flat" data-pane="competitors" hidden>
+                      <div class="rb-comp">
+                        <div class="cc-grid"><article class="cc"><header><span class="cc-mono" style="background:#E8F0FE" title="Google Cloud"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M12.19 2.38a9.344 9.344 0 0 0-9.234 6.893c.053-.02-.055.013 0 0-3.875 2.551-3.922 8.11-.247 10.941l.006-.007-.007.03a6.717 6.717 0 0 0 4.077 1.356h5.173l.03.03h5.192c6.687.053 9.376-8.605 3.835-12.35a9.365 9.365 0 0 0-2.821-4.552l-.043.043.006-.05A9.344 9.344 0 0 0 12.19 2.38zm-.358 4.146c1.244-.04 2.518.368 3.486 1.15a5.186 5.186 0 0 1 1.862 4.078v.518c3.53-.07 3.53 5.262 0 5.193h-5.193l-.008.009v-.04H6.785a2.59 2.59 0 0 1-1.067-.23h.001a2.597 2.597 0 1 1 3.437-3.437l3.013-3.012A6.747 6.747 0 0 0 8.11 8.24c.018-.01.04-.026.054-.023a5.186 5.186 0 0 1 3.67-1.69z"/></svg></span><h3>Vertex AI</h3></header><p class="cc-plus">Rich metrics, and TensorBoard to track them over time.</p><p class="cc-minus">Comparing confusion matrices means juggling tabs, and it assumes deep Google Cloud know-how.</p></article><article class="cc"><header><span class="cc-mono" style="background:#E3F5F4"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#2AB1AC" d="M12 0a12 12 0 1 0 12 12A12 12 0 0 0 12 0zm6.527 15.34H12.5v-.934h6.026zm-.739-8.73s-.412.543-.193 1.995c.41 2.724-1.02 5.15-3.56 5.15h-1.87s-1.835-.092-2.933 1.01c-3.263 3.269-4.04 4.116-4.274 4.233-.15.08-.188-.093-.188-.093l9.644-11.891c-.203-2.145 2.34-2.715 3.278-1.13l.884-.248zm-1.599-.614a.476.476 0 1 0 .47.474.476.476 0 0 0-.47-.474z"/></svg></span><h3>Dataiku</h3></header><p class="cc-plus">You crown a “champion model”, so a comparison ends in a decision.</p><p class="cc-minus">Confusion matrices are compared by hand, never side by side.</p></article><article class="cc"><header><span class="cc-mono cc-bigml" style="background:#F2F7E8"><b>ml</b></span><h3>BigML</h3></header><p class="cc-plus">Overlaid ROC and PR curves, and side-by-side matrices.</p><p class="cc-minus">So much freedom it overwhelms, and it's hard to scope a comparison to one dataset.</p></article><article class="cc"><header><span class="cc-mono" style="background:#1A1C1F"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#FFBE00" d="M2.48 0a1.55 1.55 0 1 0 0 3.1 1.55 1.55 0 0 0 0-3.1zm19.04 0a1.55 1.55 0 1 0 0 3.101 1.55 1.55 0 0 0 0-3.101zM12 2.295a1.55 1.55 0 1 0 0 3.1 1.55 1.55 0 0 0 0-3.1zM2.48 5.272a2.48 2.48 0 1 0 0 4.96 2.48 2.48 0 0 0 0-4.96zm19.04 0a2.48 2.48 0 1 0 0 4.96 2.48 2.48 0 0 0 0-4.96zM12 8.496a1.55 1.55 0 1 0 0 3.1 1.55 1.55 0 0 0 0-3.1zm-9.52 3.907a1.55 1.55 0 1 0 0 3.1 1.55 1.55 0 0 0 0-3.1zm19.04 0a1.55 1.55 0 1 0 0 3.102 1.55 1.55 0 0 0 0-3.102zM12 13.767a2.48 2.48 0 1 0 0 4.962 2.48 2.48 0 0 0 0-4.962zm-9.52 3.907a2.48 2.48 0 1 0 .001 4.962 2.48 2.48 0 0 0 0-4.962zm19.04.93a1.55 1.55 0 1 0 0 3.102 1.55 1.55 0 0 0 0-3.101zM12 20.9a1.55 1.55 0 1 0 0 3.1 1.55 1.55 0 0 0 0-3.1Z"/></svg></span><h3>Weights &amp; Biases</h3><span class="cc-tag">Not a competitor</span></header><p class="cc-plus">Logs each run's settings next to its scores, so you can see why it won.</p><p class="cc-minus">The bar I measured the gap against.</p></article></div>
+                        <div class="cc-gap">
+                          <div><p class="rb-k">The gap</p><p class="cc-gap-h">None of the three shows which settings changed between runs.</p><p>You can see that one model won, but not why. That's where AutoML could stand out.</p></div>
+                          <table aria-label="Example: settings compared across two runs"><thead><tr><th>Setting</th><th>Run A</th><th>Run B</th></tr></thead><tbody><tr class="on"><td>Epochs</td><td>10</td><td>20</td></tr><tr><td>Batch size</td><td>32</td><td>32</td></tr><tr class="on"><td>Learning rate</td><td>0.001</td><td>0.0005</td></tr></tbody></table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="project-content-text"><p>Google's <a href="https://cloud.google.com/blog/products/ai-machine-learning/vertex-ai-model-registry" target="_blank" rel="noopener noreferrer">post on the Vertex AI Model Registry</a> gave me the backbone: evaluation belongs to a model's versioned history.</p></div>
+                <div class="project-content-text"><p class="mission"><span>The insight</span>People weren't comparing models. They were comparing runs: one model, one snapshot of data, one set of settings. That run needed a home.</p></div>
+              </section>
+
+              <section id="design" data-toc="The redesign" class="project-content-grid">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">The redesign</p>
+                <div class="project-content-text"><h2>Evaluations: every result can be read, traced and compared.</h2></div>
+                <div class="project-content-text"><p>Try it. Tick two evaluations and compare them, click any evaluation name to open its results, then open Evaluation info to see the settings behind it.</p></div>
+                <div class="project-content-media" style="display:flex;flex-direction:column;gap:14px">
+                  <div class="proto-tabs" data-proto-tabs role="tablist" aria-label="Screen">
+                    <button type="button" role="tab" aria-selected="true" data-v="list" data-cap="Pick: balanced accuracy and status on every row. Tick any two, then Compare Evaluations.">1. Pick</button>
+                    <button type="button" role="tab" aria-selected="false" data-v="compare" data-cap="Compare: one table with every metric, then the confusion matrices side by side. Open Prompts to see why the second run won, or click a name to open its results.">2. Compare</button>
+                    <button type="button" role="tab" aria-selected="false" data-v="results" data-cap="Understand: click any metric to see what it means and whether higher is better.">3. Understand</button>
+                    <button type="button" role="tab" aria-selected="false" data-v="info" data-cap="Trace: every setting the run used, next to its latency, tokens, cost and data.">4. Trace</button>
+                  </div>
+                  <div class="proto" style="aspect-ratio:1456 / 920"><iframe src="../media/automl/app.html?v=list" title="Interactive recreation of the shipped Evaluations pages" loading="lazy"></iframe></div>
+                  <p class="proto-cap" aria-live="polite">Pick: balanced accuracy and status on every row. Tick any two, then Compare Evaluations.</p>
+                </div>
+                <div class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>No mystery badges</p><p>Ties are visible, so “Best” went. The table shows every number and lets you read it.</p></div>
+                    <div><p>Every metric explains itself</p><p>A plain definition, and whether higher or lower is better, sits right where you read the number. That's for Ivy.</p></div>
+                    <div><p>Every result is traceable</p><p>Settings, prompt, data, speed and cost live on the evaluation. That's for Dane.</p></div>
+                    <div><p>Compare like with like</p><p>You pick from a short list of finished evaluations, with the version beside each name.</p></div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="impact" data-toc="Impact &amp; reflection" class="project-content-grid section-fill">
+                <div class="project-content-text"><div class="divider"></div></div>
+                <p class="project-section-label project-content-text">Impact &amp; reflection</p>
+                <div class="project-content-text"><h2>From “Best… at what?” to a comparison you can defend.</h2></div>
+                <div class="project-content-text"><p>Evaluations shipped to production in August 2025 and replaced Compare Models as the way AutoML customers check and compare models.</p></div>
+                <!-- Before → after counts read from the old and shipped screens. Anoushka: add real usage or feedback numbers here if you get them. -->
+                <div class="project-content-text">
+                  <div class="stats accent">
+                    <div><p class="stat-q">“Which one wins?”</p><p class="stat">1 table</p><p>Every metric on by default and ties in plain sight, instead of six “Best” badges on one tied row.</p></div>
+                    <div><p class="stat-q">“What does it mean?” · Ivy</p><p class="stat">6 of 6</p><p>Metrics explain themselves in plain words, and say whether higher or lower is better.</p></div>
+                    <div><p class="stat-q">“Why did it win?” · Dane</p><p class="stat">1 tab away</p><p>The prompt, data and all 9 run settings behind every result.</p></div>
+                  </div>
+                </div>
+                <!-- DRAFT reflection, written by Claude from the Figma file: Anoushka to rewrite in her own words. -->
+                <div class="project-content-text">
+                  <div class="takeaways">
+                    <div><p>A label is a promise</p><p>“Best” looked helpful and meant nothing. Now I check what every badge, star and icon is claiming.</p></div>
+                    <div><p>Find the real object</p><p>The fix wasn't a better comparison screen. It was seeing that people compare runs, not models.</p></div>
+                    <div><p>What's next</p><p>Highlight the settings that differ between two evaluations right in Compare, so you see why one won without opening each run.</p></div>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+          </article>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Research board: each tab shows its own card.
+    document.querySelectorAll("[data-board]").forEach((board) => board.querySelector("[role=tablist]").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-tab]");
+      if (!b) return;
+      board.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", x === b));
+      board.querySelectorAll("[data-pane]").forEach((p) => { p.hidden = p.dataset.pane !== b.dataset.tab; });
+    }));
+    // The two old screens share one spot: the tabs swap which one shows.
+    document.querySelectorAll("[data-before-tabs]").forEach((tabs) => tabs.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-show]");
+      if (!b) return;
+      tabs.querySelectorAll("[data-show]").forEach((x) => x.setAttribute("aria-selected", x === b));
+      tabs.parentElement.querySelectorAll("[data-before]").forEach((f) => { f.hidden = f.dataset.before !== b.dataset.show; });
+    }));
+  </script>
+  <script src="../site.js?v=20261121"></script>
+  <script src="../chat.js?v=20261116u"></script>
+</body>
+</html>

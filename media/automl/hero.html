@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoML Evaluations hero</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Baskerville:wght@400&display=swap" rel="stylesheet">
+  <style>
+    /* A small task on a loop, like the Mensio and Denials heroes: Ivy asks which model to ship over the old
+       leaderboard, then the live prototype answers it, driven by a cursor: tick two evaluations, compare them,
+       and open Prompts to see why one won. Drawn at 1456px wide. */
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { background: linear-gradient(135deg, #1f2430, #6b7591); font-family: Inter, sans-serif; }
+    .scene { position: relative; width: 1456px; height: 100vh; }
+    .window { position: absolute; left: 64px; right: 64px; top: 48px; bottom: 0; overflow: hidden; border-radius: 14px 14px 0 0; background: #fff; box-shadow: 0 16px 60px rgba(10, 14, 24, .45); }
+    iframe { position: absolute; left: 0; top: 0; width: 1456px; height: 860px; border: 0; transform: translateY(var(--pan, 0px)) scale(var(--s, .912)); transform-origin: 0 0; pointer-events: none; transition: transform .8s cubic-bezier(.45, 0, .2, 1); }
+
+    /* Beat 1: Ivy's question, over the dimmed old leaderboard */
+    .dim { position: absolute; inset: 0; background: rgba(13, 17, 27, .5); opacity: 0; transition: opacity .45s ease; }
+    .ask { position: absolute; left: 50%; top: 47%; width: 800px; box-sizing: border-box; padding: 40px 52px; border-radius: 24px; background: #fff; color: #1f2937;
+      box-shadow: 0 16px 40px -12px rgba(15, 23, 42, .35); opacity: 0; transform: translate(-50%, -44%) rotate(-1deg); transition: opacity .45s ease, transform .6s cubic-bezier(.3, 0, .2, 1); }
+    .ask p { margin: 0; }
+    .who { display: flex; align-items: center; gap: 16px; font: 500 26px/1.2 Inter, sans-serif; }
+    .who img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+    .who small { display: block; margin-top: 2px; font: 400 22px Inter, sans-serif; color: #6b7280; }
+    .q { margin-top: 22px !important; font: 400 40px/1.3 "Libre Baskerville", Georgia, serif; letter-spacing: -.01em; }
+    .q mark { background: transparent; color: inherit; transition: background .4s ease; border-radius: 4px; }
+    .beat-ask .dim { opacity: 1; }
+    .beat-ask .ask { opacity: 1; transform: translate(-50%, -50%) rotate(-1deg); }
+    .beat-ask.marked .q mark { background: #E6E0FA; }
+    .beat-task .ask { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+
+    /* The answer, pinned under the winning row at the end */
+    .won { position: absolute; z-index: 4; margin: 0; padding: 16px 22px; border-radius: 16px; background: #fff; color: #1f2937; font: 500 24px/1.3 Inter, sans-serif;
+      box-shadow: 0 16px 40px -12px rgba(15, 23, 42, .4), 0 0 0 2px #8F7CD6; opacity: 0; transform: translateY(10px); transition: opacity .35s ease, transform .45s cubic-bezier(.3, 0, .2, 1); white-space: nowrap; }
+    .won small { display: block; margin-top: 4px; font: 400 19px Inter, sans-serif; color: #6b7280; }
+    .won.on { opacity: 1; transform: none; }
+    /* A note beside the confusion matrices while the window pans down to them */
+    .mx-note { position: absolute; z-index: 4; margin: 0; padding: 14px 20px; border-radius: 14px; background: #fff; color: #1f2937; font: 500 22px/1.3 Inter, sans-serif; white-space: nowrap;
+      box-shadow: 0 16px 40px -12px rgba(15, 23, 42, .4), 0 0 0 2px #8F7CD6; opacity: 0; transform: translateY(10px); transition: opacity .35s ease, transform .45s cubic-bezier(.3, 0, .2, 1); }
+    .mx-note small { display: block; margin-top: 4px; font: 400 18px Inter, sans-serif; color: #6b7280; }
+    .mx-note.on { opacity: 1; transform: none; }
+
+    /* Cursor and click ring, in window px */
+    .cursor { position: absolute; left: 0; top: 0; z-index: 5; width: 36px; height: 36px; opacity: 0; transition: transform .7s cubic-bezier(.45, 0, .2, 1), opacity .3s ease; }
+    .beat-task .cursor { opacity: 1; }
+    .cursor svg { width: 36px; height: 36px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); }
+    .ring { position: absolute; left: -18px; top: -18px; width: 36px; height: 36px; border-radius: 50%; border: 4px solid #8F7CD6; opacity: 0; }
+    .cursor.click .ring { animation: ring .45s ease-out; }
+    @keyframes ring { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(1.6); } }
+    @media (prefers-reduced-motion: reduce) { .ask, .dim, .won { transition: none; } .cursor { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="window">
+      <iframe src="app.html?v=before&amp;focus=1&amp;pins=0&amp;nohint=1" title="" tabindex="-1" aria-hidden="true"></iframe>
+      <div class="dim"></div>
+      <div class="ask">
+        <p class="who"><img src="avatar-ivy.webp" alt=""><span>Ivy<small>Marketing analytics</small></span></p>
+        <p class="q">Five models score 100%. <mark>Which one do we actually ship?</mark></p>
+      </div>
+      <p class="mx-note">Fewer mix-ups<small>93–95% right,<br>up from 78–83%</small></p>
+      <p class="won">Clearer prompt wins, 95.6% to 85.6%<small>And the Prompts tab shows why.</small></p>
+      <div class="cursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l15 9.5-6.6 1.3 3.9 7.4-3 1.6-3.9-7.4L4.6 19z" fill="#151b2d" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="ring"></span></div>
+    </div>
+  </div>
+  <script>
+    const scene = document.querySelector(".scene"), win = document.querySelector(".window"), frame = document.querySelector("iframe");
+    const cursor = document.querySelector(".cursor"), won = document.querySelector(".won"), mxNote = document.querySelector(".mx-note");
+    let pan = 0;
+    const panTo = (px) => { pan = px; frame.style.setProperty("--pan", `${px}px`); };
+    let s = .912;
+    // The app fills the window: scaled to its width, and drawn at least as tall as the window shows
+    const fit = () => { if (!win.clientWidth) return; s = win.clientWidth / 1456; frame.style.setProperty("--s", s); frame.style.height = `${Math.max(860, Math.ceil(win.clientHeight / s))}px`; };
+    addEventListener("resize", fit); fit();
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const beat = (name) => { scene.className = "scene" + (name ? " beat-" + name : ""); };
+    // The prototype's own view switcher, state and elements, reached through the frame (same origin)
+    const app = () => frame.contentWindow;
+    const view = (v) => { app().eval(`show(${JSON.stringify(v)})`); return q("#v-" + v); };
+    const q = (sel, root) => (root || app().document).querySelector(sel);
+    const at = (el, fx = .5, fy = .5) => { const r = el.getBoundingClientRect(); return [(r.left + r.width * fx) * s, (r.top + r.height * fy) * s + pan]; };
+    const to = (el, fx, fy) => { const [x, y] = at(el, fx, fy); cursor.style.transform = `translate(${x - 6}px, ${y - 3}px)`; };
+    const click = (el) => { cursor.classList.remove("click"); void cursor.offsetWidth; cursor.classList.add("click"); el && el.click(); };
+
+    async function loop() {
+      // Wait until the app itself is ready (the frame starts as a blank page that already reads "complete")
+      const ready = () => { try { return frame.contentWindow.eval("typeof show") === "function"; } catch { return false; } };
+      while (!ready()) await wait(150);
+      fit(); await wait(300);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { view("compare"); return; }
+      for (;;) {
+        // 1. The ask, over the old leaderboard and its six Best badges
+        app().eval(`state.picked = []; state.err = ""; state.cmpTab = "matrix";`);
+        view("before");
+        won.classList.remove("on"); mxNote.classList.remove("on"); panTo(0);
+        await wait(500);
+        beat("ask");
+        await wait(1200); scene.classList.add("marked"); await wait(2400);
+
+        // 2. The new list: tick two evaluations, then compare
+        let v = view("list");
+        beat("task"); await wait(500);
+        for (const i of [0, 1]) {
+          const box = q(`[data-pick="${i}"]`, v);
+          to(box); await wait(700); click(box); await wait(350);
+          v = q("#v-list");
+        }
+        const cmp = q("[data-compare]", v);
+        to(cmp); await wait(750); click(cmp); await wait(800);
+
+        // 3. Compare: read the winner, then open Prompts to see why
+        v = q("#v-compare");
+        const row = v.querySelectorAll("tbody tr")[1];
+        to(row.children[2], .4); await wait(900);
+
+        // 4. Pan down to the side-by-side confusion matrices: the winner's diagonal is stronger
+        const mx = v.querySelectorAll(".mx-wrap")[1];
+        const mr = mx.getBoundingClientRect();
+        panTo(-Math.max(0, (mr.bottom + 30) * s - win.clientHeight)); await wait(850);
+        const diag = mx.querySelectorAll(".c")[4];
+        to(diag); await wait(500);
+        // The note sits in the empty column under the Label / Class panel, clear of both matrices
+        const [nx, ny] = at(q(".side", v), 0, 1);
+        mxNote.style.left = `${nx}px`; mxNote.style.top = `${ny + 40 * s}px`;
+        mxNote.classList.add("on"); await wait(2400);
+        mxNote.classList.remove("on"); panTo(0); await wait(800);
+
+        const tab = q('[data-cmp="prompts"]', v);
+        to(tab); await wait(750); click(tab); await wait(500);
+        v = q("#v-compare");
+        // The answer sits under the two prompts, so it never covers them
+        const pr = v.querySelector(".prompts").getBoundingClientRect();
+        won.style.left = `${pr.left * s}px`; won.style.top = `${(pr.bottom + 24) * s}px`;
+        won.classList.add("on");
+        to(v.querySelectorAll(".prompts > div")[1], .3, .6); await wait(3200);
+        beat("");
+      }
+    }
+    // If anything in the loop fails in some browser, start over rather than stop on a blank window
+    (async function run() { try { await loop(); } catch (e) { console.error("hero loop", e); await wait(1000); run(); } })();
+  </script>
+</body>
+</html>

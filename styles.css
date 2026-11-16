@@ -496,6 +496,8 @@ footer .links a:hover { color: var(--primary-ink); }
   .takeaways { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .takeaways p:first-child { color: var(--ink-100); margin-bottom: 4px; }
+@media (min-width: 768px) { .takeaways.three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.takeaways > div > figure + p { color: var(--ink-100); margin-bottom: 4px; }
 .takeaways p:last-child { color: var(--ink-55); }
 
 
@@ -530,6 +532,7 @@ footer .links a:hover { color: var(--primary-ink); }
 @media (min-width: 768px) { .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .stats .stat { font-family: var(--font-serif); font-size: 1.75rem; letter-spacing: -0.02em; color: var(--ink-100); line-height: 1.2; margin-bottom: 4px; }
 .stats p:last-child { color: var(--ink-55); }
+.stats .stat-q { font-size: 13px; color: var(--primary-ink); margin-bottom: 6px; }
 
 .numbered { list-style: none; counter-reset: n; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
 .numbered li { counter-increment: n; display: grid; grid-template-columns: 2rem 1fr; }
@@ -794,6 +797,13 @@ footer .links a:hover { color: var(--primary-ink); }
   display: grid; grid-template-columns: 1fr 1fr; gap: 0.75em; padding: 0.75em; width: 100%;
 }
 .tx-board p { margin: 0; }
+/* Typeface strip across both scales: Inter, and the Roboto it replaced */
+.tx-face { grid-column: 1 / -1; display: flex; align-items: center; gap: 0.6em; padding: 0.15em 0.15em 0.6em; border-bottom: 1px solid #EDEDEF; }
+.tx-face-aa { font-size: 2.2em; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
+.tx-face-name { font-size: 0.75em; font-weight: 500; }
+.tx-face-meta { font-size: 0.55em; color: #64748B; }
+.tx-face-was { margin-left: auto !important; font-size: 0.55em; color: #64748B; }
+.tx-face-was span { font-family: Roboto, sans-serif; text-decoration: line-through; }
 .tx-col { display: flex; flex-direction: column; gap: 0.5em; min-width: 0; }
 .tx-head { font-size: 0.6em; font-weight: 500; }
 .tx-specimens { display: flex; flex-direction: column; border-radius: 0.375em; background: #F5F5F5; padding: 0 0.6em; }
@@ -2618,3 +2628,56 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
   :is(.panel-card.fb.cb:has([data-bv]), .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty))::after { content: none; }
   .panel-card.fb.cb:has([data-bv]), .panel-card.hs, .panel-card.sc, .panel-card.fb:not(.cb, .pl, .ty) { border: 1px solid var(--border-default); }
 }
+
+/* AutoML research board: a tabbed panel card per research method */
+.panel-card.rb.rb-flat { background: transparent; padding: 0; }
+.panel-card.rb.rb-flat::after { display: none; }  /* no hairline frame around cards that sit straight on the panel */
+.panel-card.rb { display: block; place-items: initial; padding: 20px; color: #3B4252; font-size: 15px; line-height: 1.5; }
+.panel-card.rb[hidden] { display: none; }
+.rb p { margin: 0; }
+.rb-interview { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: center; }
+.rb-interview img { border-radius: 10px; aspect-ratio: 5 / 4; object-fit: cover; }
+.rb-k { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7058CB; margin-bottom: 6px !important; }
+.rb-h { font-size: 22px; color: #0D111B; margin-bottom: 8px !important; font-family: var(--font-serif); }
+.rb-personas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+/* Persona cards, rebuilt from the Figma persona boards */
+.pc { border-radius: 14px; border: 1px solid #ECEDF2; overflow: hidden; display: flex; flex-direction: column; background: #fff; }
+.pc header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: var(--pc-soft); }
+.pc header img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px #fff; }
+.pc h3 { margin: 0; font: 400 19px/1.2 var(--font-serif); color: #0D111B; }
+.pc header p { margin: 2px 0 0; font-size: 13px; color: #5B6170; }
+.pc header span { display: inline-block; margin-top: 6px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #fff; color: var(--pc); white-space: nowrap; }
+.pc blockquote { margin: 0; border: 0; padding: 16px 18px 4px; font: 400 17px/1.4 var(--font-serif); color: #0D111B; }
+.pc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px 18px 16px; }
+.pc-k { font-size: 11px !important; letter-spacing: .06em; text-transform: uppercase; color: #8A90A0; margin-bottom: 6px !important; }
+.pc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; line-height: 1.4; color: #3B4252; }
+.pc li { position: relative; padding-left: 16px; }
+.pc li::before { content: ""; position: absolute; left: 0; top: .5em; width: 7px; height: 7px; border-radius: 50%; }
+.pc-yes li::before { background: var(--pc); }
+.pc-no li::before { border: 1.5px solid #C0C4CE; width: 4px; height: 4px; }
+.pc footer { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 18px 16px; border-top: 1px solid #F0F1F4; }
+.pc footer em { font-style: normal; font-size: 12px; padding: 3px 9px; border-radius: 6px; background: #F4F5F8; color: #4B5263; }
+/* Competitor cards: what each does well and where it falls short, then the gap they share */
+.cc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cc { background: #fff; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.cc header { display: flex; align-items: center; gap: 10px; }
+.cc-mono { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-weight: 600; font-size: 15px; }
+.cc-bigml b { width: 22px; height: 22px; border-radius: 50%; background: #8DB33A; color: #fff; display: grid; place-items: center; font: 600 11px/1 var(--font-sans); letter-spacing: -.02em; }
+.cc h3 { margin: 0; font: 500 15px/1.2 var(--font-sans); color: #0D111B; }
+.cc-tag { margin-left: auto; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #F4F5F8; color: #6B7280; white-space: nowrap; }
+.cc p { position: relative; margin: 0; padding-left: 24px; font-size: 13.5px; line-height: 1.45; }
+.cc p::before { position: absolute; left: 0; top: 1px; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; line-height: 1; }
+.cc-plus { color: #2A3140; } .cc-plus::before { content: "+"; background: #E6F4EC; color: #1F8A4C; }
+.cc-minus { color: #6B7280; } .cc-minus::before { content: "−"; background: #F1F2F5; color: #8A90A0; }
+.cc-gap { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 20px 22px; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1.5px #8F7CD6; }
+.cc-gap p { margin: 0; }
+.cc-gap-h { font: 400 19px/1.35 var(--font-serif); color: #0D111B; margin-bottom: 6px !important; }
+.cc-gap p:last-child { font-size: 13.5px; color: #5B6170; }
+.cc-gap table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.cc-gap th { text-align: left; font-weight: 500; color: #8A90A0; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; padding: 0 10px 6px; }
+.cc-gap td { padding: 7px 10px; color: #3B4252; border-top: 1px solid #F0F1F4; }
+.cc-gap tr.on td { background: #F3F0FB; color: #0D111B; }
+.cc-gap tr.on td:first-child { box-shadow: inset 3px 0 0 #8F7CD6; }
+.cc-gap tr.on td:last-child { color: #7058CB; font-weight: 500; }
+@media (max-width: 720px) { .rb-interview, .rb-personas, .cc-grid, .cc-gap { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .rb-personas { grid-template-columns: 1fr; } }

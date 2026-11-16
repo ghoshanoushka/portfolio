@@ -7,7 +7,7 @@ import path from "node:path";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PAGES = [
   "index.html", "about.html", "fun.html",
-  "projects/mensio.html", "projects/deploy-design-system.html", "projects/denials.html",
+  "projects/mensio.html", "projects/deploy-design-system.html", "projects/denials.html", "projects/automl.html",
   "projects/ctrlz.html", "projects/bumpy.html", "projects/somnia.html", "projects/coverflow.html",
 ];
 

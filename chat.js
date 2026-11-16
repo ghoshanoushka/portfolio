@@ -46,6 +46,11 @@
       chips: ["What about the design system?", "Is she open to work?"],
     },
     {
+      keys: ["automl", "auto ml", "evaluation", "compare models", "model registry", "internship"],
+      html: `During her 2025 internship at Hive, Anoushka was the sole designer on AutoML's model comparison. She audited the old Compare Models page, studied Vertex AI, Dataiku, BigML and Weights & Biases, and redesigned it into Evaluations: runs you can read, trace and compare side by side. It shipped in August 2025. ${link("projects/automl.html", "Read the case study")}.`,
+      chips: ["What about the design system?", "How do I get in touch?"],
+    },
+    {
       keys: ["design system", "hive", "rebrand", "landing", "component", "token"],
       html: `When Hive rebranded as Deploy in October 2026, Anoushka and the design team rebuilt the design system for the new brand. One system serves both the Portal and the marketing site: the color tokens are shared, and product and marketing each get their own type scale. She worked with frontend engineers through handoff. ${link("projects/deploy-design-system.html", "Read the case study")}.`,
       chips: ["What about Mensio?", "How do I get in touch?"],

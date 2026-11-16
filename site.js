@@ -33,6 +33,7 @@ const SITE = {
     { title: "Mensio", sub: "Shipped 2026", href: "projects/mensio.html", cursor: "View project", ratio: 16 / 9, media: "media/mensio/hero.html", colors: ["#2b3a67", "#7aaee9"], tint: "#E9F0FC", tagline: "Data you can pull yourself", card: ["#24407A", "#6FA6EC"], blurb: "Redesigned the Data Explorer so customers build their own charts instead of emailing analysts." },
     { title: "Deploy Design System", sub: "Shipped 2026", href: "projects/deploy-design-system.html", cursor: "View project", ratio: 16 / 9, media: "media/deploy/hero.html", colors: ["#050a1f", "#2f6bff"], tint: "#ECE8FA", tagline: "One system for product and marketing", card: ["#4B3699", "#A493E3"], blurb: "Rebuilt the design system for the Deploy rebrand. One system for the Portal and the marketing site." },
     { title: "Claim Denials", sub: "Capstone 2025", href: "projects/denials.html", cursor: "View project", ratio: 16 / 9, media: "media/denials/hero.html", colors: ["#0f5c59", "#4fc1a6"], tint: "#E6F5F1", tagline: "From denial alert to fix, faster", card: ["#0F5C59", "#4FC1A6"], blurb: "Redesigned a denials platform so revenue cycle teams find and fix high-dollar denials with fewer clicks." },
+    { title: "AutoML Evaluations", sub: "Shipped 2025", href: "projects/automl.html", cursor: "View project", ratio: 16 / 9, media: "media/automl/hero.html", colors: ["#1f2430", "#6b7591"], tint: "#EEF0F5", tagline: "Which model wins?", card: ["#2B3242", "#8A93AB"], blurb: "Redesigned AutoML's model comparison into Evaluations people can read, trace and compare. Shipped August 2025." },
     { title: "Deploy Chat", sub: "Shipping 2026", cursor: "Coming soon", ratio: 16 / 9, colors: ["#0b1430", "#4a7dff"], tint: "#F8EAF3", tagline: "Coming soon", card: ["#8E3A7E", "#E79BCB"], blurb: "Coming soon." },
   ],
 
@@ -622,6 +623,15 @@ function initProtoTabs() {
       tabs.querySelectorAll("[data-v]").forEach((x) => x.setAttribute("aria-selected", x === b));
       want = b.dataset.v;
       frame.contentWindow.postMessage({ v: want }, "*");
+      if (cap) cap.textContent = b.dataset.cap || "";
+    });
+    // Navigating inside the prototype (a button that opens another screen) moves the tabs along with it.
+    addEventListener("message", (e) => {
+      const v = e.data && e.data.shown;
+      const b = v && e.source === frame?.contentWindow && tabs.querySelector(`[data-v="${v}"]`);
+      if (!b) return;
+      tabs.querySelectorAll("[data-v]").forEach((x) => x.setAttribute("aria-selected", x === b));
+      want = v;
       if (cap) cap.textContent = b.dataset.cap || "";
     });
   });
