@@ -1,1 +1,15 @@
 - Mensio: the other product designer was Serena. Anoushka and Serena co-owned every design decision.
+- Relocation: she's open to relocating.
+- Remote work: yes, absolutely. She jokes it means more time with the cats.
+- Start date: she can start as soon as possible.
+- Visa: she's on F-1 OPT right now and will need H-1B sponsorship, so she'd appreciate a company that can support the H-1B filing.
+- In five years: she wants to lead a team of designers working on a genuine problem that many people face. Alongside that, she wants to run her own shelter for animals that have been given up, as her way of giving back.
+- Companies: she has always dreamed of working at Netflix. Entertainment is a space she'd love to be part of.
+- Biggest weakness: she's a perfectionist. When engineering constraints mean a design can't ship exactly as planned, she works toward a middle ground: ship the quick wins now and move the rest into the backlog, rather than hold up the release.
+- Feedback and disagreement: she talks through the trade-offs openly, what each option gives up in usability or in what the product can do, and agrees with the team on which trade-offs are worth taking.
+- Mentoring: she was an instructional aide for the interaction design course at UMSI (University of Michigan School of Information). She helped a class of 30 students build their first mobile or web app.
+- Dream project: an end-to-end app that helps people live more sustainably and ethically. It would track things like purchases and choosing public transport over driving, a digital footprint that actually makes people realise the impact of their choices. She knows it's a complex problem.
+- Publishing and speaking: not yet.
+- Accessibility: she designs to WCAG, the Web Content Accessibility Guidelines, including its conformance levels (A, AA, AAA).
+- Languages: English, Hindi, and Bengali, her mother tongue.
+- Books and shows: Dan Brown will always be her favourite author, and she loves Jeffrey Archer too. To watch, anything crime thriller.
