@@ -495,8 +495,8 @@ function renderCardStage(root) {
       paint();
       void root.offsetWidth;
       root.classList.replace("mode-out", "mode-in");
-      setTimeout(() => token === switching && root.classList.remove("mode-in"), 800);
-    }, 130);
+      setTimeout(() => token === switching && root.classList.remove("mode-in"), 850);
+    }, 150);
   };
   let saved = null;
   try { saved = localStorage.getItem("homeView"); } catch {}

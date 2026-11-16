@@ -126,13 +126,18 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 .content:has(.projects.is-grid) .home-made { padding-bottom: 96px; }
 
 /* Switching layouts (site.js switchMode): side cards fade out in place, then fade in at their new places, nearest first */
-.projects.mode-out .stage-card:not([data-d="0"]) { opacity: 0 !important; transition: opacity .12s ease; }
-.projects.mode-out .stage-card:not([data-d="0"])::before { opacity: 0 !important; transition: opacity .12s ease; }
-.projects.mode-in .stage-card:not([data-d="0"]) { transition: opacity .3s ease .05s, filter .3s ease .05s; }
-.projects.mode-in .stage-card:is([data-d="2"], [data-d="-2"]) { transition-delay: .1s; }
-.projects.mode-in .stage-card:not([data-d="0"])::before { transition: opacity .4s ease .3s; }
+.projects.mode-out .stage-card:not([data-d="0"]) { opacity: 0 !important; transition: opacity .14s cubic-bezier(.4, 0, 1, 1); }
+.projects.mode-out .stage-card:not([data-d="0"])::before { opacity: 0 !important; transition: opacity .14s cubic-bezier(.4, 0, 1, 1); }
+/* The middle card resizes on the same quick, soft curve the side cards arrive on */
+.projects:is(.mode-out, .mode-in) .stage-card[data-d="0"] { transition: transform .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1); }
+/* Side cards settle in from a touch smaller; the glow follows once they've landed. Keyframes with only "from" ease into each card's own end state */
+.projects.mode-in .stage-card:not([data-d="0"]) { transition: none; animation: card-settle .45s cubic-bezier(.22, 1, .36, 1) .03s both; }
+.projects.mode-in .stage-card:is([data-d="2"], [data-d="-2"]) { animation-delay: .09s; }
+.projects.mode-in .stage-card:not([data-d="0"])::before { transition: none; will-change: opacity; animation: glow-in .5s cubic-bezier(.33, 0, .2, 1) .28s both; }
+@keyframes card-settle { from { opacity: 0; scale: .96; } }
+@keyframes glow-in { from { opacity: 0; } }
 
-@media (prefers-reduced-motion: reduce) { .stage-card, .stage-card::before { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .stage-card, .stage-card::before { transition: none; animation: none; } }
 
 /* Built with Claude Code: bottom-left corner on the carousel, after the cards on the grid */
 .home-made { position: fixed; left: var(--grid-margin); bottom: 28px; z-index: 5; }
