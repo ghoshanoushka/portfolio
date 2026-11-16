@@ -199,6 +199,7 @@
     <div class="card glass" id="card"><img src="f1.webp" alt=""><b>Formula 1 Theme</b><span>Brian Tyler</span></div>
     <div class="tower"><p>POSITION <b>P<span id="pos">7</span></b></p><ol id="tower"></ol></div>
     <p class="steer"><kbd>←</kbd><kbd>→</kbd> or move your pointer to steer</p>
+    <script>if (matchMedia("(pointer: coarse)").matches) { const h = document.querySelector(".steer"); h.textContent = "Tilt your phone to steer"; h.style.paddingLeft = "14px"; }</script>
 
     <div class="bar glass">
       <button aria-label="Previous" id="prev"><svg viewBox="0 0 20 20"><path d="M9 5v10L2 10zM17 5v10l-7-5z"/></svg></button>
@@ -598,6 +599,20 @@
       let on = false, last = 0, speed = 0, dist = 0, x = 0, steer = 0, raf = 0, keys = {}, intro = 0, tick = 0;
       addEventListener("keydown", (e) => (keys[e.key] = true)); addEventListener("keyup", (e) => (keys[e.key] = false));
       canvas.addEventListener("pointermove", (e) => { const r = canvas.getBoundingClientRect(); steer = ((e.clientX - r.left) / r.width - .5) * 2; });
+      // On a phone, tilting it steers: about 25 degrees either way is full lock, whichever way the phone is held
+      const tilt = (e) => {
+        if (e.gamma == null) return;
+        const a = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+        const deg = a === 90 ? e.beta : a === -90 || a === 270 ? -e.beta : e.gamma;
+        steer = Math.max(-1, Math.min(1, deg / 25));
+      };
+      let tiltAsked = false;
+      function askTilt() {
+        if (tiltAsked || !matchMedia("(pointer: coarse)").matches) return; tiltAsked = true;
+        const D = window.DeviceOrientationEvent;
+        if (D && D.requestPermission) D.requestPermission().then((s) => s === "granted" && addEventListener("deviceorientation", tilt)).catch(() => {});
+        else addEventListener("deviceorientation", tilt);
+      }
       function frame(now) {
         const dt = Math.min(.05, (now - last) / 1000 || 0); last = now;
         speed += ((on ? 1 : 0) - speed) * dt * (on ? .6 : 2.5);
@@ -648,7 +663,7 @@
       }
       setInterval(() => { if (eng) eng.forEach((o) => o.frequency.setTargetAtTime(48 + 70 * speed, ac.currentTime, .2)); }, 100);
       return {
-        start() { fit(); on = true; intro = 0; hum(.035); if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } },
+        start() { fit(); askTilt(); on = true; intro = 0; hum(.035); if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } },
         stop() { on = false; hum(0); $(".stage").classList.remove("inside"); },
       };
     })();
