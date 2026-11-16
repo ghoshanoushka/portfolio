@@ -118,6 +118,8 @@
     .now div { min-width: 0; font-size: 12px; line-height: 1.3; }
     .now b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .now span { color: rgba(255, 255, 255, .6); }
+    .now img, .now div { transition: opacity .25s ease, translate .25s ease; }
+    .now.swap img, .now.swap div { opacity: 0; translate: 0 4px; }
     .prog { position: absolute; left: 164px; bottom: 6px; width: 228px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .18); overflow: hidden; }
     .prog i { display: block; height: 100%; width: 0; background: rgba(255, 255, 255, .85); }
 
@@ -306,19 +308,38 @@
 
     // ---------- Play bar ----------
     const PLAY = '<path d="M5 3.5v13l11-6.5z"/>', PAUSE = '<path d="M5 3.5h3.5v13H5zM11.5 3.5H15v13h-3.5z"/>';
-    function show(i) { playing = i; $("#nowImg").src = ALBUMS[i].img; $("#nowT").textContent = ALBUMS[i].t; $("#nowA").textContent = ALBUMS[i].a; }
+    // The play bar's song fades out and the next one fades in
+    let barT = 0;
+    function show(i) {
+      const first = !$("#nowT").textContent, same = playing === i && !first; playing = i;
+      if (same) return;
+      const put = () => { $("#nowImg").src = ALBUMS[i].img; $("#nowT").textContent = ALBUMS[i].t; $("#nowA").textContent = ALBUMS[i].a; $(".now").classList.remove("swap"); };
+      clearTimeout(barT); if (first) return put();
+      $(".now").classList.add("swap"); barT = setTimeout(put, 250);
+    }
     // The preview audio; the race loops the Formula 1 theme
     const audio = new Audio(); audio.preload = "none";
     audio.addEventListener("ended", () => { if (ALBUMS[playing].race && mode === "race") { audio.currentTime = 0; audio.play(); } else setPlaying(false); });
+    // Songs fade instead of cutting: the old one fades out, then the new one fades in.
+    // (iPhones don't let a page set the volume, so there the switch stays a cut.)
+    // The fade runs on a clock, not on animation frames, which stop when the browser isn't drawing the page and would leave a song playing silently
+    let fadeTick = 0, swapT = 0;
+    function fadeTo(v, ms, done) {
+      clearInterval(fadeTick); const from = audio.volume, t0 = performance.now();
+      const step = () => { const k = Math.min(1, (performance.now() - t0) / ms); audio.volume = from + (v - from) * k; if (k >= 1) { clearInterval(fadeTick); if (done) done(); } };
+      fadeTick = setInterval(step, 25); step();
+    }
     function setPlaying(p) {
       isPlaying = p; covers.forEach((el, i) => el.classList.toggle("over", turned(i))); $("#playIcon").innerHTML = p ? PAUSE : PLAY; $("#play").setAttribute("aria-label", p ? "Pause" : "Play");
-      if (p) { if (audio.src !== ALBUMS[playing].src) audio.src = ALBUMS[playing].src; audio.play().catch(() => {}); } else audio.pause();
+      clearTimeout(swapT);
+      if (!p) return fadeTo(0, 250, () => audio.pause());
+      const src = ALBUMS[playing].src;
+      if (audio.src === src && !audio.paused) return fadeTo(1, 400);
+      const start = () => { if (audio.src !== src) audio.src = src; audio.volume = 0; audio.play().catch(() => {}); fadeTo(1, 700); };
+      if (!audio.paused && audio.src) { fadeTo(0, 350); swapT = setTimeout(start, 350); } else start();
     }
     show(2);
-    function playSong(i) {
-      if (i !== playing) { audio.pause(); audio.removeAttribute("src"); }
-      show(i); setPlaying(true);
-    }
+    function playSong(i) { show(i); setPlaying(true); }
     // Formula 1's card is turned over while its theme plays in Coverflow; clicking it then starts the race
     function turned(i) { return !!ALBUMS[i].race && i === cur && i === playing && isPlaying && mode === "cf"; }
     function playAlbum(i) { playSong(i); layout(); }
@@ -331,7 +352,7 @@
     $("#prev").addEventListener("click", () => { const i = (playing + ALBUMS.length - 1) % ALBUMS.length; if (mode === "cf") go(i); playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
     (function tickBar() { $("#progBar").style.width = `${audio.duration ? (audio.currentTime / audio.duration) * 100 : 0}%`; requestAnimationFrame(tickBar); })();
 
-    // ---------- 3. The race: a night run down a red-and-black circuit ----------
+    // ---------- 3. The race: a night run down the Las Vegas Strip ----------
     // Rendered with tone mapping, reflections from a lit environment, soft shadows from the floodlights and bloom on the lights.
     // The cars are built from smooth parts (tapered nose, rounded pods, aerofoil wings, lathed tyres) in clear-coated paint.
     const race = (() => {
@@ -343,8 +364,8 @@
       renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       const col = (h) => new THREE.Color(h).convertSRGBToLinear();
       const scene = new THREE.Scene();
-      const HAZE = 0x2a080b;
-      scene.background = col(HAZE); scene.fog = new THREE.Fog(col(HAZE), 80, 380);
+      const HAZE = 0x1c0c2a;
+      scene.background = col(HAZE); scene.fog = new THREE.Fog(col(HAZE), 90, 460);
       const cam = new THREE.PerspectiveCamera(70, 1280 / 800, .03, 900); scene.add(cam); window.__cam = cam;
 
       // Bloom, when the post-processing scripts loaded; otherwise a straight render
@@ -370,7 +391,7 @@
       const tex = (w, h, draw, rx = 1, ry = 1, srgb = true) => { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h);
         const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = maxAniso; if (srgb) t.encoding = THREE.sRGBEncoding; return t; };
       const sky = tex(8, 512, (g, w, h) => { const l = g.createLinearGradient(0, 0, 0, h);
-        [[0, "#030206"], [.32, "#0a0408"], [.43, "#260609"], [.485, "#8f1c17"], [.5, "#ff5236"], [.512, "#6a1210"], [.56, "#200506"], [1, "#0b0304"]].forEach(([at, c]) => l.addColorStop(at, c)); g.fillStyle = l; g.fillRect(0, 0, w, h); });
+        [[0, "#04030c"], [.3, "#0b0820"], [.42, "#251040"], [.475, "#6a2464"], [.495, "#d8487a"], [.5, "#ffa070"], [.51, "#7a2a66"], [.56, "#1e0c2c"], [1, "#09050f"]].forEach(([at, c]) => l.addColorStop(at, c)); g.fillStyle = l; g.fillRect(0, 0, w, h); });
       // Asphalt: fine aggregate, darker rubbered-in racing lines, painted edges and centre line
       const road = tex(1024, 1024, (g, w, h) => {
         g.fillStyle = "#24242a"; g.fillRect(0, 0, w, h);
@@ -382,40 +403,59 @@
       }, 1, 40);
       const grain = tex(1024, 1024, (g, w, h) => { g.fillStyle = "#8a8a8a"; g.fillRect(0, 0, w, h); for (let i = 0; i < 90000; i++) { const v = 100 + Math.random() * 80 | 0; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(Math.random() * w, Math.random() * h, 1, 1); } }, 1, 40, false);
       const kerb = tex(64, 128, (g, w, h) => { g.fillStyle = "#d10a04"; g.fillRect(0, 0, w, h / 2); g.fillStyle = "#f1f1f3"; g.fillRect(0, h / 2, w, h / 2); }, 1, 120);
-      const wall = tex(512, 128, (g, w, h) => { g.fillStyle = "#0c0c0f"; g.fillRect(0, 0, w, h); g.fillStyle = "#c80904"; for (let x = 0; x < w; x += 128) g.fillRect(x, 0, 64, h);
+      const wall = tex(512, 128, (g, w, h) => { g.fillStyle = "#16151c"; g.fillRect(0, 0, w, h); g.fillStyle = "#0b0a10"; for (let x = 0; x < w; x += 128) g.fillRect(x, 0, 3, h);
         g.fillStyle = "rgba(255,255,255,.92)"; g.fillRect(0, h - 12, w, 5); }, 60, 1);
       // Catch fence: a diamond mesh with a post every few metres
       const fence = tex(256, 256, (g, w, h) => { g.clearRect(0, 0, w, h); g.strokeStyle = "rgba(190,190,200,.55)"; g.lineWidth = 1.4;
         for (let i = -w; i < w * 2; i += 16) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + h, h); g.stroke(); g.beginPath(); g.moveTo(i, h); g.lineTo(i + h, 0); g.stroke(); }
         g.fillStyle = "#3a3a40"; g.fillRect(0, 0, 8, h); g.fillRect(0, 0, w, 6); }, 90, 1);
       const windows = (seed) => tex(256, 256, (g, w, h) => { g.fillStyle = "#000"; g.fillRect(0, 0, w, h);
-        for (let i = 0; i < 520; i++) { const warm = Math.random() < seed; g.fillStyle = warm ? `rgba(255,${170 + Math.random() * 60 | 0},${120 + Math.random() * 60 | 0},${.3 + Math.random() * .7})` : `rgba(255,${60 + Math.random() * 40 | 0},${50 + Math.random() * 30 | 0},${.25 + Math.random() * .6})`;
+        for (let i = 0; i < 520; i++) { const warm = Math.random() < seed; g.fillStyle = warm ? `rgba(255,${180 + Math.random() * 50 | 0},${110 + Math.random() * 60 | 0},${.3 + Math.random() * .7})` : `rgba(${200 + Math.random() * 40 | 0},${215 + Math.random() * 30 | 0},255,${.25 + Math.random() * .6})`;
           g.fillRect((Math.random() * 64 | 0) * 4 + 1, (Math.random() * 64 | 0) * 4 + 1, 2, 2); } });
+      const facade = (warm, lit) => tex(256, 1024, (g, w, h) => { g.fillStyle = "#07060b"; g.fillRect(0, 0, w, h);
+        for (let r = 0; r < 128; r++) { if (r % 16 === 0) { g.fillStyle = "rgba(255,220,170,.35)"; g.fillRect(0, r * 8, w, 2); continue; }
+          for (let c = 0; c < 32; c++) { if (Math.random() > lit) continue; const a = .2 + Math.random() ** 2 * .8;
+            g.fillStyle = Math.random() < warm ? `rgba(255,${190 + Math.random() * 45 | 0},${120 + Math.random() * 50 | 0},${a})` : `rgba(${210 + Math.random() * 40 | 0},228,255,${a})`; g.fillRect(c * 8 + 1, r * 8 + 2, 6, 5); } } });
+      // Neon casino signs: a lit word in a frame of bulbs
+      const sign = (word, c1, c2) => tex(512, 256, (g, w, h) => { g.fillStyle = "#0b0612"; g.fillRect(0, 0, w, h);
+        g.fillStyle = "#ffd27a"; for (let x = 12; x < w; x += 22) { g.beginPath(); g.arc(x, 12, 5, 0, 7); g.arc(x, h - 12, 5, 0, 7); g.fill(); } for (let y = 34; y < h - 20; y += 22) { g.beginPath(); g.arc(12, y, 5, 0, 7); g.arc(w - 12, y, 5, 0, 7); g.fill(); }
+        g.strokeStyle = c2; g.lineWidth = 6; g.shadowColor = c2; g.shadowBlur = 18; g.strokeRect(36, 36, w - 72, h - 72);
+        g.font = `800 ${word.length > 7 ? 64 : 92}px Inter, system-ui, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.shadowColor = c1; g.shadowBlur = 26; g.fillStyle = c1; g.fillText(word, w / 2, h / 2 + 4);
+        g.shadowBlur = 0; g.fillStyle = "rgba(255,255,255,.75)"; g.fillText(word, w / 2, h / 2 + 4); });
+      // Palm fronds: a stem with leaflets, cut out by alpha
+      const frond = tex(64, 256, (g, w, h) => { g.clearRect(0, 0, w, h); g.strokeStyle = "#fff"; g.lineCap = "round";
+        g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, h); g.lineTo(w / 2, 4); g.stroke(); g.lineWidth = 2.2;
+        for (let y = 10; y < h - 6; y += 7) { const l = (w / 2 - 3) * Math.sin(Math.PI * (1 - y / h) * .95 + .1); [-1, 1].forEach((d) => { g.beginPath(); g.moveTo(w / 2, y); g.lineTo(w / 2 + d * l, y - 12); g.stroke(); }); } }, 1, 1, false);
       const radial = (stops) => tex(128, 128, (g, w) => { const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); stops.forEach(([at, c]) => r.addColorStop(at, c)); g.fillStyle = r; g.fillRect(0, 0, w, w); });
       const glowTex = radial([[0, "rgba(255,255,255,1)"], [.25, "rgba(255,255,255,.4)"], [1, "rgba(255,255,255,0)"]]), shadeTex = radial([[0, "rgba(0,0,0,.8)"], [.55, "rgba(0,0,0,.5)"], [1, "rgba(0,0,0,0)"]]);
       const glowMat = (c, o) => new THREE.SpriteMaterial({ map: glowTex, color: col(c), opacity: o, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
 
       // ---------- Light and reflections ----------
-      // The paint and the road reflect a small lit world: the red horizon, floodlight panels overhead and red strips along the walls
+      // The paint and the road reflect a small lit world: the glowing horizon, floodlights overhead, hotel facades and neon along the Strip
       const env = new THREE.Scene();
       env.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, map: sky })));
       const panel = (w, h, c, k, x, y, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m); };
       [[-14, 22, -10], [14, 22, -10], [-14, 20, 14], [14, 20, 14], [0, 26, 0]].forEach(([x, y, z]) => panel(9, 4, 0xfff1e0, 6, x, y, z));
-      [-1, 1].forEach((s) => { for (let z = -40; z <= 40; z += 10) panel(6, 1.2, 0xff2a14, 4, s * 18, 2, z); });
+      [-1, 1].forEach((s) => { for (let z = -40; z <= 40; z += 10) panel(6, 1.2, [0xff2bd6, 0x2ee6ff, 0xffb347][(z / 10 + s + 6) % 3], 4, s * 18, 2, z);
+        [-26, 6].forEach((z) => panel(22, 16, 0xffb36a, .7, s * 30, 12, z)); });
       const pmrem = new THREE.PMREMGenerator(renderer);
       scene.environment = pmrem.fromScene(env, .02).texture;
 
-      scene.add(new THREE.HemisphereLight(col(0x8a6a78), col(0x1a0507), .55));
+      scene.add(new THREE.HemisphereLight(col(0x7a6a9a), col(0x140818), .6));
       // Floodlights: a warm key light from above and behind, which follows the camera and casts soft shadows
       const sun = new THREE.DirectionalLight(col(0xfff0e2), 2.4);
       sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .02; sun.shadow.radius = 4;
       Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 44, bottom: -44, near: 1, far: 140 });
       scene.add(sun, sun.target);
-      // A red light from up the track that rims the cars ahead
-      const rim = new THREE.DirectionalLight(col(0xff3a24), .8); rim.position.set(0, 30, -40); scene.add(rim);
+      // Neon from the Strip: magenta from up the track rims the cars ahead, cyan fills from the side
+      const rim = new THREE.DirectionalLight(col(0xff3ac8), .8); rim.position.set(0, 30, -40); scene.add(rim);
+      const fill = new THREE.DirectionalLight(col(0x3ad7ff), .45); fill.position.set(-30, 12, -20); scene.add(fill);
 
       // ---------- Track ----------
       const LEN = 600, W = 22, Z0 = -LEN / 2 + 20;
+      // Neon tubes: unlit colour that the bloom picks up
+      const neons = {}, neon = (c, k = 1) => (neons[c + "/" + k] ||= new THREE.MeshBasicMaterial({ color: col(c).multiplyScalar(k), toneMapped: false }));
+      const NEON = [0xff2bd6, 0x2ee6ff, 0x9b5cff, 0xffb347, 0x3dff9e];
       const roadM = new THREE.Mesh(new THREE.PlaneGeometry(W, LEN), new THREE.MeshStandardMaterial({ map: road, roughnessMap: grain, bumpMap: grain, bumpScale: .004, roughness: .72, metalness: 0, envMapIntensity: .7 }));
       roadM.rotation.x = -Math.PI / 2; roadM.position.z = Z0; roadM.receiveShadow = true; scene.add(roadM);
       const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, LEN + 400), new THREE.MeshStandardMaterial({ color: col(0x130608), roughness: .95 }));
@@ -430,30 +470,77 @@
         const wl = new THREE.Mesh(new THREE.BoxGeometry(.7, 1.4, LEN), wallMat); wl.position.set(xw, .7, Z0); wl.receiveShadow = true; scene.add(wl);
         const rail = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, LEN, 10), railMat); rail.rotation.x = Math.PI / 2; rail.position.set(xw, 1.46, Z0); scene.add(rail);
         const fn = new THREE.Mesh(new THREE.PlaneGeometry(LEN, 3.4), fenceMat); fn.rotation.y = Math.PI / 2; fn.position.set(xw, 3.2, Z0); scene.add(fn);
+        const led = new THREE.Mesh(new THREE.BoxGeometry(.1, .09, LEN), neon(0xff2bd6, 1.4)); led.position.set(xw - s * .36, 1.3, Z0); scene.add(led);
       });
       // The skyline: far enough away that it never gets closer, standing against the glowing horizon
       const skyline = new THREE.Group(); scene.add(skyline);
-      const cityMats = [.15, .45, .8].map((k) => new THREE.MeshStandardMaterial({ color: col(0x09090c), roughness: .9, emissive: col(0xffffff), emissiveMap: windows(k), emissiveIntensity: 1.3, fog: false }));
-      for (let i = 0; i < 70; i++) {
-        const s = i % 2 ? 1 : -1, h = 18 + Math.random() * 70, w = 14 + Math.random() * 26;
-        const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), cityMats[i % 3]); m.position.set(s * (60 + Math.random() * 320), h / 2 - 2, -360 - Math.random() * 220); skyline.add(m);
+      const cityMats = [.3, .6, .85].map((k) => new THREE.MeshStandardMaterial({ color: col(0x09090c), roughness: .9, emissive: col(0xffffff), emissiveMap: windows(k), emissiveIntensity: 1.2, fog: false }));
+      for (let i = 0; i < 60; i++) {
+        const s = i % 2 ? 1 : -1, h = 30 + Math.random() * 90, w = 14 + Math.random() * 26;
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), cityMats[i % 3]); m.position.set(s * (110 + Math.random() * 320), h / 2 - 2, -420 - Math.random() * 180); skyline.add(m);
       }
+      // The globe: a giant LED sphere at the far end of the Strip, playing a light show
+      const showC = document.createElement("canvas"); showC.width = 512; showC.height = 256; const showG = showC.getContext("2d");
+      const show = new THREE.CanvasTexture(showC); show.encoding = THREE.sRGBEncoding;
+      const ledGrid = document.createElement("canvas"); ledGrid.width = 512; ledGrid.height = 256;
+      { const g = ledGrid.getContext("2d"); g.fillStyle = "rgba(0,0,0,.55)"; for (let x = 0; x < 512; x += 4) g.fillRect(x, 0, 1, 256); for (let y = 0; y < 256; y += 4) g.fillRect(0, y, 512, 1); }
+      function drawShow(t) {
+        const g = showG; g.fillStyle = "#0a0420"; g.fillRect(0, 0, 512, 256);
+        [[300, .13, 0], [200, .09, 2], [40, .07, 4]].forEach(([hue, sp, ph]) => { const cx = (t * sp * 60 + ph * 90) % 512, cy = 128 + Math.sin(t * sp * 3 + ph) * 70;
+          [-512, 0, 512].forEach((o) => { const r = g.createRadialGradient(cx + o, cy, 0, cx + o, cy, 170); r.addColorStop(0, `hsla(${(hue + t * 12) % 360},100%,60%,.95)`); r.addColorStop(1, "hsla(0,0%,0%,0)"); g.fillStyle = r; g.fillRect(0, 0, 512, 256); }); });
+        // A chequered band that sweeps around the globe
+        const bx = (t * 40) % 512; [0, -512].forEach((o) => { for (let x = 0; x < 160; x += 10) for (let y = 0; y < 2; y++) { g.fillStyle = (x / 10 + y) % 2 ? "#fff" : "#111"; g.fillRect(bx + o + x, 116 + y * 12, 10, 12); } });
+        g.drawImage(ledGrid, 0, 0); show.needsUpdate = true;
+      }
+      drawShow(0);
+      const globe = new THREE.Mesh(new THREE.SphereGeometry(78, 64, 32), new THREE.MeshBasicMaterial({ map: show, toneMapped: false, fog: false }));
+      globe.position.set(80, 66, -640); globe.rotation.y = -Math.PI / 2; skyline.add(globe);
+      // The tower at the north end of the Strip: a tall shaft on three fins, a pod of observation decks, and a needle with a beacon
+      const towerMat = new THREE.MeshStandardMaterial({ color: col(0xb4b0c4), roughness: .55, emissive: col(0x2a1f48), fog: false });
+      const TX = 30, TZ = -770, TH = 420, tower = new THREE.Group(); tower.position.set(TX, -2, TZ); skyline.add(tower);
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 8, TH * .8, 3), towerMat); shaft.position.y = TH * .4; tower.add(shaft);
+      for (let k = 0; k < 3; k++) { const fin = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 3.5, TH * .5, 6), towerMat); fin.position.set(Math.cos(k * 2.09) * 10, TH * .22, Math.sin(k * 2.09) * 10); fin.rotation.set(Math.sin(k * 2.09) * .1, 0, -Math.cos(k * 2.09) * .1); tower.add(fin); }
+      const podMat = new THREE.MeshStandardMaterial({ color: col(0x15131c), emissive: col(0xffffff), emissiveMap: windows(.25), emissiveIntensity: 1.8, fog: false });
+      const podProfile = [[0, 0], [14, 3], [21, 9], [23, 15], [20, 21], [22, 26], [17, 32], [8, 36], [0, 37]].map(([x, y]) => new THREE.Vector2(x, y));
+      const pod = new THREE.Mesh(new THREE.LatheGeometry(podProfile, 32), podMat); pod.position.y = TH * .76; tower.add(pod);
+      [TH * .76 + 9, TH * .76 + 21].forEach((y) => { const ring = new THREE.Mesh(new THREE.CylinderGeometry(21.6, 21.6, 1.4, 32, 1, true), new THREE.MeshBasicMaterial({ color: col(0x7a5cff).multiplyScalar(1.8), toneMapped: false, fog: false })); ring.position.y = y; tower.add(ring); });
+      const needle = new THREE.Mesh(new THREE.CylinderGeometry(.8, 2.4, TH * .2, 8), towerMat); needle.position.y = TH * .76 + 37 + TH * .1; tower.add(needle);
+      const beacon = new THREE.Mesh(new THREE.SphereGeometry(2.4, 12, 8), new THREE.MeshBasicMaterial({ color: col(0xff2020).multiplyScalar(2), toneMapped: false })); beacon.position.y = TH * .76 + 37 + TH * .2; tower.add(beacon);
+      // The Eiffel Tower replica, lit gold: stacked four-sided lattice sections that follow its curved profile, with platforms and arches
+      const lattice = (arch) => tex(128, 128, (g, w, h) => { g.clearRect(0, 0, w, h); g.strokeStyle = "#fff"; g.lineWidth = 11; g.strokeRect(0, 0, w, h);
+        g.lineWidth = 5; g.beginPath(); for (let k = 0; k <= 2; k++) { g.moveTo(0, k * h / 2); g.lineTo(w, k * h / 2 + h / 2); g.moveTo(w, k * h / 2); g.lineTo(0, k * h / 2 + h / 2); } g.stroke();
+        if (arch) { g.globalCompositeOperation = "destination-out"; g.beginPath(); g.moveTo(w * .18, h); g.lineTo(w * .18, h * .55); g.quadraticCurveTo(w / 2, h * .05, w * .82, h * .55); g.lineTo(w * .82, h); g.fill();
+          g.globalCompositeOperation = "source-over"; g.lineWidth = 5; g.beginPath(); g.moveTo(w * .18, h); g.lineTo(w * .18, h * .55); g.quadraticCurveTo(w / 2, h * .05, w * .82, h * .55); g.lineTo(w * .82, h); g.stroke(); } }, 1, 1, false);
+      const goldLit = (map) => new THREE.MeshBasicMaterial({ color: col(0xffb24a).multiplyScalar(1.15), map, alphaTest: .4, side: THREE.DoubleSide, toneMapped: false, fog: false });
+      const EH = 240, eiffel = new THREE.Group(); eiffel.position.set(-24, -2, -540); eiffel.rotation.y = .5; skyline.add(eiffel);
+      const prof = [[0, .19], [.12, .14], [.2, .105], [.3, .075], [.38, .06], [.5, .042], [.62, .03], [.75, .02], [.88, .012], [.94, .008]];
+      const latA = goldLit(lattice(true)), latB = goldLit(lattice(false));
+      for (let k = 0; k < prof.length - 1; k++) {
+        const [y0, r0] = prof[k], [y1, r1] = prof[k + 1], hh = (y1 - y0) * EH;
+        const sec = new THREE.Mesh(new THREE.CylinderGeometry(r1 * EH * 1.414, r0 * EH * 1.414, hh, 4, 1, true), k === 0 ? latA : latB);
+        sec.rotation.y = Math.PI / 4; sec.position.y = y0 * EH + hh / 2; eiffel.add(sec);
+      }
+      const deck = new THREE.MeshBasicMaterial({ color: col(0xffd27a).multiplyScalar(1.3), toneMapped: false, fog: false });
+      [[.12, .15], [.38, .068]].forEach(([y, r]) => { const d = new THREE.Mesh(new THREE.BoxGeometry(r * EH * 2.1, 2.4, r * EH * 2.1), deck); d.position.y = y * EH; eiffel.add(d); });
+      const top = new THREE.Mesh(new THREE.CylinderGeometry(.3, 1.6, EH * .1, 6), deck); top.position.y = EH * .99; eiffel.add(top);
+      skyline.traverse((m) => m.material && (m.material.fog = false));
       const dome = new THREE.Mesh(new THREE.SphereGeometry(700, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, map: sky, fog: false, depthWrite: false }));
       dome.renderOrder = -1; scene.add(dome);
 
-      // Things that pass by: light gantries with floodlight masts, and grandstands
+      // Things that pass by: light gantries, the hotels of the Strip, palms and neon signs
       const group = new THREE.Group(); scene.add(group);
       const steel = new THREE.MeshStandardMaterial({ color: col(0x16161a), metalness: .8, roughness: .35 });
       const lamp = (c, k) => new THREE.MeshStandardMaterial({ color: col(0x050505), emissive: col(c), emissiveIntensity: k });
-      const redLamp = lamp(0xff1a0a, 1.7), whiteLamp = lamp(0xfff2e4, 3);
-      const poolMat = new THREE.MeshBasicMaterial({ map: glowTex, color: col(0xff3020), opacity: .45, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+      const whiteLamp = lamp(0xfff2e4, 3);
       const gantries = [];
       for (let i = 0; i < 8; i++) {
-        const g = new THREE.Group();
+        const g = new THREE.Group(), hue = NEON[i % NEON.length];
         [-1, 1].forEach((s) => { const p = new THREE.Mesh(new THREE.BoxGeometry(.6, 9, .6), steel); p.position.set(s * (W / 2 + 3), 4.5, 0); p.castShadow = true; g.add(p); });
         const beam = new THREE.Mesh(new THREE.BoxGeometry(W + 7, 1.4, .9), steel); beam.position.y = 9; beam.castShadow = true; g.add(beam);
-        for (let k = -4; k <= 4; k++) { const l = new THREE.Mesh(new THREE.BoxGeometry(1.7, .45, .08), redLamp); l.position.set(k * 2.6, 9, .48); g.add(l); }
-        const pool = new THREE.Mesh(new THREE.PlaneGeometry(W + 2, 30), poolMat); pool.rotation.x = -Math.PI / 2; pool.position.set(0, .03, 4); g.add(pool);
+        const bar = lamp(hue, 1.6);
+        for (let k = -4; k <= 4; k++) { const l = new THREE.Mesh(new THREE.BoxGeometry(1.7, .45, .08), bar); l.position.set(k * 2.6, 9, .48); g.add(l); }
+        const pool = new THREE.Mesh(new THREE.PlaneGeometry(W + 2, 30), new THREE.MeshBasicMaterial({ map: glowTex, color: col(hue), opacity: .1, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+        pool.rotation.x = -Math.PI / 2; pool.position.set(0, .03, 4); g.add(pool);
         [-1, 1].forEach((s) => {
           const mast = new THREE.Mesh(new THREE.CylinderGeometry(.16, .22, 17, 12), steel); mast.position.set(s * (W / 2 + 9), 8.5, -37); g.add(mast);
           const head = new THREE.Mesh(new THREE.BoxGeometry(2.6, .7, 1.2), steel); head.position.set(s * (W / 2 + 8.2), 17.2, -37); head.rotation.z = s * .35; g.add(head);
@@ -461,13 +548,68 @@
         });
         g.position.z = -i * 75; group.add(g); gantries.push(g);
       }
-      const standMats = [.3, .6].map((k) => new THREE.MeshStandardMaterial({ color: col(0x101014), roughness: .85, emissive: col(0xffffff), emissiveMap: windows(k), emissiveIntensity: 1.1 }));
-      const stands = [];
-      for (let i = 0; i < 24; i++) {
-        const s = i % 2 ? 1 : -1, h = 7 + Math.random() * 9, st = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.BoxGeometry(14, h, 24), standMats[i % 2]); body.position.y = h / 2; st.add(body);
-        const roof = new THREE.Mesh(new THREE.BoxGeometry(17, .4, 26), steel); roof.position.set(-s * 1.5, h + .6, 0); st.add(roof);
-        st.position.set(s * (W / 2 + 32 + Math.random() * 10), 0, -i * 26); group.add(st); stands.push(st);
+
+      // Hotels: a lit podium with a marquee, and a tower on top: a slab, a three-winged Y or an octagon of gold glass.
+      // Every tower has a lit crown and neon on its edges.
+      const facades = [facade(.85, .55), facade(.4, .5), facade(.95, .45)].map((map) => new THREE.MeshStandardMaterial({ color: col(0x0d0c12), roughness: .55, metalness: .2, emissive: col(0xffffff), emissiveMap: map, emissiveIntensity: .85 }));
+      const gold = new THREE.MeshStandardMaterial({ color: col(0xc9a050), metalness: 1, roughness: .18, emissive: col(0xffd9a0), emissiveMap: facade(1, .45), emissiveIntensity: .9 });
+      const podMats = [facade(.9, .9), facade(.6, .9)].map((map) => { map.repeat.set(2, .12); return new THREE.MeshStandardMaterial({ color: col(0x120f18), roughness: .6, emissive: col(0xffffff), emissiveMap: map, emissiveIntensity: 1.3 }); });
+      const hotels = [], STEP = 46, PER = 14;
+      for (let i = 0; i < PER * 2; i++) {
+        const s = i % 2 ? 1 : -1, hz = new THREE.Group(), glow = NEON[(i * 3) % NEON.length], kind = i % 3, h = 70 + Math.random() * 90;
+        const pw = 34, pd = 40, ph = 12;
+        const podium = new THREE.Mesh(new THREE.BoxGeometry(pw, ph, pd), podMats[i % 2]); podium.position.y = ph / 2; hz.add(podium);
+        const marquee = new THREE.Mesh(new THREE.BoxGeometry(pw + .5, 1.1, pd + .5), neon(glow, 1.3)); marquee.position.y = ph - 1; hz.add(marquee);
+        const mat = facades[i % 3];
+        if (kind === 0) {
+          const t = new THREE.Mesh(new THREE.BoxGeometry(14, h, 30), mat); t.position.y = ph + h / 2; hz.add(t);
+          [[-7.2, -15.2], [-7.2, 15.2]].forEach(([x, z]) => { const e = new THREE.Mesh(new THREE.BoxGeometry(.5, h, .5), neon(glow, 1.5)); e.position.set(x * -s, ph + h / 2, z); hz.add(e); });
+          const crown = new THREE.Mesh(new THREE.BoxGeometry(14.6, 2.4, 30.6), neon(glow, 1.6)); crown.position.y = ph + h - 2; hz.add(crown);
+        } else if (kind === 1) {
+          for (let k = 0; k < 3; k++) {
+            const a = k * Math.PI * 2 / 3 + .3, wing = new THREE.Group(); wing.rotation.y = a; wing.position.y = ph; hz.add(wing);
+            const hh = h * (1 - k * .08), w = new THREE.Mesh(new THREE.BoxGeometry(9, hh, 22), mat); w.position.set(0, hh / 2, 11); wing.add(w);
+            const crown = new THREE.Mesh(new THREE.BoxGeometry(9.5, 1.6, 22.4), neon(0xffd9a0, 1.4)); crown.position.set(0, hh - 1.2, 11); wing.add(crown);
+            const edge = new THREE.Mesh(new THREE.BoxGeometry(.5, hh, .5), neon(glow, 1.5)); edge.position.set(4.6, hh / 2, 22.1); wing.add(edge);
+          }
+        } else {
+          const t = new THREE.Mesh(new THREE.CylinderGeometry(11, 13, h, 8), gold); t.position.y = ph + h / 2; hz.add(t);
+          const crown = new THREE.Mesh(new THREE.CylinderGeometry(11.3, 11.3, 2.4, 8, 1, true), neon(glow, 1.6)); crown.position.y = ph + h - 2; hz.add(crown);
+          const spire = new THREE.Mesh(new THREE.ConeGeometry(4, 16, 8), gold); spire.position.y = ph + h + 8; hz.add(spire);
+        }
+        hz.position.set(s * (W / 2 + 34 + Math.random() * 14), 0, -Math.floor(i / 2) * STEP - (s > 0 ? STEP / 2 : 0)); group.add(hz); hotels.push(hz);
+      }
+
+      // Palms along the outside of the fence, standing in their uplights
+      const frondMat = new THREE.MeshStandardMaterial({ color: col(0x2c5a36), map: frond, alphaTest: .4, side: THREE.DoubleSide, roughness: .8, emissive: col(0x0c2a14), emissiveMap: frond });
+      const trunkMat = new THREE.MeshStandardMaterial({ color: col(0x6a5240), roughness: .9 });
+      const frondGeo = new THREE.PlaneGeometry(1.3, 5.5, 1, 8); frondGeo.translate(0, 2.75, 0);
+      { const p = frondGeo.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i), t = y / 5.5; p.setXYZ(i, p.getX(i) * (1 - t * .4), y * .45 + 1.2 * Math.sin(t * Math.PI) - t * t * 2.6, y * .85); } frondGeo.computeVertexNormals(); }
+      const crowns = [0, 1, 2].map(() => {
+        const parts = []; for (let k = 0; k < 9; k++) { const f = frondGeo.toNonIndexed(); f.rotateX((Math.random() - .5) * .3); f.rotateY(k * Math.PI * 2 / 9 + Math.random() * .3); parts.push(f); }
+        const g = new THREE.BufferGeometry(), cat = (name, n) => new THREE.Float32BufferAttribute(parts.flatMap((f) => [...f.attributes[name].array]), n);
+        g.setAttribute("position", cat("position", 3)); g.setAttribute("normal", cat("normal", 3)); g.setAttribute("uv", cat("uv", 2)); return g;
+      });
+      const trunkGeo = new THREE.CylinderGeometry(.22, .36, 1, 8); trunkGeo.translate(0, .5, 0);
+      const palms = [];
+      for (let i = 0; i < 52; i++) {
+        const s = i % 2 ? 1 : -1, h = 9 + Math.random() * 4, palm = new THREE.Group();
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat); trunk.scale.y = h; palm.add(trunk);
+        const crown = new THREE.Mesh(crowns[i % 3], frondMat); crown.position.y = h - .2; palm.add(crown);
+        const up = new THREE.Sprite(glowMat(0xffc27a, .5)); up.scale.set(3, 3, 1); up.position.y = .4; palm.add(up);
+        palm.rotation.z = (Math.random() - .5) * .12;
+        palm.position.set(s * (W / 2 + 9 + Math.random() * 3), 0, -Math.floor(i / 2) * 24 - (s > 0 ? 12 : 0)); group.add(palm); palms.push(palm);
+      }
+
+      // Neon signs on poles, angled to face the oncoming cars
+      const WORDS = [["CASINO", "#ff4fd8", "#2ee6ff"], ["JACKPOT", "#ffd24a", "#ff2bd6"], ["LIVE SHOWS", "#2ee6ff", "#9b5cff"], ["HOTEL", "#ff6a3d", "#ffd24a"], ["POKER", "#3dff9e", "#ff2bd6"], ["OPEN 24 HRS", "#ff4fd8", "#ffd24a"], ["BUFFET", "#ffd24a", "#2ee6ff"], ["WEDDINGS", "#ff8fd0", "#9b5cff"]];
+      const signs = [];
+      for (let i = 0; i < 10; i++) {
+        const s = i % 2 ? 1 : -1, [word, c1, c2] = WORDS[i % WORDS.length], sg = new THREE.Group();
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(.25, .3, 12, 10), steel); pole.position.y = 6; sg.add(pole);
+        const board = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), new THREE.MeshBasicMaterial({ map: sign(word, c1, c2), toneMapped: false, side: THREE.DoubleSide }));
+        board.position.y = 14; board.rotation.y = -s * .75; sg.add(board);
+        sg.position.set(s * (W / 2 + 15), 0, -i * 62 - 20); group.add(sg); signs.push(sg);
       }
 
       // ---------- Cars ----------
@@ -596,7 +738,7 @@
       const LED_ON = Array.from({ length: 15 }, (_, i) => col(i < 5 ? 0x1ED760 : i < 10 ? 0xFF2A2A : 0x3D7BFF).multiplyScalar(2.2)), LED_OFF = col(0x1d1e22);
       const leds = LED_ON.map((_, i) => { const m = new THREE.Mesh(new THREE.SphereGeometry(.0042, 10, 8), new THREE.MeshBasicMaterial({ color: LED_OFF.clone(), toneMapped: false })); m.position.set(-.0588 + i * .0084, .058, .02); wheel.add(m); return m; });
 
-      let on = false, last = 0, speed = 0, dist = 0, x = 0, steer = 0, raf = 0, keys = {}, intro = 0, tick = 0;
+      let on = false, last = 0, speed = 0, dist = 0, x = 0, steer = 0, raf = 0, keys = {}, intro = 0, tick = 0, showT = 0;
       addEventListener("keydown", (e) => (keys[e.key] = true)); addEventListener("keyup", (e) => (keys[e.key] = false));
       canvas.addEventListener("pointermove", (e) => { const r = canvas.getBoundingClientRect(); steer = ((e.clientX - r.left) / r.width - .5) * 2; });
       // On a phone, tilting it steers: about 25 degrees either way is full lock, whichever way the phone is held
@@ -636,7 +778,8 @@
         road.offset.y = (road.offset.y + v * dt / (LEN / 40)) % 1; kerb.offset.y = (kerb.offset.y + v * dt / (LEN / 120)) % 1;
         wall.offset.x = (wall.offset.x - v * dt / (LEN / 60)) % 1; fence.offset.x = (fence.offset.x - v * dt / (LEN / 90)) % 1;
         const wrap = (o, span) => { o.position.z += v * dt; if (o.position.z > 20) o.position.z -= span; };
-        gantries.forEach((g) => wrap(g, 600)); stands.forEach((s) => wrap(s, 624));
+        gantries.forEach((g) => wrap(g, 600)); hotels.forEach((h) => wrap(h, PER * STEP)); palms.forEach((p) => wrap(p, 26 * 24)); signs.forEach((g) => wrap(g, 620));
+        if ((showT += dt) > .06) { showT = 0; drawShow(now / 1000); } beacon.visible = Math.sin(now * .004) > 0;
         rivals.forEach((c, i) => { c.rear.material.opacity = Math.sin(now * .01 + i * 2) > .2 ? 1 : .3; c.position.z += v * dt * (1 - c.userData.v); if (c.position.z > 14) { c.position.z = -220 - Math.random() * 60; c.position.x = (Math.random() - .5) * (W - 6); } c.position.x += Math.sin(now * .001 + i) * .01;
           // Rivals keep out of your lane as they come past
           if (c.position.z > -14 && Math.abs(c.position.x - x) < 3.4) c.position.x += Math.sign(c.position.x - x || 1) * dt * 9;
