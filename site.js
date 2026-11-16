@@ -480,18 +480,29 @@ function renderCardStage(root) {
       el.setAttribute("aria-hidden", shown ? "false" : "true");
     });
   };
-  const go = (to) => { if (to !== cur) dir = Math.sign(to - cur); cur = ((to % n) + n) % n; paint(); };
+  const go = (to) => { endSwitch(); if (to !== cur) dir = Math.sign(to - cur); cur = ((to % n) + n) % n; paint(); };
   // Layouts bend the side cards in opposite directions, so tweening them across draws them flat through the middle.
   // Instead the side cards fade out where they are, jump while hidden, and fade in at their new places, nearest
   // first. The middle card stays put in every layout, so it just tweens its size.
-  let switching = 0;
+  let switching = 0, outTimer = 0, afterOut = null;
+  // Scrolling while the side cards fade in ends the switch at once, or they'd snap to their new places, since they
+  // don't animate moves meanwhile; their opacity carries on from where it is. Scrolling while they're still fading
+  // out lets them move unseen, and waits a little longer so the card that just left the middle finishes fading too
+  const endSwitch = () => {
+    if (afterOut) { clearTimeout(outTimer); outTimer = setTimeout(afterOut, 150); return; }
+    if (!root.classList.contains("mode-in")) return;
+    ++switching;
+    root.classList.remove("mode-in");
+  };
   const switchMode = (m) => {
     if (m === root.dataset.mode) return;
     if (noMotion || isGrid()) { setMode(m); return paint(); }
     const token = ++switching;
     root.classList.remove("mode-in");
     root.classList.add("mode-out");
-    setTimeout(() => {
+    clearTimeout(outTimer);
+    outTimer = setTimeout(afterOut = () => {
+      afterOut = null;
       if (token !== switching) return;
       // While "mode-out" is on, the side cards only transition opacity, so they jump to the new layout unseen
       setMode(m);

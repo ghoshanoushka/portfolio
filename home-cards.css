@@ -144,11 +144,13 @@ a.stage-card[data-pos="center"]:hover .thumb { transform: scale(1.03); }
 .projects.mode-out .stage-card:not([data-d="0"]) { opacity: 0 !important; transition: opacity .14s cubic-bezier(.4, 0, 1, 1); }
 .projects.mode-out .stage-card:not([data-d="0"])::before { opacity: 0 !important; transition: opacity .14s cubic-bezier(.4, 0, 1, 1); }
 /* The middle card resizes on the same quick, soft curve the side cards arrive on */
-.projects:is(.mode-out, .mode-in) .stage-card[data-d="0"] { transition: transform .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1); }
+.projects:is(.mode-out, .mode-in) .stage-card[data-d="0"] { transition: transform .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1), opacity .3s ease-out; }
 /* Side cards settle in from a touch smaller; the glow follows once they've landed. Keyframes with only "from" ease into each card's own end state */
 .projects.mode-in .stage-card:not([data-d="0"]) { transition: none; animation: card-settle .45s cubic-bezier(.22, 1, .36, 1) .03s both; }
 .projects.mode-in .stage-card:is([data-d="2"], [data-d="-2"]) { animation-delay: .09s; }
 .projects.mode-in .stage-card:not([data-d="0"])::before { transition: none; will-change: opacity; animation: glow-in .5s cubic-bezier(.33, 0, .2, 1) .28s both; }
+/* Bulge's spare card waits behind the outer card, and would show through it while that card fades, so it stays out of switches */
+.projects[data-mode="bulge"]:is(.mode-out, .mode-in) .stage-card:not([data-d="0"]):not([data-d="1"]):not([data-d="-1"]):not([data-d="2"]):not([data-d="-2"]) { opacity: 0 !important; transition: none; animation: none; }
 @keyframes card-settle { from { opacity: 0; scale: .96; } }
 @keyframes glow-in { from { opacity: 0; } }
 
