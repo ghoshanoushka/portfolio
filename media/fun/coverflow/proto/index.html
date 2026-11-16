@@ -348,8 +348,9 @@
       if (isPlaying) { setPlaying(false); if (mode === "race") setMode("cf"); return; }
       playAlbum(mode === "cf" ? cur : playing);
     });
-    $("#next").addEventListener("click", () => { const i = (playing + 1) % ALBUMS.length; if (mode === "cf") go(i); playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
-    $("#prev").addEventListener("click", () => { const i = (playing + ALBUMS.length - 1) % ALBUMS.length; if (mode === "cf") go(i); playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
+    // Skipping in the Library or the race moves the cover too, so Coverflow always opens on the song that's playing
+    $("#next").addEventListener("click", () => { const i = (playing + 1) % ALBUMS.length; if (mode === "cf") go(i); else cur = i; playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
+    $("#prev").addEventListener("click", () => { const i = (playing + ALBUMS.length - 1) % ALBUMS.length; if (mode === "cf") go(i); else cur = i; playAlbum(i); if (!ALBUMS[i].race && mode === "race") setMode("cf"); });
     (function tickBar() { $("#progBar").style.width = `${audio.duration ? (audio.currentTime / audio.duration) * 100 : 0}%`; requestAnimationFrame(tickBar); })();
 
     // ---------- 3. The race: a night run down the Las Vegas Strip ----------
