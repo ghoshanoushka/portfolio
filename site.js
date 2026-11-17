@@ -2028,7 +2028,12 @@ function initTldr() {
   const sayOnLoad = () => setTimeout(() => say(5000), 900);
   toggle.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") say(60000); });
   toggle.addEventListener("pointerleave", () => { clearTimeout(timer); timer = setTimeout(() => (bubble.hidden = true), 250); });
+  const shown = (el) => el.getClientRects().length > 0;
+  const sections = [...document.querySelectorAll(".project-sections section[id]")];
+  // The section the reader is in: the last one whose top has passed a third of the way down the screen
+  const current = () => sections.filter(shown).filter((s) => s.getBoundingClientRect().top <= innerHeight / 3).pop();
   const set = (mode, scroll) => {
+    const reading = scroll && current();
     document.body.classList.toggle("tldr", mode === "short");
     tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tldrMode === mode)));
     // Hide contents links whose section is gone in this mode
@@ -2037,7 +2042,13 @@ function initTldr() {
       a.hidden = !!target && !target.getClientRects().length;
     });
     try { localStorage.setItem("story-mode", mode); } catch (e) {}
-    if (scroll) document.querySelector(".project-sections").scrollIntoView({ block: "start", behavior: "smooth" });
+    // Keep the reader in the same section, at its top. If it only exists in the other version, use the nearest one above.
+    // Readers still above the first section stay where they are.
+    if (reading) {
+      const i = sections.indexOf(reading);
+      const target = sections.slice(0, i + 1).reverse().find(shown);
+      if (target) target.scrollIntoView({ block: "start" });
+    }
   };
   tabs.forEach((t) => t.addEventListener("click", () => { set(t.dataset.tldrMode, true); say(); }));
   // The short version is the default; a speech bubble, like Valentino's, points to the other one.
