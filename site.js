@@ -2032,8 +2032,18 @@ function initTldr() {
   const sections = [...document.querySelectorAll(".project-sections section[id]")];
   // The section the reader is in: the last one whose top has passed a third of the way down the screen
   const current = () => sections.filter(shown).filter((s) => s.getBoundingClientRect().top <= innerHeight / 3).pop();
+  // The heading, paragraph or image on screen that both versions share, nearest that same line
+  const anchorIn = (section) => {
+    const line = innerHeight / 3, gap = (el) => { const r = el.getBoundingClientRect(); return r.top > line ? r.top - line : Math.max(0, line - r.bottom); };
+    return [...section.querySelectorAll("h2, h3, p, figure, .panel-card")]
+      .filter((el) => shown(el) && !el.closest("[data-tldr-hide], [data-tldr-only]"))
+      .filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; })
+      .sort((a, b) => gap(a) - gap(b))[0];
+  };
   const set = (mode, scroll) => {
     const reading = scroll && current();
+    const anchor = reading && anchorIn(reading);
+    const before = anchor && anchor.getBoundingClientRect().top;
     document.body.classList.toggle("tldr", mode === "short");
     tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tldrMode === mode)));
     // Hide contents links whose section is gone in this mode
@@ -2042,15 +2052,17 @@ function initTldr() {
       a.hidden = !!target && !target.getClientRects().length;
     });
     try { localStorage.setItem("story-mode", mode); } catch (e) {}
-    // Keep the reader in the same section, at its top. If it only exists in the other version, use the nearest one above.
+    // Keep what the reader was looking at in the same spot on screen, so the text grows or shrinks around them.
+    // With nothing shared to hold on to, go to the top of the section, or the nearest one above if it's gone in this version.
     // Readers still above the first section stay where they are.
-    if (reading) {
+    if (anchor && shown(anchor)) scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: "instant" });
+    if (reading && (!anchor || !shown(anchor) || current() !== reading)) {
       const i = sections.indexOf(reading);
       const target = sections.slice(0, i + 1).reverse().find(shown);
       if (target) target.scrollIntoView({ block: "start" });
     }
   };
-  tabs.forEach((t) => t.addEventListener("click", () => { set(t.dataset.tldrMode, true); say(); }));
+  tabs.forEach((t) => t.addEventListener("click", () => { if (t.getAttribute("aria-selected") !== "true") set(t.dataset.tldrMode, true); say(); }));
   // The short version is the default; a speech bubble, like Valentino's, points to the other one.
   let saved = "short";
   try { saved = localStorage.getItem("story-mode") || "short"; } catch (e) {}
