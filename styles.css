@@ -2455,7 +2455,8 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 .vc-pose img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vc-curl { width: 74px; height: 54px; }
 .vc-loaf { width: 69px; height: 48px; }
-.vc-sit { width: 52px; height: 69px; }
+/* Sitting up he takes less room than lying down, so he's drawn a bit larger to look the same size */
+.vc-sit { width: 60px; height: 79px; }
 /* The tail pivots where it meets the body */
 .vc-sit .vc-wag { transform-origin: 76% 87%; animation: vc-swish 2.8s ease-in-out infinite; }
 .vc-cat.is-hover .vc-sit .vc-wag { animation-duration: 1.2s; }
@@ -2493,7 +2494,7 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 .vc-z { left: 4px; top: 2px; }
 /* The label and bubble sit centred just above his head, and rise with him when he sits up */
 .vc-say.vc-say-val, .vc-ask { left: 50%; right: auto; bottom: 60px; translate: calc(-50% - 8px) 0; transition: bottom .35s cubic-bezier(.34, 1.4, .64, 1); }
-.vc-tree:has(.vc-cat.is-hover) :is(.vc-ask, .vc-say-val), .vc-tree.chatting :is(.vc-ask, .vc-say-val) { bottom: 76px; }
+.vc-tree:has(.vc-cat.is-hover) :is(.vc-ask, .vc-say-val), .vc-tree.chatting :is(.vc-ask, .vc-say-val) { bottom: 86px; }
 @media (prefers-reduced-motion: reduce) { .vc-pose, .vc-pose img, .vc-rear, .vc-ball { animation: none !important; transition: none; } }
 
 /* Fun bento: tall | two stacked | tall, so no card gets wider than a column */
