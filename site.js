@@ -20,13 +20,13 @@ const SITE = {
   // `ratio` is the thumbnail aspect ratio (width / height).
   // `tint` and `blurb` are used by the row layout (<div class="projects" data-layout="rows">);
   // `tagline` and `card` (two gradient colours) by the card carousel (data-layout="cards").
-  // Fun page tiles in a bento grid. `group` is the small label on the card (Hackathon, Concept); `size` is wide (2 columns) or small. `logo` is the app's own logo, shown in the middle; `stickers` (three) peek in from the tile's edges on hover. Without `href` a tile reads "Coming soon".
+  // Fun page tiles in a bento grid. `group` is the small label on the card (Hackathon, Concept); `size` is wide (2 columns) or small. `logo` is the app's own logo, shown in the middle; `stickers` (three, or four on a tall tile) peek in from the tile's edges on hover. Without `href` a tile reads "Coming soon".
   fun: [
     // Lounge is paused; its page and media stay in the repo. To bring it back:
     // { title: "Lounge", tagline: "A calmer TV home screen", year: "2026", href: "projects/tv.html", card: ["#2A2350", "#8F7CD6"], media: "media/fun/tv/tv.html" },
     { title: "ctrl z", tagline: "1st place at Converge '25", year: "2025", group: "Hackathon", size: "tall", href: "projects/ctrlz.html", card: ["#E3DAFB", "#F7F3FF"], logo: "media/fun/ctrlz/logo.png", stickers: ["media/fun/ctrlz/stk-run.webp", "media/fun/ctrlz/stk-picnic.webp", "media/fun/ctrlz/stk-fish.webp"] },
     { title: "Bumpy AI", tagline: "An AI helper for a pregnancy app", year: "2025", group: "Hackathon", href: "projects/bumpy.html", card: ["#F3DFEC", "#E6EDFC"], logo: "media/fun/bumpy/mark-round.png", logoClass: "round", stickers: ["media/fun/bumpy/stk-water.webp", "media/fun/bumpy/stk-yoga.webp", "media/fun/bumpy/stk-couple.webp"], stickerClass: "card" },
-    { title: "Coverflow", tagline: "Apple Music on Vision Pro", year: "2025", group: "Concept", size: "tall", href: "projects/coverflow.html", card: ["#F6DEDC", "#EEF0F5"], logo: "media/fun/coverflow/logo.png", logoClass: "wide", stickers: ["media/fun/coverflow/stk-car.webp?v=3", "media/fun/coverflow/stk-top.webp?v=3", "media/fun/coverflow/stk-track.webp?v=3"], stickerClass: "card" },
+    { title: "Coverflow", tagline: "Apple Music on Vision Pro", year: "2025", group: "Concept", size: "tall", href: "projects/coverflow.html", card: ["#F6DEDC", "#EEF0F5"], logo: "media/fun/coverflow/logo.png", logoClass: "wide", stickers: ["media/fun/coverflow/stk-strip.webp", "media/fun/coverflow/stk-letters.webp", "media/fun/coverflow/stk-cockpit.webp", "media/fun/coverflow/stk-crack.webp"], stickerClass: "card" },
     { title: "Somnia", tagline: "A sleep app that grows a garden", year: "2025", group: "Concept", href: "projects/somnia.html", card: ["#D6DCF5", "#EEF1FC"], logo: "media/fun/somnia/logo-moon.png", logoClass: "moon", stickers: ["media/fun/somnia/stk-seed.webp", "media/fun/somnia/stk-daisy.webp", "media/fun/somnia/stk-spark.webp"] },
   ],
   projects: [

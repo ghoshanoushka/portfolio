@@ -2346,6 +2346,8 @@ a.fun-tile:hover .fun-logo { transform: translateY(-4px) rotate(-3deg) scale(1.0
 .fun-stk-0 { top: -22px; right: -18px; --fx: -30px; --fy: 30px; --r: 12deg; }
 .fun-stk-1 { top: 44%; right: -26px; --fx: -34px; --fy: 0px; --r: -10deg; transition-delay: .05s; }  /* right edge: the text sits on the left */
 .fun-stk-2 { bottom: -20px; right: 26%; --fx: 0px; --fy: -30px; --r: 6deg; transition-delay: .1s; }
+/* A fourth, for Coverflow's two worlds: low on the left edge, under the text */
+.fun-stk-3 { top: 60%; left: -24px; --fx: 34px; --fy: 0px; --r: -8deg; transition-delay: .15s; }
 @media (hover: hover) and (pointer: fine) {
   .fun-page a.fun-tile:hover .fun-stk { opacity: 1; translate: 0 0; scale: 1; rotate: var(--r); }
 }
