@@ -2,3 +2,6 @@ node_modules/
 .wrangler/
 .dev.vars
 api-key.txt
+
+# Built by build-knowledge.mjs and uploaded to KV by the GitHub Action
+knowledge.txt

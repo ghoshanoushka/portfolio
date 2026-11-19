@@ -9,4 +9,9 @@ name = "LIMITER"
 namespace_id = "1001"
 simple = { limit = 10, period = 60 }
 
+# Valentino's knowledge (plain text under the key "knowledge"). The GitHub Action uploads it on every push that changes a page.
+[[kv_namespaces]]
+binding = "KNOWLEDGE"
+id = "ca4c54ed3e7148e1a8796dc047b34011"
+
 # The API key is a secret, set with `npx wrangler secret put ANTHROPIC_API_KEY`. Never put it in this file.
