@@ -17,8 +17,8 @@ jobs:
     env:
       NAMESPACE_ID: ca4c54ed3e7148e1a8796dc047b34011
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Build knowledge from the pages
