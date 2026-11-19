@@ -12,7 +12,7 @@
   const EMAIL = "mailto:noushka@umich.edu";
   const GITHUB = "https://github.com/ghoshanoushka";
   const BEHANCE = "https://www.behance.net/Anoushka-Ghosh";
-  const RESUME = "https://drive.google.com/file/d/1x3pUb8lTMzYpkzIJ6nRIZ6F23U4mlWyp/view";
+  const RESUME = "https://drive.google.com/file/d/1MctwJ16IsIHXPILkxUvnaX-_-3TjD7nG/view?usp=sharing";
 
   // Local preview talks to `npm run dev` in worker/. Set the live URL once the worker is deployed.
   const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
