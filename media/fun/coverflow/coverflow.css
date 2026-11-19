@@ -4,3 +4,16 @@
 .cf-proto .cz-frame { aspect-ratio: 16 / 10; }
 .cf-proto iframe { display: block; width: 100%; height: 100%; border: 0; }
 .cf-proto figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-55); }
+
+/* Motion, driven by string-tune (motion.js adds .st-on only when it runs). The split gives each word --word-index;
+   --progress runs 0 to 1 from an element's top entering the bottom of the window to its bottom leaving the top.
+   The split's words carry a non-breaking space, so they're inline blocks to let lines wrap between them. */
+.st-on .cz-title .-s-word { display: inline-block; }
+.st-on .cz-title .-s-word { opacity: 0; translate: 0 .4em; animation: cf-rise .8s cubic-bezier(.2, .7, .2, 1) forwards; animation-delay: calc(var(--word-index) * 45ms + 150ms); }
+@keyframes cf-rise { to { opacity: 1; translate: 0 0; } }
+/* The prototype grows to full size by the time its top is a fifth of the way down the window */
+.st-on .cf-proto .cz-frame { scale: calc(.94 + .06 * clamp(0, (var(--progress) - .1) / .35, 1)); transform-origin: 50% 0; }
+/* Each bullet is fully in by the time it reaches the middle of the window */
+.st-on .cz-points li[string] { --in: clamp(0, var(--progress) * 2.2, 1); opacity: calc(.15 + .85 * var(--in)); translate: 0 calc((1 - var(--in)) * 16px); }
+/* The credit line under My part: small and quiet */
+.cf-credit { font-size: .85em; opacity: .7; }

@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1;1,9..144,400,0..100,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css?v=20261113">
   <link rel="stylesheet" href="../media/fun/ctrlz/ctrlz.css">
-  <link rel="stylesheet" href="../media/fun/coverflow/coverflow.css">
+  <link rel="stylesheet" href="../media/fun/coverflow/coverflow.css?v=6">
   <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -25,14 +25,14 @@
           <article class="cz cf fade-in d1">
 
             <section id="intro" data-toc="Coverflow" class="cz-intro">
-              <h1 class="cz-title">Coverflow: browse Apple Music on Vision Pro one album at a time</h1>
+              <h1 class="cz-title" string="split" string-split="word">Coverflow: browse Apple Music on Vision Pro one album at a time</h1>
               <p class="cz-lede">A concept that brings Coverflow back to Apple Music on visionOS. Your albums stand in a row in your room, you flip through them, and playing a song can turn the room into its world.</p>
             </section>
 
             <!-- A playable prototype: library, Coverflow, then the race when the Formula 1 theme plays -->
-            <figure class="cz-video cf-proto">
-              <div class="cz-frame"><iframe src="../media/fun/coverflow/proto/index.html?v=20261115i" title="Coverflow prototype: open Coverflow, flip to Formula 1 Theme and press play" loading="lazy" allow="autoplay; fullscreen; accelerometer; gyroscope"></iframe></div>
-              <figcaption>Click the Coverflow button, flip through the songs and click one to play its preview. Formula 1 Theme takes you into the race; steer with your pointer or the arrow keys. Song previews come from Apple Music. <a class="cf-full" href="../media/fun/coverflow/proto/index.html?v=20261115i">Open it full screen</a></figcaption>
+            <figure class="cz-video cf-proto" string="progress">
+              <div class="cz-frame"><iframe src="../media/fun/coverflow/proto/index.html?v=20261119d" title="Coverflow prototype: open Coverflow, flip to Formula 1 Theme or Kids and press play" loading="lazy" allow="autoplay; fullscreen; accelerometer; gyroscope"></iframe></div>
+              <figcaption>Click the Coverflow button, flip through the songs and click one to play its preview. Formula 1 Theme takes you into the race; steer with your pointer or the arrow keys. The Kids theme from Stranger Things takes you into the Upside Down. Song previews come from Apple Music. <a class="cf-full" href="../media/fun/coverflow/proto/index.html?v=20261119d">Open it full screen</a></figcaption>
             </figure>
 
             <dl class="cz-meta">
@@ -45,12 +45,12 @@
               <p class="cz-label">My part</p>
               <div>
                 <ul class="cz-points">
-                  <li><b>The idea.</b> This class was the first time I tried the Vision Pro. I wanted to bring back Coverflow, the old way of flipping through album covers, in a space where covers can really stand in front of you.</li>
-                  <li><b>Coverflow in 3D.</b> I designed the row of floating covers and how the library window clears to make room for them.</li>
-                  <li><b>The Coverflow icon.</b> An inactive and an active state for switching views.</li>
-                  <li><b>Immersive mode.</b> When the Formula 1 theme plays, the room turns into the track.</li>
-                  <li><b>The prototype.</b> Every screen and transition in the flow, built on a visionOS UI kit.</li>
+                  <li string="progress"><b>The idea.</b> This class was the first time I tried the Vision Pro. Some songs take me somewhere: the Stranger Things theme puts me in the Upside Down, the F1 theme puts me on the track. I wanted listening to feel like that, a more indulgent way to enjoy music. So I brought back Coverflow, the old way of flipping through album covers, and let a song turn the room around you into its world.</li>
+                  <li string="progress"><b>Coverflow in 3D.</b> I designed the row of floating covers and how the library window clears to make room for them.</li>
+                  <li string="progress"><b>Immersive mode.</b> When the Formula 1 theme plays, the room turns into the track. The Kids theme from Stranger Things takes you to the Upside Down.</li>
+                  <li string="progress"><b>The prototype.</b> Every screen and transition in the flow, built on a visionOS UI kit.</li>
                 </ul>
+                <p class="cf-credit">Models and textures in the Upside Down: <a href="https://polyhaven.com">Poly Haven</a> (CC0). A fan homage to <i>Stranger Things</i> (Netflix); not affiliated with the show.</p>
               </div>
             </section>
 
@@ -59,6 +59,8 @@
       </div>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@fiddle-digital/string-tune@1.2.7/dist/index.js" defer></script>
+  <script src="../media/fun/coverflow/motion.js?v=4" defer></script>
   <script src="../site.js?v=20261121u"></script>
   <script src="../chat.js?v=20261116u"></script>
 </body>
