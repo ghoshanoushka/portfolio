@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloth Cards Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../home-cards.css">
+  <style>
+    html, body { height: 100%; margin: 0; overflow: hidden; }
+    body { background: var(--stage-bg); }
+    #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+    .note { position: fixed; left: 24px; top: 20px; z-index: 5; font: 13px/1.4 Inter, system-ui, sans-serif; color: var(--ink-55); }
+    .note a { color: inherit; }
+  </style>
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }</script>
+</head>
+<body class="home-cards">
+  <p class="note">Preview, not live · Look: <a href="./" data-look="paper">Modern paper</a> · <a href="?look=magazine" data-look="magazine">Magazine</a> · <a href="?look=cards" data-look="cards">Original cards</a> · <a href="?look=mix" data-look="mix">All mixed</a> · <a href="../index.html">Live landing</a></p>
+  <style>.note a[aria-current] { color: var(--ink-100); font-weight: 500; text-decoration: none; }</style>
+  <script>{ const l = new URLSearchParams(location.search).get("look") || "paper"; document.querySelector(`[data-look="${l}"]`)?.setAttribute("aria-current", "page"); }</script>
+  <canvas id="stage"></canvas>
+  <div class="stage-tabs">
+    <div class="stage-modes" role="group" aria-label="How the cards move">
+      <button type="button" data-mode="bend" aria-pressed="true">Bend</button>
+      <button type="button" data-mode="bulge" aria-pressed="false">Bulge</button>
+      <button type="button" data-mode="stack" aria-pressed="false">Stack</button>
+      <button type="button" data-mode="flat" aria-pressed="false">Flat</button>
+      <button type="button" data-mode="drum" aria-pressed="false">Drum</button>
+      <button type="button" data-mode="ribbon" aria-pressed="false" title="Visual DEPT's own motion">Ribbon</button>
+    </div>
+  </div>
+  <script type="module" src="preview.js"></script>
+</body>
+</html>

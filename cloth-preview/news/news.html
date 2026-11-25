@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Newspaper Card</title>
+<!-- One project card as a newspaper front page. ?p=0..3 picks the project, ?shape=tall the Bulge/Drum card.
+     Screenshotted into ../cards/news-*.png for the cloth preview. -->
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1c1a17; --paper: #f3eee2; --rule: #2a2723; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: transparent; }
+  .paper {
+    position: relative; overflow: hidden; color: var(--ink);
+    background-color: var(--paper);
+    padding: 16px 18px 14px; display: flex; flex-direction: column;
+    font-family: "Source Serif 4", Georgia, serif;
+  }
+  .wide { width: 540px; height: 460px; }
+  .tall { width: 420px; height: 467px; padding: 14px 15px 12px; }
+  /* newsprint: fine grain and a little foxing towards the edges */
+  .paper::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3; mix-blend-mode: multiply; opacity: .5;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .4  0 0 0 0 .33  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .paper::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+    background: radial-gradient(130% 110% at 50% 45%, transparent 60%, rgba(120, 95, 50, .16)); }
+
+  .top { display: flex; justify-content: space-between; align-items: baseline; font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; }
+  .mast { font-family: "UnifrakturMaguntia", serif; font-size: 40px; line-height: 1; text-align: center; margin: 2px 0 4px; letter-spacing: .01em; }
+  .tall .mast { font-size: 33px; }
+  .dateline { display: flex; justify-content: space-between; font-size: 8.5px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 0; border-top: 2.5px double var(--rule); border-bottom: 1px solid var(--rule); border-top-width: 3px; border-top-style: double; }
+  .kicker { margin-top: 9px; font-size: 9px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: "Playfair Display", serif; font-weight: 900; font-size: 30px; line-height: 1.02; letter-spacing: -.01em; margin: 3px 0 5px; }
+  .tall h1 { font-size: 26px; }
+  .deck { font-family: "Playfair Display", serif; font-style: italic; font-size: 13px; line-height: 1.25; margin-bottom: 8px; }
+  .tall .deck { font-size: 12px; }
+  .body { display: grid; gap: 12px; flex: 1; min-height: 0; border-top: 1px solid var(--rule); padding-top: 7px; }
+  .wide .body { grid-template-columns: 1.55fr 1fr; }
+  .tall .body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 7px; }
+  figure { display: flex; flex-direction: column; gap: 3px; min-height: 0; }
+  .photo { position: relative; overflow: hidden; border: 1px solid var(--rule); background: #ddd; }
+  .wide .photo { flex: 1; }
+  .tall .photo { height: 118px; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; filter: grayscale(1) contrast(1.18) brightness(1.04) sepia(.12); }
+  /* halftone: a printed dot screen over the photo */
+  .photo::after { content: ""; position: absolute; inset: 0; mix-blend-mode: multiply; opacity: .32;
+    background: radial-gradient(circle at center, #2a2520 32%, transparent 36%) 0 0 / 3px 3px; }
+  figcaption { font-size: 8px; font-style: italic; line-height: 1.3; }
+  .cols { columns: 2; column-gap: 11px; column-rule: 1px solid rgba(42, 39, 35, .35); font-size: 8.6px; line-height: 1.38; text-align: justify; hyphens: auto; overflow: hidden; min-height: 0; }
+  .wide .cols { columns: 1; }
+  .cols p { margin-bottom: 4px; text-indent: 1em; }
+  .cols .byline, .cols .byline + p { text-indent: 0; }
+  .cols .byline + p::first-letter { font-family: "Playfair Display", serif; font-weight: 900; float: left; font-size: 27px; line-height: .86; padding: 2px 3px 0 0; }
+  .byline { font-size: 7.5px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; break-after: avoid; }
+  .more { margin-top: 6px; padding-top: 4px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; }
+  .more b { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="paper" id="paper"></div>
+<script src="stories.js"></script>
+<script>
+const STORIES = window.STORIES;
+
+const q = new URLSearchParams(location.search), s = STORIES[+q.get("p") || 0], tall = q.get("shape") === "tall";
+const paper = document.getElementById("paper");
+paper.className = "paper " + (tall ? "tall" : "wide");
+paper.style.setProperty("--accent", s.accent);
+paper.innerHTML = `
+  <div class="top"><span>${s.section}</span><span>Late edition</span></div>
+  <div class="mast">The Ghosh Gazette</div>
+  <div class="dateline"><span>Vol. ${s.year.slice(2)}</span><span>Product design, ${s.year}</span><span>${s.status}</span></div>
+  <p class="kicker">${s.status} · ${s.year}</p>
+  <h1>${s.head}</h1>
+  <p class="deck">${s.deck}</p>
+  <div class="body">
+    <figure><div class="photo"><img src="${s.photo}" alt=""></div><figcaption>${s.caption}</figcaption></figure>
+    <div class="cols"><p class="byline">By Anoushka Ghosh</p>${s.body.map((t) => `<p>${t}</p>`).join("")}</div>
+  </div>
+  <div class="more"><span>${s.status} ${s.year}</span><b>Read the full story &rarr;</b></div>`;
+</script>
+</body>
+</html>

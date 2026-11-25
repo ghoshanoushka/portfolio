@@ -1,0 +1,28 @@
+// Headlines and copy from each case study (projects/*.html), shared by every card look.
+// Colours are the live cards' (site.js `card`); tint is each project's soft row tint (site.js `tint`).
+window.STORIES = [
+  { title: "Mensio", short: "Mensio", tint: "#E9F0FC", accent: "#24407A", c: ["#24407A", "#6FA6EC"], status: "Shipped", year: "2026", section: "Analytics",
+    head: "Customers Can Now Pull Their Own Data", deck: "Mensio's Data Explorer rebuilt around presets and Guided Setup. Shipped in 14 weeks.",
+    photo: "../../media/mensio/chart-heatmap.jpg", caption: "A heatmap built in the new chart builder.",
+    body: ["Mensio watches every second of 185 TV networks and 2,000+ social handles, and catches 13,000+ brand logos at 99%+ accuracy.",
+      "But Data Explorer showed every metric, grouping and filter at once. Customers didn't know which combination answered their question, so they leaned on Mensio's analysts to pull the data for them.",
+      "The new chart builder offers six presets for recurring questions, and Guided Setup, a step-by-step wizard, for everything else. It shipped in 14 weeks."] },
+  { title: "Deploy Design System", short: "Deploy", tint: "#ECE8FA", accent: "#4B3699", c: ["#4B3699", "#A493E3"], status: "Shipped", year: "2026", section: "Design Systems",
+    head: "Hive Becomes Deploy, and One System Serves It All", deck: "The design system was rebuilt for the new brand, for the Portal and the marketing site alike.",
+    photo: "../../media/deploy/deploy-home.jpg", caption: "The Deploy home page, on the new system.",
+    body: ["In October 2026, Hive rebranded as Deploy, an AI inference platform for developers and enterprises. The brand, platform and website changed at the same time.",
+      "Hive's system was built for trust and safety dashboards. It had tokens for a light theme only, and its Roboto type made the products look dated.",
+      "One system now serves both the Portal and the marketing site, handed off with frontend engineers."] },
+  { title: "Claim Denials", short: "Denials", tint: "#E6F5F1", accent: "#0F5C59", c: ["#0F5C59", "#4FC1A6"], status: "Capstone", year: "2025", section: "Healthcare",
+    head: "From Denial Alert to Fix, in Fewer Clicks", deck: "Four screens rebuilt so revenue cycle teams see the dollar impact first.",
+    photo: "../../media/denials/dashboard.webp", caption: "The redesigned denials dashboard.",
+    body: ["Hospitals lose money every time an insurer denies a claim. Finding out why took too many clicks, filters typed by hand, and a trip to Excel.",
+      "For a University of Michigan capstone, the team rebuilt the path from an alert to a fix: the dashboard, the cases list, the case page and starting an intervention.",
+      "The thread through all of them: show the dollar impact first, and keep the next step on the screen you're on."] },
+  { title: "AutoML Evaluations", short: "AutoML", tint: "#EEF0F5", accent: "#2B3242", c: ["#2B3242", "#8A93AB"], status: "Shipped", year: "2025", section: "Machine Learning",
+    head: "Which Model Wins? Now the Page Says Why", deck: "AutoML's leaderboard becomes Evaluations people can read, trace and compare.",
+    photo: "automl.png", caption: "Evaluations, as shipped in August 2025.",
+    body: ["Six models. Five score 100% on everything. One gets every “Best” badge, and the page never says why.",
+      "Hive AutoML lets teams train image and language models without code. The Compare Models page showed a wall of numbers and no way to decide between them.",
+      "Redesigned around Evaluations, each a run you can read, trace and compare side by side. It shipped in August 2025."] },
+];
