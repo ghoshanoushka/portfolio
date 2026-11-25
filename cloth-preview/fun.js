@@ -1,4 +1,4 @@
-// Fun page preview (fun-cloth.html): the tiles in the same paper layout as the project cards: a small caps
+// Fun page: the tiles in the same paper layout as the project cards: a small caps
 // row with the kind of project and the year over a rule, the title as a serif headline, the line under it
 // muted. Logos and hover stickers stay. Type comes from styles.css.
 const ready = () => new Promise((done) => {
@@ -20,11 +20,6 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 for (const t of document.querySelectorAll(".fun-tile")) {
   const top = t.querySelector(".stage-top"), group = t.querySelector(".fun-label")?.textContent || "", year = t.querySelector(".stage-bottom span:last-child")?.textContent || "";
   top.insertAdjacentHTML("afterbegin", `<div class="nc-top"><b>${group}</b><span>${year}</span></div>`);
-}
-// in the preview, Work leads back to the preview landing, and Fun shows as the page you're on
-for (const a of document.querySelectorAll("a")) {
-  if (/index\.html$/.test(a.getAttribute("href") || "")) a.href = a.href.replace(/index\.html$/, "index-cloth.html");
-  if (/fun\.html$/.test(a.getAttribute("href") || "")) { a.href = "fun-cloth.html"; a.setAttribute("aria-current", "page"); }
 }
 
 /* ---------- cloth: each tile is a sheet of cloth over its place in the grid ---------- */

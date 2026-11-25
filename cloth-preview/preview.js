@@ -5,7 +5,7 @@
 import * as THREE from "three";
 import { Cloth } from "./clothSim.js";
 
-// Files are found next to this script, so it runs from this preview page or from the landing copy (index-cloth.html)
+// Files are found next to this script, so it runs from this preview page or from the landing (index.html)
 const HERE = (path) => new URL(path, import.meta.url).href;
 const PROJECTS = [
   { title: "Mensio", href: HERE("../projects/mensio.html"), c: ["#24407A", "#6FA6EC"] },

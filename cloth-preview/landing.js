@@ -1,4 +1,4 @@
-// The landing (index-cloth.html, a copy of index.html) with the cloth cards in place of the DOM cards.
+// The landing (index.html) with the cloth cards in place of the DOM cards.
 // Everything else is the live page: name, nav, lamp, Tino, the bottom switch. The cloth listens to the
 // switch's own layout and view buttons, and a Ribbon button joins them.
 const ready = () => new Promise((done) => {
@@ -27,8 +27,6 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 </style>`);
 for (const el of projects.querySelectorAll(".stage-card")) el.replaceChildren();   // (no hidden live iframes running)
 
-// the preview's Fun link goes to the Fun page preview
-for (const a of document.querySelectorAll('a[href$="fun.html"]')) a.href = a.href.replace(/fun\.html$/, "fun-cloth.html");
 
 await import("./preview.js");
 // carousel or grid, from the page's own switch
