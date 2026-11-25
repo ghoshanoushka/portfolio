@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script>if (new URLSearchParams(location.search).has("light")) document.documentElement.classList.add("light");</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Deploy hero</title>
@@ -160,6 +161,9 @@
     .tag { position: absolute; left: 1em; top: 1.05em; padding: 0.2em 0.55em; border-radius: 0.3em 0.6em 0.6em 0.6em; background: #206CFD; color: #fff; font-size: 0.75em; font-weight: 500; white-space: nowrap; box-shadow: 0 0.1em 0.3em rgba(5, 10, 31, .2); }
 
     @media (prefers-reduced-motion: reduce) { .cursor { display: none; } * { transition: none !important; } }
+      /* ?light: a soft backdrop in the project's colours (the project pages ask for it) */
+    html.light body { background: radial-gradient(140% 120% at 90% 0%, color-mix(in srgb, #A493E3 48%, #ECE8FA), #ECE8FA 55%, color-mix(in srgb, #4B3699 16%, #ECE8FA)) !important; }
+    html.light .window { box-shadow: 0 16px 50px rgba(30, 40, 60, .18); }
   </style>
 </head>
 <body>

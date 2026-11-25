@@ -371,7 +371,8 @@ footer .links a:hover { color: var(--primary-ink); }
 
 .case-study { display: flex; flex-direction: column; gap: 40px; padding-bottom: 64px; }
 
-.project-hero { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+.project-hero { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 20px; }
+.project-hero::after { border-radius: inherit; }
 /* Shorter on wider screens so the title and project details sit above the fold */
 @media (min-width: 720px) { .project-hero { aspect-ratio: 21 / 9; } }
 .project-hero::after,
